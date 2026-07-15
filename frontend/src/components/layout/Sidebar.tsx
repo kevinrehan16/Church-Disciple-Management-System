@@ -67,7 +67,7 @@ export default function Sidebar({
       className={`h-full shadow-xl relative z-20 flex flex-col transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'}`}
       style={{ backgroundColor: getColor('--sidebar-bg'), color: getColor('--menu-text') }}
     >
-      <div className={`h-16 flex items-center ${isCollapsed ? 'justify-center px-0' : 'px-5'} border-b border-slate-400/50 shrink-0`}>
+    <div className={`h-16 flex items-center ${isCollapsed ? 'justify-center px-0' : 'px-5'} border-b border-slate-400/50 shrink-0`}>
         {/* Logo Section */}
         <div className="w-10 h-10 rounded-full border-3 border-[var(--active-parent)] shadow-md overflow-hidden shrink-0">
           <img src="/web_images/cdms_logo.png" alt="Logo" className="w-full h-full object-cover" />

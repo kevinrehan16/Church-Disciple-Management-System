@@ -60,11 +60,23 @@ export default function LoginPage() {
         style={{ backgroundColor: theme.activeParentBg }}
       >
         <div className="flex items-center gap-3">
-          {/* Pinalitan ko muna ang image placeholder para sa Church System */}
-          <div className="w-16 h-16 rounded-full border-2 border-white/20 flex items-center justify-center text-2xl font-bold bg-white/10">
+          {/* Logo Wrapper (May overflow-hidden para perpektong bilog ang image) */}
+          <div className="w-16 h-16 rounded-full border-2 border-white/20 overflow-hidden bg-white/10 shrink-0">
             <img src="/web_images/cdms_logo.png" alt="Logo" className="w-full h-full object-cover" />
           </div>
-          <span className="text-2xl font-bold tracking-tight">GracePortal</span>
+
+          {/* Text Wrapper (Naka-stack vertical/pababa) */}
+          <div className="flex flex-col justify-center select-none">
+            {/* Main Title */}
+            <span className="text-2xl font-bold tracking-tight leading-tight text-white">
+              DiscipleNetwork
+            </span>
+            
+            {/* Subtitle */}
+            <span className="text-[10px] font-bold leading-none tracking-widest text-slate-400 uppercase mt-1">
+              Management System
+            </span>
+          </div>
         </div>
         
         <div className="space-y-4">
@@ -76,7 +88,7 @@ export default function LoginPage() {
           </p>
         </div>
         
-        <div className="text-sm text-white/60 font-medium">© 2026 GracePortal Systems</div>
+        <div className="text-sm text-white/60 font-medium">© 2026 DiscipleNetwork</div>
       </div>
 
       {/* RIGHT PANEL */}
@@ -88,7 +100,7 @@ export default function LoginPage() {
         >
           <div className="mb-8">
             <h2 className="font-heading text-3xl font-bold text-slate-900">Welcome Back</h2>
-            <p className="text-slate-500 mt-2">Sign in to the church admin portal.</p>
+            <p className="text-slate-500 mt-2">Sign in to the Disciple Network portal.</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
