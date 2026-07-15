@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class MemberResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            // Users info
+            'email' => $this->user->email,
+            // Identifiers
+            'id' => $this->id,
+            'member_id' => $this->member_id,
+
+            // Name Info
+            'first_name' => $this->first_name,
+            'middle_name' => $this->middle_name,
+            'last_name' => $this->last_name,
+            'full_name' => trim("{$this->first_name} {$this->middle_name} {$this->last_name}"),
+            'nickname' => $this->nickname,
+
+            // Personal & Family
+            'gender' => $this->gender,
+            'birthday' => $this->birthday ? $this->birthday : null,
+            'age' => $this->age,
+            'lifestage' => $this->lifestage,
+            'spouse_name' => $this->spouse_name,
+            'father_name' => $this->father_name,
+            'mother_name' => $this->mother_name,
+            'facebook_name' => $this->facebook_name,
+
+            // Contact & Address
+            'mobile_number' => $this->mobile_number,
+            'contact_details' => $this->contact_details,
+            'home_address' => $this->home_address,
+            'country' => $this->country,
+            'region' => $this->region,
+            'city' => $this->city,
+            'barangay' => $this->barangay,
+
+            // Professional & Education
+            'occupation' => $this->occupation,
+            'industry' => $this->industry,
+            'college_school' => $this->college_school,
+            'college_degree' => $this->college_degree,
+            'high_school' => $this->high_school,
+
+            // Religious & Membership
+            'received_jesus' => $this->received_jesus,
+            'baptized_immersion' => $this->baptized_immersion, // 'Yes'/'No'
+            'baptized_date' => $this->baptized_date,
+            'spiritual_gift' => $this->spiritual_gift,
+            'picture' => $this->picture,
+            'purpose_reg' => $this->purpose_reg,
+            'prev_church' => $this->prev_church,
+            'church_affiliation' => $this->church_affiliation,
+            'satellite_id' => $this->satellite_id,
+            'member_position' => $this->member_position,
+            'member_status' => $this->member_status,
+            'membership_date' => $this->membership_date,
+
+            // Flags (Boolean converted)
+            'rec_for_baptism' => (bool) $this->rec_for_baptism,
+            'rec_for_membership' => (bool) $this->rec_for_membership,
+
+            'comment' => $this->comment,
+            'created_at' => $this->created_at ? $this->created_at->format('Y-m-d') : null,
+        ];
+    }
+}

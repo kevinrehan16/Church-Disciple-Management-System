@@ -1,0 +1,40 @@
+import apiClient from '../api/axiosInstance';
+import type { Member } from '../types/typeMember';
+import type { Pagination } from '../types/typePagination';
+
+export interface MemberFilters {
+  search?: string;
+  page?: number;
+  position?: string;
+  rank?: number;
+}
+
+export const memberService = {
+  getMembers: async (filters: MemberFilters): Promise<Pagination<Member>> => {
+    const response = await apiClient.get('members/', {
+      params: {
+        search: filters.search,
+        page: filters.page || 1,
+        position: filters.position,
+        rank: filters.rank,
+      }
+    });
+    return response.data;
+  },
+
+  // getPatientById: async (id: string): Promise<Patient> => {
+  //   const { data } = await apiClient.get(`patients/${id}/`);
+  //   return data;
+  // },
+
+  registerMember: async (memberData: FormData | object): Promise<Member> => {
+    const { data } = await apiClient.post('register/', memberData);
+    return data;
+  },
+
+  // updatePatient: async (id: string, data: any): Promise<Patient> => {
+  //   const res = await apiClient.patch(`/patients/${id}/`, data);
+  //   return res.data;
+  // },
+  
+};

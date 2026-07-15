@@ -1,0 +1,62 @@
+# ==============================================================================
+# GENERAL & IDE SETTINGS (Root level)
+# ==============================================================================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.env.bak
+
+# ==============================================================================
+# BACKEND (Laravel)
+# ==============================================================================
+/backend/vendor/
+/backend/node_modules/
+/backend/bootstrap/cache/*.php
+/backend/public/storage
+/backend/storage/*.key
+/backend/storage/framework/cache/data/*
+/backend/storage/framework/sessions/*
+/backend/storage/framework/testing/*
+/backend/storage/framework/views/*.php
+/backend/storage/logs/*.log
+/backend/.phpunit.result.cache
+
+# SENSITIVE LARAVEL FILES (NEVER UPLOAD THESE)
+/backend/.env
+/backend/.env.backup
+/backend/.env.production
+/backend/auth.json
+
+# Laravel package logs
+/backend/npm-debug.log
+/backend/yarn-error.log
+
+# ==============================================================================
+# FRONTEND (React / Vite / CRA)
+# ==============================================================================
+/frontend/node_modules/
+/frontend/dist/
+/frontend/build/
+/frontend/coverage/
+/frontend/.eslintcache
+/frontend/.pnp
+/frontend/.pnp.js
+
+# SENSITIVE REACT FILES (NEVER UPLOAD THESE)
+/frontend/.env
+/frontend/.env.local
+/frontend/.env.development.local
+/frontend/.env.test.local
+/frontend/.env.production.local
+
+# React logs
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
+/frontend/.pnpm-debug.log*

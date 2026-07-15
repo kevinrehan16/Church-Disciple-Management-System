@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
+@import "tailwindcss";
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Reset/Base Styles */
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif !important;
+    @apply antialiased;
+  }
+  
+  /* Para masiguro na gagana ang font-heading na class natin */
+  .font-heading {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    @apply antialiased;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+
+  /* Backdrop animation - yung madilim sa likod */
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+  /* Modal animation - yung parang lumulutang na box */
+  @keyframes slideIn { 
+    from { opacity: 0; transform: scale(0.96) translateY(12px); } 
+    to { opacity: 1; transform: scale(1) translateY(0); } 
+  }
+  @keyframes slideOut { 
+    from { opacity: 1; transform: scale(1) translateY(0); } 
+    to { opacity: 0; transform: scale(0.96) translateY(12px); } 
+  }
+
+  /* Mga Classes na gagamitin natin */
+  .modal-overlay {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  .modal-overlay.closing {
+    animation: fadeOut 0.2s ease-in forwards;
+  }
+  .modal-content {
+    animation: slideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  .modal-content.closing {
+    animation: slideOut 0.2s ease-in forwards;
+  }
+}
