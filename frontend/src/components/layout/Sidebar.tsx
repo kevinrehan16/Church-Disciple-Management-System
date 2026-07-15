@@ -68,10 +68,25 @@ export default function Sidebar({
       style={{ backgroundColor: getColor('--sidebar-bg'), color: getColor('--menu-text') }}
     >
       <div className={`h-16 flex items-center ${isCollapsed ? 'justify-center px-0' : 'px-5'} border-b border-slate-400/50 shrink-0`}>
+        {/* Logo Section */}
         <div className="w-10 h-10 rounded-full border-3 border-[var(--active-parent)] shadow-md overflow-hidden shrink-0">
           <img src="/web_images/cdms_logo.png" alt="Logo" className="w-full h-full object-cover" />
         </div>
-        {!isCollapsed && <span className="ml-2.5 font-extrabold text-xl tracking-tight">Med<span className="text-[var(--active-parent)]">Salus</span></span>}
+
+        {/* Brand Text Section (Ipapakita lang kapag hindi naka-collapse ang sidebar) */}
+        {!isCollapsed && (
+          <div className="ml-3 flex flex-col justify-center select-none">
+            {/* Primary Brand Name */}
+            <span className="font-extrabold text-[15px] leading-tight tracking-tight text-slate-100">
+              Disciple<span className="text-[var(--active-parent)]">Network</span>
+            </span>
+            
+            {/* Subtitle - Enterprise Micro-text Style */}
+            <span className="text-[8px] font-bold leading-none tracking-widest text-slate-400 uppercase mt-0.5">
+              Management System
+            </span>
+          </div>
+        )}
       </div>
 
       <nav className="flex-1 p-4 space-y-3 overflow-y-auto scrollbar-thin">
