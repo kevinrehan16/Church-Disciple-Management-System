@@ -62,7 +62,7 @@ export default function LoginPage() {
         <div className="flex items-center gap-3">
           {/* Pinalitan ko muna ang image placeholder para sa Church System */}
           <div className="w-16 h-16 rounded-full border-2 border-white/20 flex items-center justify-center text-2xl font-bold bg-white/10">
-            ✝️
+            <img src="/web_images/cdms_logo.png" alt="Logo" className="w-full h-full object-cover" />
           </div>
           <span className="text-2xl font-bold tracking-tight">GracePortal</span>
         </div>
