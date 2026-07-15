@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaUsers, FaUserFriends } from "react-icons/fa";
+import { FaUsers, FaUserFriends, FaNetworkWired } from "react-icons/fa";
 import { 
   LayoutDashboard, Users, Calendar, Settings, 
   CreditCard, ChevronDown, ChevronRight, MonitorCog 
@@ -138,6 +138,10 @@ export default function Sidebar({
             <NavLink to="/visitors" className={getNavLinkClass}>
               <FaUserFriends size={18} className="shrink-0" />
               {!isCollapsed && <span>Visitors</span>}
+            </NavLink>
+            <NavLink to="/disciple-network" className={getNavLinkClass}>
+              <FaNetworkWired size={18} className="shrink-0" />
+              {!isCollapsed && <span>Disciple Network</span>}
             </NavLink>
             
             {/* BILLING DROPDOWN */}
