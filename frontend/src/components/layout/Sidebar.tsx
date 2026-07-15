@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { FaUsers, FaUserFriends, FaNetworkWired, FaLayerGroup } from "react-icons/fa";
+import { FaUsers, FaUserFriends, FaNetworkWired, FaLayerGroup, FaChartArea } from "react-icons/fa";
 import { 
-  LayoutDashboard, Users, Calendar, Settings, 
+  Users, Calendar, Settings, 
   ChevronDown, ChevronRight, MonitorCog 
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -77,7 +77,7 @@ export default function Sidebar({
 
       <nav className="flex-1 p-4 space-y-3 overflow-y-auto scrollbar-thin">
         <NavLink to="/" className={getNavLinkClass}>
-          <LayoutDashboard size={18} className="shrink-0" />
+          <FaChartArea size={18} className="shrink-0" />
           {!isCollapsed && <span>Dashboard</span>}
         </NavLink>
 
