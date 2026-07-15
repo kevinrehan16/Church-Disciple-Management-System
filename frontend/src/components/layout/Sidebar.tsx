@@ -149,7 +149,7 @@ export default function Sidebar({
               <button onClick={toggleBilling} className={`${navLinkBase} w-full justify-between ${isBillingActive ? activeParentClass : inactiveParentClass} ${isCollapsed ? 'justify-center px-0' : ''}`}>
                 <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
                   <CreditCard size={18} className="shrink-0" />
-                  {!isCollapsed && <span>Billing</span>}
+                  {!isCollapsed && <span>Groups</span>}
                 </div>
                 {!isCollapsed && (isBillingOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
               </button>
@@ -158,11 +158,27 @@ export default function Sidebar({
                 <div className={`mt-1 relative w-full ${isCollapsed ? 'flex flex-col items-center gap-2' : 'space-y-1'}`}> 
                    {!isCollapsed && <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />}
                    
-                   <NavLink to="/billing/invoices" className="group flex items-center w-full text-sm h-9 relative z-10">
+                   <NavLink to="/groups/clusters" className="group flex items-center w-full text-sm h-9 relative z-10">
                      {({ isActive }) => (
                        <div className="pl-[23px] flex items-center w-full h-full">
                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Invoices</div>
+                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Clusters</div>
+                       </div>
+                     )}
+                   </NavLink>
+                   <NavLink to="/groups/growth-groups" className="group flex items-center w-full text-sm h-9 relative z-10">
+                     {({ isActive }) => (
+                       <div className="pl-[23px] flex items-center w-full h-full">
+                         <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Growth Groups</div>
+                       </div>
+                     )}
+                   </NavLink>
+                   <NavLink to="/groups/ggli-classes" className="group flex items-center w-full text-sm h-9 relative z-10">
+                     {({ isActive }) => (
+                       <div className="pl-[23px] flex items-center w-full h-full">
+                         <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>GGLi Classes</div>
                        </div>
                      )}
                    </NavLink>
