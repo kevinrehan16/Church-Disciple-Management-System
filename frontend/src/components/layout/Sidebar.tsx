@@ -7,7 +7,6 @@ import {
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getInitials } from '../../utils/formatters';
-import Logo from '../ui/Logo';
 
 const getColor = (variable: string) => `var(${variable})`;
 
@@ -70,7 +69,7 @@ export default function Sidebar({
     >
       <div className={`h-16 flex items-center ${isCollapsed ? 'justify-center px-0' : 'px-5'} border-b border-slate-400/50 shrink-0`}>
         <div className="w-10 h-10 rounded-full border-3 border-[var(--active-parent)] shadow-md overflow-hidden shrink-0">
-          <Logo />
+          <img src="/web_images/cdms_logo.png" alt="Logo" className="w-full h-full object-cover" />
         </div>
         {!isCollapsed && <span className="ml-2.5 font-extrabold text-xl tracking-tight">Med<span className="text-[var(--active-parent)]">Salus</span></span>}
       </div>
