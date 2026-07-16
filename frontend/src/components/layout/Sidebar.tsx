@@ -59,9 +59,9 @@ export default function Sidebar({
   const getNavLinkClass = ({ isActive }: { isActive: boolean }) => 
     `${navLinkBase} ${isActive ? activeParentClass : inactiveParentClass} ${isCollapsed ? 'justify-center px-0' : ''}`;
 
-  // Smoother Header para sa "Operations"
+  // Smoother Header para sa "Navigations"
   const SectionHeader = ({ title }: { title: string }) => (
-    <div className="relative mt-6 mb-2 flex items-center h-4">
+    <div className="relative mt-3 mb-3 flex items-center h-4">
        <div className={`absolute transition-all duration-300 border-t border-slate-700/50 mx-4 left-0 right-0 ${isCollapsed ? 'opacity-100' : 'opacity-0 hidden'}`}></div>
        <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[200px] opacity-100'}`}>
          <div className="px-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">{title}</div>
@@ -110,7 +110,7 @@ export default function Sidebar({
         </div>
 
         <div>
-          <SectionHeader title="Operations" />
+          <SectionHeader title="Navigations" />
           <div className="space-y-1.5">
             
             {/* MEMBERS DROPDOWN WITH POP-OUT MENU */}
