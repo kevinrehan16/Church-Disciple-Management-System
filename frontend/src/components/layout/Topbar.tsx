@@ -1,15 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
-import { PanelLeftClose, PanelRightOpen, Lock, LogOut } from 'lucide-react';
+import { PanelLeft, PanelLeftClose, PanelLeftOpen, PanelRightOpen, Lock, LogOut } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { getInitials } from '../../utils/formatters';
 
 export default function Topbar({ isCollapsed, setIsCollapsed }: any) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false); 
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const { theme } = useTheme();
-  // 1. I-extract ang 'user' mula sa context
   const { user, logout } = useAuth();
   const isWhiteBg = theme.topbarBg?.toLowerCase() === '#ffffff' || theme.topbarBg?.toLowerCase() === 'white';
 
@@ -33,13 +33,34 @@ export default function Topbar({ isCollapsed, setIsCollapsed }: any) {
       className="h-16 flex shadow-md z-10 items-center px-6 justify-between border-b border-slate-200/50 transition-colors duration-300"
       style={{ backgroundColor: theme.topbarBg, borderColor: theme.topbarBorder, color: theme.topbarAccent }}
     >
-      <button 
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="p-2 rounded-lg text-slate-500 transition-all duration-300 hover:bg-slate-200/50 active:scale-90 cursor-pointer"
-        style={{ color: theme.topbarAccent }}
-      >
-        {isCollapsed ? <PanelRightOpen size={20} /> : <PanelLeftClose size={20} />}
-      </button>
+      
+      {/* SIDEBAR TOGGLE WRAPPER */}
+      <div className="relative flex items-center">
+        <button 
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="p-2 rounded-lg text-slate-500 transition-all duration-300 hover:bg-slate-200/50 active:scale-90 cursor-pointer"
+          style={{ color: theme.topbarAccent }}
+        >
+          {isHovered ? (
+            isCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />
+          ) : (
+            <PanelLeft size={20} />
+          )}
+        </button>
+
+        {/* TOOLTIP / POPUP (Lilitaw sa right side) */}
+        <div 
+          className={`absolute left-full ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-md shadow-lg whitespace-nowrap pointer-events-none transition-all duration-200 z-50
+            ${isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2'}`}
+        >
+          {isCollapsed ? 'Open Sidebar' : 'Close Sidebar'}
+          
+          {/* Maliit na triangle arrow na nakaturo sa button */}
+          <div className="absolute top-1/2 -left-1 -translate-y-1/2 border-y-4 border-y-transparent border-r-4 border-r-slate-800"></div>
+        </div>
+      </div>
 
       {/* Profile Trigger */}
       <div className="relative" ref={dropdownRef}>
@@ -56,7 +77,6 @@ export default function Topbar({ isCollapsed, setIsCollapsed }: any) {
                       hover:ring-2 hover:ring-offset-2 hover:ring-offset-[var(--offset-color)]
                       active:scale-95 cursor-pointer ${isWhiteBg ? 'hover:ring-black' : 'hover:ring-white'}`}
         >
-          {/* 2. Dito natin ilalagay ang dynamic initials */}
           {user ? getInitials(user?.data?.member?.firstName + ' ' + user?.data?.member?.lastName) : '??'}
         </button>
 
@@ -77,8 +97,8 @@ export default function Topbar({ isCollapsed, setIsCollapsed }: any) {
                   {user ? getInitials(user?.data?.member?.firstName + ' ' + user?.data?.member?.lastName) : '??'}
                 </div>
                 <div>
-                  {/* 3. Dito ang dynamic name at role */}
-                  <p className="text-sm font-semibold text-slate-900">{user?.data?.member?.firsNname} {user?.data?.member?.lastName}</p>
+                  {/* Tinama ko yung firsNname -> firstName dito */}
+                  <p className="text-sm font-semibold text-slate-900">{user?.data?.member?.firstName} {user?.data?.member?.lastName}</p>
                   <p className="text-xs text-slate-500 capitalize">{user?.data?.role || 'User'}</p>
                 </div>
               </div>
