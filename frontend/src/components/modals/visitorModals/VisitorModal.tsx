@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaFacebookSquare, FaEnvelopeSquare, FaMobile } from "react-icons/fa";
 import { X, User, MapPin, Phone, HeartHandshake, Users, Save, Church } from 'lucide-react';
+import { useRegisterVisitor } from '../../../hooks/useVisitors';
 // I-adjust ang import path base sa kung nasaan ang components mo
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import SectionHeader from '../../ui/SectionHeader';
@@ -14,7 +15,21 @@ interface VisitorModalProps {
 
 export default function VisitorModal({ isOpen, onClose }: VisitorModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
+  const { mutate: addVisitor, isPending: pendingAddVisitor } = useRegisterVisitor();
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+
+    // IMPORTANT: Convert string values to correct types (Boolean/Number)
+    const formattedData = {
+        ...data,
+        age: parseInt(data.age as string) || 0,
+    };
+
+    addVisitor(formattedData, { onSuccess: () => startClose() });
+  };
 
   if (!isOpen) return null;
 
@@ -64,70 +79,84 @@ export default function VisitorModal({ isOpen, onClose }: VisitorModalProps) {
 
         {/* Scrollable Form Body */}
         <div className="p-6 overflow-y-auto space-y-8">
-          
-          {/* Section 1: Basic Info */}
-          <div>
-            <SectionHeader title="Basic Information" icon={User} />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <InputField label="First Name" name='first_name' placeholder="Juan" />
-              <InputField label="Last Name" name='last_name' placeholder="Dela Cruz" />
-              <InputField label="Date Visited" name='date_visited' type="date" />
-              <SelectField label="Service Time" name='service_time' options={serviceOptions} />
-              <SelectField label="Age Group" name='age_group' options={ageOptions} />
-              <SelectField label="Gender" name='gender' options={genderOptions} />
-            </div>
-          </div>
-
-          {/* Section 2: Address & Life Stage */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <form id="visitor-form" onSubmit={handleSubmit} className="space-y-10">
+            {/* Section 1: Basic Info */}
             <div>
-              <SectionHeader title="Address" icon={MapPin} />
-              <div className="space-y-4">
-                <InputField label="Barangay" />
-                <InputField label="City" />
-                <InputField label="Province" />
-              </div>
+                <SectionHeader title="Basic Information" icon={User} />
+                <div className="grid grid-cols-3 gap-6">
+                    {/* Row 1: Date, Empty Space, Service Time */}
+                    <div className="col-span-1">
+                    <InputField label="Date Visited" name='date_visited' type="date" />
+                    </div>
+                    <div className="col-span-1"></div>
+                    <div className="col-span-1">
+                    <SelectField label="Service Time" name='service_time' options={serviceOptions} />
+                    </div>
+
+                    {/* Row 2: Firstname & Lastname (Nested Grid for perfect 50/50) */}
+                    <div className="col-span-3 grid grid-cols-2 gap-6">
+                    <InputField label="First Name" name='first_name' placeholder="Juan" />
+                    <InputField label="Last Name" name='last_name' placeholder="Dela Cruz" />
+                    </div>
+
+                    {/* The Rest: Birthday, Age, Gender */}
+                    <InputField label="Birthday" name='birthday' type="date" />
+                    <SelectField label="Age Group" name='age_group' options={ageOptions} />
+                    <SelectField label="Gender" name='gender' options={genderOptions} />
+                </div>
             </div>
+
+            {/* Section 2: Address & Life Stage */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                <SectionHeader title="Address" icon={MapPin} />
+                <div className="space-y-4">
+                    <InputField label="Barangay" name='barangay' />
+                    <InputField label="City" name='city' />
+                    <InputField label="Province" name='province' />
+                </div>
+                </div>
+                <div>
+                <SectionHeader title="Discipleship Profile" icon={Users} />
+                <div className="space-y-4">
+                    <SelectField label="Life Stage" name='life_stage' options={lifeStageOptions} />
+                    <InputField label="Current Church" name='current_church' placeholder="Optional" icon={<Church  size={15}/>} />
+                </div>
+                </div>
+            </div>
+
+            {/* Section 3: Contact & Referral */}
             <div>
-              <SectionHeader title="Discipleship Profile" icon={Users} />
-              <div className="space-y-4">
-                <SelectField label="Life Stage" options={lifeStageOptions} />
-                <InputField label="Current Church" placeholder="Optional" icon={<Church  size={15}/>} />
-              </div>
+                <SectionHeader title="Contacts & Referral" icon={Phone} />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <InputField label="Mobile Number" name='mobile_number' placeholder="09*********" icon={<FaMobile size={15}/>} />
+                <InputField label="Email Address" name='email' placeholder='johndoe@gmail.com' icon={<FaEnvelopeSquare size={15}/>} />
+                <InputField label="Facebook Name" name='facebook_name' placeholder='Kevin Godnacam' icon={<FaFacebookSquare size={15}/>} />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <SelectField label="How they heard about us" name='heard_from_details' options={heardOptions} />
+                <InputField label="Invitee (Name)" name='heard_from_invitee' placeholder='John Doe' />
+                </div>
             </div>
-          </div>
 
-          {/* Section 3: Contact & Referral */}
-          <div>
-            <SectionHeader title="Contacts & Referral" icon={Phone} />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <InputField label="Mobile Number" placeholder="09*********" icon={<FaMobile size={15}/>} />
-              <InputField label="Email Address" placeholder='johndoe@gmail.com' icon={<FaEnvelopeSquare size={15}/>} />
-              <InputField label="Facebook Name" placeholder='Kevin Godnacam' icon={<FaFacebookSquare size={15}/>} />
+            {/* Section 4: Notes */}
+            <div>
+                <SectionHeader title="Prayer Request and Remarks" icon={HeartHandshake} />
+                <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                    <label className="text-sm font-medium text-slate-700">Prayer Requests</label>
+                    <textarea className="w-full p-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none h-20" name='prayer_requests'/>
+                    </div>
+                    <div className="space-y-1">
+                    <label className="text-sm font-medium text-slate-700">Remarks</label>
+                    <textarea className="w-full p-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none h-20" name='remarks'/>
+                    </div>
+                </div>
+                <InputField label="Welcomed by" name='welcome_by'/>
+                </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SelectField label="How they heard about us" options={heardOptions} />
-              <InputField label="Invitee (Name)" placeholder='John Doe' />
-            </div>
-          </div>
-
-          {/* Section 4: Notes */}
-          <div>
-            <SectionHeader title="Prayer Request and Remarks" icon={HeartHandshake} />
-            <div className="space-y-4">
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <div className="space-y-1">
-                   <label className="text-sm font-medium text-slate-700">Prayer Requests</label>
-                   <textarea className="w-full p-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none h-20" />
-                 </div>
-                 <div className="space-y-1">
-                   <label className="text-sm font-medium text-slate-700">Remarks</label>
-                   <textarea className="w-full p-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none h-20" />
-                 </div>
-               </div>
-               <InputField label="Welcomed by" />
-            </div>
-          </div>
+          </form>
         </div>
 
         {/* Footer Actions - Sticky */}
@@ -135,7 +164,7 @@ export default function VisitorModal({ isOpen, onClose }: VisitorModalProps) {
             <button type="button" onClick={startClose} className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider border border-slate-200 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all flex items-center gap-2">
                 <X size={15} /> Cancel
             </button>
-            <button type="submit" form="member-form" className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2">
+            <button type="submit" form="visitor-form" className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2">
                 <Save size={15} /> Save Visitor
             </button>
         </div>

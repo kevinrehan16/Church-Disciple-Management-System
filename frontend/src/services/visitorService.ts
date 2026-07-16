@@ -1,5 +1,5 @@
 import apiClient from '../api/axiosInstance';
-import type { Visitor } from '../types/typeVisitor';
+import type { Visitor, VisitorPayload } from '../types/typeVisitor';
 import type { Pagination } from '../types/typePagination';
 
 // 1. Definisyon para sa filters
@@ -15,6 +15,11 @@ export const visitorService = {
     const response = await apiClient.get('/visitors', { params: filters });
     
     return response.data;
+  },
+
+  registerVisitor: async (visitorData: FormData | object): Promise<VisitorPayload> => {
+    const { data } = await apiClient.post('/visitors', visitorData);
+    return data;
   },
 
 };

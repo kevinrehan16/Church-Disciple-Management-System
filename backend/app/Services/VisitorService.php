@@ -23,7 +23,7 @@ class VisitorService
                     ->orWhere('visitor_id', 'ILIKE', "%{$searchTerm}%")
                     ->orWhere('email', 'ILIKE', "%{$searchTerm}%")
                     ->orWhere('mobile_number', 'ILIKE', "%{$searchTerm}%");
-            });
+            })->orderBy('id', 'desc');
         }
 
         // Ang paginate() na ang bahalang bumasa ng 'page' parameter na ipinadala ng frontend

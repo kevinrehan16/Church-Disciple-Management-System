@@ -26,7 +26,7 @@ class StoreVisitorRequest extends FormRequest
             // Address
             'barangay'           => 'required|string|max:255',
             'city'               => 'required|string|max:255',
-            'province'           => 'required|string|max:255',
+            'province'           => 'nullable|string|max:255',
 
             // Life-Stage
             'life_stage'         => 'required|string|max:100',

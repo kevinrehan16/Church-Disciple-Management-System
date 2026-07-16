@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaFacebookF, FaMobile, FaEnvelope, FaUserFriends } from "react-icons/fa";
+import { FaFacebookSquare, FaMobile, FaEnvelope, FaUserFriends } from "react-icons/fa";
 import { Plus, Search, Filter, ArrowUpDown, Mars, Venus, Eye, Calendar, Clock } from 'lucide-react';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
@@ -152,7 +152,7 @@ export default function Visitors() {
                             <span className="text-xs font-mono">{visitor.mobileNumber || 'N/A'}</span>
                           </div>
                           <div className="flex items-center gap-2 text-slate-500">
-                            <FaFacebookF size={11} className="text-blue-500" />
+                            <FaFacebookSquare size={11} className="text-blue-500" />
                             <span className="text-xs font-mono">{visitor.facebookName || 'N/A'}</span>
                           </div>
                         </div>

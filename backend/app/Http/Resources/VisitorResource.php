@@ -57,6 +57,7 @@ class VisitorResource extends JsonResource
             // Timestamps
             'createdAt' => $this->created_at ? $this->created_at->format('Y-m-d H:i') : null,
             'updatedAt' => $this->updated_at ? $this->updated_at->format('Y-m-d H:i') : null,
+            'welcome_by' => $this->welcome_by,
         ];
     }
 }
