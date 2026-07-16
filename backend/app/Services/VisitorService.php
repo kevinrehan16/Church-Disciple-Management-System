@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Visitor;
+use Illuminate\Support\Facades\DB;
 
 class VisitorService
 {
@@ -27,5 +28,18 @@ class VisitorService
 
         // Ang paginate() na ang bahalang bumasa ng 'page' parameter na ipinadala ng frontend
         return $query->latest()->paginate(10);
+    }
+
+    public function createVisitor(array $data): Visitor
+    {
+        return DB::transaction(function () use ($data) {
+            // Generate visitor ID kung wala pa
+            if (!isset($data['visitor_id'])) {
+                $data['visitor_id'] = 'VIS-' . rand(1000, 9999);
+            }
+
+            // Save to DB
+            return Visitor::create($data);
+        });
     }
 }

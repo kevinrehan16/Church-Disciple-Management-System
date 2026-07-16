@@ -6,11 +6,14 @@ import SearchInput from '../../components/inputs/SearchInput';
 import { TableLoading, TableError, TableEmpty } from '../../components/ui/TableStates';
 import { useVisitors } from '../../hooks/useVisitors';
 import { getLifestageStyles } from '../../utils/formatters';
-// import RegisterMemberModal from '../../components/modals/memberModals/RegisterMemberModal';
+import VisitorModal from '../../components/modals/visitorModals/VisitorModal';
 
 export default function Visitors() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [isVisitorModalOpen, setIsVisitorModalOpen] = useState(false);
+  const [selectedVisitorId, setSelectedVisitorId] = useState('');
 
   // BUG FIX: Tanggalin ang useState dito. Gawin na lang normal object.
   // Tuwing magbabago ang searchTerm o currentPage, magre-re-render ang component 
@@ -24,6 +27,12 @@ export default function Visitors() {
   
   const currentVisitors = visitorData?.data || [];
   const meta = visitorData?.meta;
+
+
+  const handleViewVisitor = (id: string) => {
+    setSelectedVisitorId(id);
+    setIsVisitorModalOpen(true);
+  };
   
   return (
     <div className="w-full bg-slate-50 text-slate-800 px-6 py-4 space-y-6">
@@ -35,7 +44,7 @@ export default function Visitors() {
         actions={
           <button 
             className="group flex items-center gap-2 px-5 py-2.5 bg-[#0284c7] hover:bg-[#026ca1] active:scale-95 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-rose-500/10"
-            // onClick={() => handleViewProfile('')}
+            onClick={() => handleViewVisitor('')}
           >
             <Plus size={16} className="transition-transform group-hover:rotate-90" />
             Add New Visitor
@@ -161,6 +170,7 @@ export default function Visitors() {
                       <td className="px-6 py-4 text-center">
                         <button 
                           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 bg-slate-100 hover:bg-indigo-500 hover:text-white transition-all duration-200 active:scale-95 shadow-sm"
+                          onClick={()=>handleViewVisitor(visitor.id)}
                         >
                           <Eye size={14} />
                         </button>
@@ -209,6 +219,14 @@ export default function Visitors() {
           </div>
         </div>
       </div>
+      
+      {isVisitorModalOpen && (
+        <VisitorModal 
+          isOpen={isVisitorModalOpen}
+          onClose={() => setIsVisitorModalOpen(false)} 
+          visitorId={selectedVisitorId}
+        />
+      )}
     </div>
   );
 }

@@ -24,5 +24,6 @@ Route::prefix('v1')->group(function () {
         Route::get('/members', [MemberController::class, 'index']);
 
         Route::get('/visitors', [VisitorController::class, 'index']);
+        Route::post('/visitors', [VisitorController::class, 'store']);
     });
 });

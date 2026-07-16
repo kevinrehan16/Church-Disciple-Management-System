@@ -75,7 +75,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                   {memberId ? 'Edit Member Profile' : 'New Member Registration'}
               </h2>
               <p className="text-white/80 text-xs mt-0.5 font-medium">
-                  {memberId ? 'Update record details' : 'Complete the registration form'}
+                  {memberId ? 'Update record details' : 'Complete the member registration form'}
               </p>
             </div>
             <button onClick={startClose} className="p-2 hover:bg-white/10 active:scale-95 rounded-full transition-all">
@@ -284,7 +284,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
 
           {/* FOOTER */}
           <div className="px-8 py-4 bg-slate-50 border-t border-slate-200/60 flex gap-3 justify-end flex-shrink-0">
-            <button type="button" onClick={startClose} className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all flex items-center gap-2">
+            <button type="button" onClick={startClose} className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider border border-slate-200 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all flex items-center gap-2">
              <X size={15} /> Cancel
             </button>
             <button type="submit" form="member-form" className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2">
