@@ -52,14 +52,21 @@ export default function Sidebar({
   // Classes
   const activeParentClass = `bg-[var(--active-parent)] text-white font-medium shadow-md shadow-blue-500/20`;
   const inactiveParentClass = `text-[var(--menu-text)] hover:bg-slate-700/40 hover:text-white`;
-  const navLinkBase = "flex items-center gap-3 px-3.5 py-2.5 text-sm rounded-lg transition-colors duration-150 ease-in-out";
+  
+  // Tinanggal ang gap-3 dito at nilipat sa loob para sa mas maayos na animation
+  const navLinkBase = "flex items-center px-3.5 py-2.5 text-sm rounded-lg transition-colors duration-150 ease-in-out w-full";
   
   const getNavLinkClass = ({ isActive }: { isActive: boolean }) => 
     `${navLinkBase} ${isActive ? activeParentClass : inactiveParentClass} ${isCollapsed ? 'justify-center px-0' : ''}`;
 
+  // Smoother Header para sa "Operations"
   const SectionHeader = ({ title }: { title: string }) => (
-    isCollapsed ? <div className="border-t border-slate-700/50 mx-4 my-4"></div> : 
-    <div className="px-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 mt-6 first:mt-0">{title}</div>
+    <div className="relative mt-6 mb-2 flex items-center h-4">
+       <div className={`absolute transition-all duration-300 border-t border-slate-700/50 mx-4 left-0 right-0 ${isCollapsed ? 'opacity-100' : 'opacity-0 hidden'}`}></div>
+       <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[200px] opacity-100'}`}>
+         <div className="px-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">{title}</div>
+       </div>
+    </div>
   );
 
   return (
@@ -67,53 +74,64 @@ export default function Sidebar({
       className={`h-full shadow-xl relative z-20 flex flex-col transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'}`}
       style={{ backgroundColor: getColor('--sidebar-bg'), color: getColor('--menu-text') }}
     >
-    <div className={`h-16 flex items-center ${isCollapsed ? 'justify-center px-0' : 'px-5'} border-b border-slate-400/50 shrink-0`}>
+      <div className={`h-16 flex items-center ${isCollapsed ? 'justify-center px-0' : 'px-5'} border-b border-slate-400/50 shrink-0 transition-all duration-300`}>
         {/* Logo Section */}
         <div className="w-10 h-10 rounded-full border-3 border-[var(--active-parent)] shadow-md overflow-hidden shrink-0">
           <img src="/web_images/cdms_logo.png" alt="Logo" className="w-full h-full object-cover" />
         </div>
 
-        {/* Brand Text Section (Ipapakita lang kapag hindi naka-collapse ang sidebar) */}
-        {!isCollapsed && (
-          <div className="ml-3 flex flex-col justify-center select-none">
-            {/* Primary Brand Name */}
-            <span className="font-extrabold text-[15px] leading-tight tracking-tight text-slate-100">
-              Disciple<span className="text-[var(--active-parent)]">Network</span>
-            </span>
-            
-            {/* Subtitle - Enterprise Micro-text Style */}
-            <span className="text-[8px] font-bold leading-none tracking-widest text-slate-400 uppercase mt-0.5">
-              Management System
-            </span>
-          </div>
-        )}
+        {/* Brand Text Section (May width and opacity animation para di agad lumabas) */}
+        <div className={`flex flex-col justify-center select-none overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3'}`}>
+          <span className="font-extrabold text-[15px] leading-tight tracking-tight text-slate-100">
+            Disciple<span className="text-[var(--active-parent)]">Network</span>
+          </span>
+          <span className="text-[8px] font-bold leading-none tracking-widest text-slate-400 uppercase mt-0.5">
+            Management System
+          </span>
+        </div>
       </div>
 
-      <nav className="flex-1 p-4 space-y-3 overflow-y-auto scrollbar-thin">
-        <NavLink to="/" className={getNavLinkClass}>
-          <FaChartArea size={18} className="shrink-0" />
-          {!isCollapsed && <span>Dashboard</span>}
-        </NavLink>
+      {/* Overflow Fix: Ginawang 'overflow-visible' pag isCollapsed para di ma-clip ang popups */}
+      <nav className={`flex-1 p-4 space-y-3 scrollbar-thin ${isCollapsed ? 'overflow-visible' : 'overflow-y-auto overflow-x-hidden'}`}>
+        
+        {/* DASHBOARD WITH HOVER TOOLTIP */}
+        <div className="relative group/dashboard">
+          <NavLink to="/" className={getNavLinkClass}>
+            <FaChartArea size={18} className="shrink-0" />
+            <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3'}`}>
+              Dashboard
+            </span>
+          </NavLink>
+          {isCollapsed && (
+            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-md shadow-lg pointer-events-none opacity-0 group-hover/dashboard:opacity-100 transition-opacity duration-150 z-50 whitespace-nowrap border border-slate-700/50">
+              Dashboard
+            </div>
+          )}
+        </div>
 
         <div>
           <SectionHeader title="Operations" />
           <div className="space-y-1.5">
             
-            {/* MEMBERS DROPDOWN */}
-            <div>
-              <button onClick={toggleMembers} className={`${navLinkBase} w-full justify-between ${isMembersActive ? activeParentClass : inactiveParentClass} ${isCollapsed ? 'justify-center px-0' : ''}`}>
-                <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
+            {/* MEMBERS DROPDOWN WITH POP-OUT MENU */}
+            <div className="relative group/members">
+              <button onClick={toggleMembers} className={`${navLinkBase} justify-between ${isMembersActive ? activeParentClass : inactiveParentClass} ${isCollapsed ? 'justify-center px-0' : ''}`}>
+                <div className="flex items-center">
                   <FaUsers size={18} className="shrink-0" />
-                  {!isCollapsed && <span>Members</span>}
+                  <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3 text-left'}`}>
+                    Members
+                  </span>
                 </div>
-                {!isCollapsed && (isMembersOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+                <div className={`overflow-hidden transition-all duration-300 flex items-center justify-end ${isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[20px] opacity-100'}`}>
+                  {isMembersOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </div>
               </button>
               
-              {isMembersOpen && (
-                <div className={`mt-1 relative w-full ${isCollapsed ? 'flex flex-col items-center gap-2' : 'space-y-1'}`}> 
-                   {!isCollapsed && <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />}
+              {/* Accordion (Visible only when sidebar is OPEN) */}
+              {!isCollapsed && isMembersOpen && (
+                <div className="mt-1 relative w-full space-y-1 animate-in slide-in-from-top-2 fade-in duration-200"> 
+                   <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />
                    
-                   {/* Sublinks */}
                    <NavLink to="/members/all" className="group flex items-center w-full text-sm h-9 relative z-10">
                      {({ isActive }) => (
                        <div className="pl-[23px] flex items-center w-full h-full">
@@ -148,30 +166,80 @@ export default function Sidebar({
                    </NavLink>
                 </div>
               )}
+
+              {/* Fly-out Pop-out Menu */}
+              {isCollapsed && (
+                <div className="absolute left-full top-0 pl-2 w-52 opacity-0 pointer-events-none group-hover/members:opacity-100 group-hover/members:pointer-events-auto transition-all duration-200 ease-in-out z-50">
+                  <div className="py-2 rounded-xl shadow-xl border border-slate-700/40 flex flex-col space-y-1 px-1.5 bg-slate-800" style={{ backgroundColor: getColor('--sidebar-bg') }}>
+                    <div className="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-700/30 mb-1">
+                      Members Menu
+                    </div>
+                    <NavLink to="/members/all" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                      All Members
+                    </NavLink>
+                    <NavLink to="/members/pastoral-staff" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                      Pastoral Staff
+                    </NavLink>
+                    <NavLink to="/members/elders" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                      Elders
+                    </NavLink>
+                    <NavLink to="/members/deacons" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                      Deacons
+                    </NavLink>
+                  </div>
+                </div>
+              )}
             </div>
             
-            <NavLink to="/visitors" className={getNavLinkClass}>
-              <FaUserFriends size={18} className="shrink-0" />
-              {!isCollapsed && <span>Visitors</span>}
-            </NavLink>
-            <NavLink to="/disciple-network" className={getNavLinkClass}>
-              <FaNetworkWired size={18} className="shrink-0" />
-              {!isCollapsed && <span>Disciple Network</span>}
-            </NavLink>
-            
-            {/* GROUPS DROPDOWN */}
-            <div>
-              <button onClick={toggleBilling} className={`${navLinkBase} w-full justify-between ${isBillingActive ? activeParentClass : inactiveParentClass} ${isCollapsed ? 'justify-center px-0' : ''}`}>
-                <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
-                  <FaLayerGroup size={18} className="shrink-0" />
-                  {!isCollapsed && <span>Groups</span>}
+            {/* VISITORS */}
+            <div className="relative group/visitors">
+              <NavLink to="/visitors" className={getNavLinkClass}>
+                <FaUserFriends size={18} className="shrink-0" />
+                <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3'}`}>
+                  Visitors
+                </span>
+              </NavLink>
+              {isCollapsed && (
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-md shadow-lg pointer-events-none opacity-0 group-hover/visitors:opacity-100 transition-opacity duration-150 z-50 whitespace-nowrap border border-slate-700/50">
+                  Visitors
                 </div>
-                {!isCollapsed && (isBillingOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+              )}
+            </div>
+
+            {/* DISCIPLE NETWORK */}
+            <div className="relative group/network">
+              <NavLink to="/disciple-network" className={getNavLinkClass}>
+                <FaNetworkWired size={18} className="shrink-0" />
+                <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3'}`}>
+                  Disciple Network
+                </span>
+              </NavLink>
+              {isCollapsed && (
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-md shadow-lg pointer-events-none opacity-0 group-hover/network:opacity-100 transition-opacity duration-150 z-50 whitespace-nowrap border border-slate-700/50">
+                  Disciple Network
+                </div>
+              )}
+            </div>
+            
+            {/* GROUPS DROPDOWN WITH POP-OUT MENU */}
+            {/* FIXED: Tinanggal ang flex at w-full dito para hindi mag-row layout ang accordion items */}
+            <div className="relative group/groups">
+              <button onClick={toggleBilling} className={`${navLinkBase} justify-between ${isBillingActive ? activeParentClass : inactiveParentClass} ${isCollapsed ? 'justify-center px-0' : ''}`}>
+                <div className="flex items-center">
+                  <FaLayerGroup size={18} className="shrink-0" />
+                  <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3 text-left'}`}>
+                    Groups
+                  </span>
+                </div>
+                <div className={`overflow-hidden transition-all duration-300 flex items-center justify-end ${isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[20px] opacity-100'}`}>
+                  {isBillingOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </div>
               </button>
               
-              {isBillingOpen && (
-                <div className={`mt-1 relative w-full ${isCollapsed ? 'flex flex-col items-center gap-2' : 'space-y-1'}`}> 
-                   {!isCollapsed && <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />}
+              {/* Accordion */}
+              {!isCollapsed && isBillingOpen && (
+                <div className="mt-1 relative w-full space-y-1 animate-in slide-in-from-top-2 fade-in duration-200"> 
+                   <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />
                    
                    <NavLink to="/groups/clusters" className="group flex items-center w-full text-sm h-9 relative z-10">
                      {({ isActive }) => (
@@ -199,31 +267,56 @@ export default function Sidebar({
                    </NavLink>
                 </div>
               )}
+
+              {/* Fly-out Pop-out Menu */}
+              {isCollapsed && (
+                <div className="absolute left-full top-0 pl-2 w-52 opacity-0 pointer-events-none group-hover/groups:opacity-100 group-hover/groups:pointer-events-auto transition-all duration-200 ease-in-out z-50">
+                  <div className="py-2 rounded-xl shadow-xl border border-slate-700/40 flex flex-col space-y-1 px-1.5 bg-slate-800" style={{ backgroundColor: getColor('--sidebar-bg') }}>
+                    <div className="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-700/30 mb-1">
+                      Groups Menu
+                    </div>
+                    <NavLink to="/groups/clusters" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                      Clusters
+                    </NavLink>
+                    <NavLink to="/groups/growth-groups" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                      Growth Groups
+                    </NavLink>
+                    <NavLink to="/groups/ggli-classes" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                      GGLi Classes
+                    </NavLink>
+                  </div>
+                </div>
+              )}
             </div>
+
           </div>
         </div>
       </nav>
-      {/* FOOTER: Restored with original design and hover animation */}
-      <div className="p-4 border-t border-slate-400/50 mt-auto bg-slate-800">
-        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
-           {!isCollapsed && (
-             <div className="flex items-center gap-3">
-               <div className="w-10 h-10 rounded-full bg-[var(--active-parent)] flex items-center justify-center text-white font-semibold shadow-sm">
-                 {user?.data?.member ? getInitials(`${user.data.member.firstName} ${user.data.member.lastName}`) : '??'}
-               </div>
-               <div>
-                  <p className="text-sm font-semibold text-white truncate max-w-[100px]">{user?.data?.member?.firstName} {user?.data?.member?.lastName}</p>
-                  <p className="text-xs text-slate-400 capitalize">{user?.data?.role}</p>
-               </div>
+
+      {/* FOOTER */}
+      <div className="p-4 border-t border-slate-400/50 mt-auto bg-slate-800 shrink-0">
+        <div className={`flex items-center transition-all duration-300 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+           
+           {/* Profile Details Container */}
+           <div className={`flex items-center overflow-hidden transition-all duration-300 ${isCollapsed ? 'max-w-0 opacity-0 m-0' : 'max-w-[200px] opacity-100'}`}>
+             <div className="w-10 h-10 rounded-full bg-[var(--active-parent)] flex items-center justify-center text-white font-semibold shadow-sm shrink-0">
+               {user?.data?.member ? getInitials(`${user.data.member.firstName} ${user.data.member.lastName}`) : '??'}
              </div>
-           )}
+             <div className="ml-3 overflow-hidden whitespace-nowrap">
+                <p className="text-sm font-semibold text-white truncate max-w-[100px]">{user?.data?.member?.firstName} {user?.data?.member?.lastName}</p>
+                <p className="text-xs text-slate-400 capitalize">{user?.data?.role}</p>
+             </div>
+           </div>
+
+           {/* Settings Button */}
            <button 
              onClick={onOpenSettings} 
-             className="p-2 hover:bg-slate-700 rounded-full text-slate-400 hover:text-white transition-all duration-300 hover:rotate-90 flex items-center justify-center" 
+             className="p-2 hover:bg-slate-700 rounded-full text-slate-400 hover:text-white transition-all duration-300 hover:rotate-90 flex items-center justify-center shrink-0" 
              title="Change Theme"
            >
             <Settings size={18} />
            </button>
+           
         </div>
       </div>
     </aside>
