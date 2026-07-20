@@ -69,11 +69,11 @@ export default function LoginPage() {
           <div className="flex flex-col justify-center select-none">
             {/* Main Title */}
             <span className="text-2xl font-bold tracking-tight leading-tight text-white">
-              DiscipleNetwork
+              Disciple<span className='text-slate-800'>Network</span>
             </span>
             
             {/* Subtitle */}
-            <span className="text-[10px] font-bold leading-none tracking-widest text-slate-400 uppercase mt-1">
+            <span className="text-[10px] font-bold leading-none tracking-widest text-white/60 uppercase mt-1">
               Management System
             </span>
           </div>
