@@ -31,6 +31,14 @@ class GrowthGroup extends Model
     ];
 
     /**
+     * Relationship: Growth Group belongs to a Church
+     */
+    public function church(): BelongsTo
+    {
+        return $this->belongsTo(Church::class);
+    }
+
+    /**
      * Relationship sa Leader ng Growth Group (Member model).
      */
     public function leader(): BelongsTo

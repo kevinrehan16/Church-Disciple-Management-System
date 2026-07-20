@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Members\MemberController;
 use App\Http\Controllers\Api\V1\Visitors\VisitorController;
 use App\Http\Controllers\Api\V1\Churches\ChurchController;
 use App\Http\Controllers\Api\V1\Clusters\ClusterController;
+use App\Http\Controllers\Api\V1\GrowthGroups\GrowthGroupController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -40,5 +41,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/clusters', [ClusterController::class, 'index']);
         Route::post('/clusters', [ClusterController::class, 'store']);
         Route::put('/clusters/{cluster}', [ClusterController::class, 'update']);
+
+        // GOWTH GROUPS ROUTES
+        Route::get('/growth-groups', [GrowthGroupController::class, 'index']);
+        Route::post('/growth-groups', [GrowthGroupController::class, 'store']);
+        Route::put('/growth-groups/{growth_group}', [GrowthGroupController::class, 'update']);
     });
 });
