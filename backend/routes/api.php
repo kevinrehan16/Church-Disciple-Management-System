@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Members\MemberController;
 use App\Http\Controllers\Api\V1\Visitors\VisitorController;
+use App\Http\Controllers\Api\V1\Churches\ChurchController;
+use App\Http\Controllers\Api\V1\Clusters\ClusterController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -17,13 +19,26 @@ Route::prefix('v1')->group(function () {
     // Dito mo ilalagay ang iba pang protected routes sa hinaharap
 
     Route::middleware('auth:sanctum')->group(function () {
+        // AUTH ROUTES
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/user', [AuthController::class, 'user']);
 
+        // MEMBERS ROUTES
         Route::get('/members', [MemberController::class, 'index']);
 
+        // VISITORS ROUTES
         Route::get('/visitors', [VisitorController::class, 'index']);
         Route::post('/visitors', [VisitorController::class, 'store']);
+
+        // CHURCHES ROUTES
+        Route::get('/churches', [ChurchController::class, 'index']);
+        Route::post('/churches', [ChurchController::class, 'store']);
+        Route::put('/churches/{church}', [ChurchController::class, 'update']);
+
+        // CLUSTERS ROUTES
+        Route::get('/clusters', [ClusterController::class, 'index']);
+        Route::post('/clusters', [ClusterController::class, 'store']);
+        Route::put('/clusters/{cluster}', [ClusterController::class, 'update']);
     });
 });
