@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
-import { FaUsers, FaUserFriends, FaNetworkWired, FaLayerGroup, FaChartArea } from "react-icons/fa";
-import { 
-  Users, Calendar, Settings, 
-  ChevronDown, ChevronRight, MonitorCog 
-} from 'lucide-react';
+import { FaUsers, FaUserFriends, FaNetworkWired, FaLayerGroup, FaChartArea, FaCogs } from "react-icons/fa";
+import { Users, Calendar, Settings, ChevronDown, ChevronRight, MonitorCog } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getInitials } from '../../utils/formatters';
@@ -23,6 +20,7 @@ export default function Sidebar({
   // 1. STATE: Initialized base sa URL pag load
   const [isMembersOpen, setIsMembersOpen] = useState(() => location.pathname.startsWith('/members'));
   const [isBillingOpen, setIsBillingOpen] = useState(() => location.pathname.startsWith('/billing'));
+  const [isGroupSetupOpen, setIsGroupSetupOpen] = useState(() => location.pathname.startsWith('/group-setup'));
 
   // 2. AUTO-CLOSE LOGIC: Kapag lumipat ng page, isasara ang menu na hindi kasama sa path
   useEffect(() => {
@@ -32,22 +30,34 @@ export default function Sidebar({
     if (!location.pathname.startsWith('/billing')) {
       setIsBillingOpen(false);
     }
+    if (!location.pathname.startsWith('/group-setup')) {
+      setIsGroupSetupOpen(false);
+    }
   }, [location.pathname]);
 
   // Handler para sa pag-toggle (Accordion style)
   const toggleMembers = () => {
     setIsMembersOpen(!isMembersOpen);
-    setIsBillingOpen(false); // Close billing pag binuksan members
+    setIsBillingOpen(false);
+    setIsGroupSetupOpen(false); // Close billing pag binuksan members
   };
 
   const toggleBilling = () => {
     setIsBillingOpen(!isBillingOpen);
-    setIsMembersOpen(false); // Close members pag binuksan billing
+    setIsMembersOpen(false); 
+    setIsGroupSetupOpen(false);// Close members pag binuksan billing
+  };
+
+  const toggleGroupSetup = () => {
+    setIsGroupSetupOpen(!isGroupSetupOpen);// Close members pag binuksan billing
+    setIsBillingOpen(false);
+    setIsMembersOpen(false); 
   };
 
   // Active States
   const isBillingActive = location.pathname.startsWith('/billing');
   const isMembersActive = location.pathname.startsWith('/members');
+  const isGroupSetupActive = location.pathname.startsWith('/group-setup');
 
   // Classes
   const activeParentClass = `bg-[var(--active-parent)] text-white font-medium shadow-md shadow-blue-500/20`;
@@ -257,11 +267,11 @@ export default function Sidebar({
                        </div>
                      )}
                    </NavLink>
-                   <NavLink to="/groups/ggli-classes" className="group flex items-center w-full text-sm h-9 relative z-10">
+                   <NavLink to="/groups/ggli-students" className="group flex items-center w-full text-sm h-9 relative z-10">
                      {({ isActive }) => (
                        <div className="pl-[23px] flex items-center w-full h-full">
                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>GGLi Classes</div>
+                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>GGLi Students</div>
                        </div>
                      )}
                    </NavLink>
@@ -281,7 +291,7 @@ export default function Sidebar({
                     <NavLink to="/groups/growth-groups" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
                       Growth Groups
                     </NavLink>
-                    <NavLink to="/groups/ggli-classes" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                    <NavLink to="/groups/ggli-students" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
                       GGLi Classes
                     </NavLink>
                   </div>
@@ -289,6 +299,80 @@ export default function Sidebar({
               )}
             </div>
 
+          </div>
+        </div>
+
+        <div>
+          <SectionHeader title="Referentials" />
+          <div className="space-y-1.5">
+            
+            {/* GROUP SETUP DROPDOWN WITH POP-OUT MENU */}
+            <div className="relative group/groupsetup">
+              <button onClick={toggleGroupSetup} className={`${navLinkBase} justify-between ${isGroupSetupActive ? activeParentClass : inactiveParentClass} ${isCollapsed ? 'justify-center px-0' : ''}`}>
+                <div className="flex items-center">
+                  <FaCogs size={18} className="shrink-0" />
+                  <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3 text-left'}`}>
+                    Group Setup
+                  </span>
+                </div>
+                <div className={`overflow-hidden transition-all duration-300 flex items-center justify-end ${isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[20px] opacity-100'}`}>
+                  {isGroupSetupOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </div>
+              </button>
+              
+              {/* Accordion (Visible only when sidebar is OPEN) */}
+              {!isCollapsed && isGroupSetupOpen && (
+                <div className="mt-1 relative w-full space-y-1 animate-in slide-in-from-top-2 fade-in duration-200"> 
+                   <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />
+                   
+                   <NavLink to="/group-setup/growth-groups" className="group flex items-center w-full text-sm h-9 relative z-10">
+                     {({ isActive }) => (
+                       <div className="pl-[23px] flex items-center w-full h-full">
+                         <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>All Growth Groups</div>
+                       </div>
+                     )}
+                   </NavLink>
+                   <NavLink to="/group-setup/clusters" className="group flex items-center w-full text-sm h-9 relative z-10">
+                     {({ isActive }) => (
+                       <div className="pl-[23px] flex items-center w-full h-full">
+                         <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Clusters</div>
+                       </div>
+                     )}
+                   </NavLink>
+                   <NavLink to="/group-setup/ggli-students" className="group flex items-center w-full text-sm h-9 relative z-10">
+                     {({ isActive }) => (
+                       <div className="pl-[23px] flex items-center w-full h-full">
+                         <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>GGLI Students</div>
+                       </div>
+                     )}
+                   </NavLink>
+                </div>
+              )}
+
+              {/* Fly-out Pop-out Menu */}
+              {isCollapsed && (
+                <div className="absolute left-full top-0 pl-2 w-52 opacity-0 pointer-events-none group-hover/groupsetup:opacity-100 group-hover/groupsetup:pointer-events-auto transition-all duration-200 ease-in-out z-50">
+                  <div className="py-2 rounded-xl shadow-xl border border-slate-700/40 flex flex-col space-y-1 px-1.5 bg-slate-800" style={{ backgroundColor: getColor('--sidebar-bg') }}>
+                    <div className="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-700/30 mb-1">
+                      Group Setup Menu
+                    </div>
+                    <NavLink to="/group-setup/growth-groups" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                      Growth Groups
+                    </NavLink>
+                    <NavLink to="/group-setup/clusters" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                      Clusters
+                    </NavLink>
+                    <NavLink to="/group-setup/ggli-students" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                      GGLI Students
+                    </NavLink>
+                  </div>
+                </div>
+              )}
+            </div>
+            
           </div>
         </div>
       </nav>
