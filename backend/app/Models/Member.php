@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Enums\MemberStatus;
 
 class Member extends Model
@@ -103,5 +104,12 @@ class Member extends Model
     public function scopeOrderedByPosition($query)
     {
         return $query->orderBy('position_rank', 'asc');
+    }
+
+    public function growthGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(GrowthGroup::class, 'growth_group_member')
+            ->withPivot('role', 'joined_at')
+            ->withTimestamps();
     }
 }
