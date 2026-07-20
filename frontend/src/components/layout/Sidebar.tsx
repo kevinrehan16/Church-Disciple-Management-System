@@ -329,7 +329,7 @@ export default function Sidebar({
                      {({ isActive }) => (
                        <div className="pl-[23px] flex items-center w-full h-full">
                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>All Growth Groups</div>
+                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Growth Groups</div>
                        </div>
                      )}
                    </NavLink>
