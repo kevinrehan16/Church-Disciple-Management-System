@@ -17,6 +17,7 @@ import Deacons from './pages/members/deacons';
 import Visitors from './pages/visitors/visitors';
 import GrowthGroups from './pages/groupsetup/growthgroups';
 import Clusters from './pages/groupsetup/clusters';
+import Churches from './pages/groupsetup/churches';
 
 // Protected Route Component
 const ProtectedRoute = () => {
@@ -52,6 +53,7 @@ function App() {
                   <Route path="/visitors" element={<Visitors />} />
                   <Route path="/group-setup/growth-groups" element={<GrowthGroups />} />
                   <Route path="/group-setup/clusters" element={<Clusters />} />
+                  <Route path="/group-setup/churches" element={<Churches />} />
                 </Route>
               </Route>
               
