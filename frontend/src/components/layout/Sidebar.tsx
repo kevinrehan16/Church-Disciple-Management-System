@@ -325,11 +325,11 @@ export default function Sidebar({
                 <div className="mt-1 relative w-full space-y-1 animate-in slide-in-from-top-2 fade-in duration-200"> 
                    <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />
                    
-                   <NavLink to="/group-setup/growth-groups" className="group flex items-center w-full text-sm h-9 relative z-10">
+                   <NavLink to="/group-setup/churches" className="group flex items-center w-full text-sm h-9 relative z-10">
                      {({ isActive }) => (
                        <div className="pl-[23px] flex items-center w-full h-full">
                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Growth Groups</div>
+                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Churches</div>
                        </div>
                      )}
                    </NavLink>
@@ -338,6 +338,14 @@ export default function Sidebar({
                        <div className="pl-[23px] flex items-center w-full h-full">
                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
                          <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Clusters</div>
+                       </div>
+                     )}
+                   </NavLink>
+                   <NavLink to="/group-setup/growth-groups" className="group flex items-center w-full text-sm h-9 relative z-10">
+                     {({ isActive }) => (
+                       <div className="pl-[23px] flex items-center w-full h-full">
+                         <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Growth Groups</div>
                        </div>
                      )}
                    </NavLink>
@@ -359,11 +367,14 @@ export default function Sidebar({
                     <div className="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-700/30 mb-1">
                       Group Setup Menu
                     </div>
-                    <NavLink to="/group-setup/growth-groups" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
-                      Growth Groups
+                    <NavLink to="/group-setup/churches" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                      Churches
                     </NavLink>
                     <NavLink to="/group-setup/clusters" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
                       Clusters
+                    </NavLink>
+                    <NavLink to="/group-setup/growth-groups" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                      Growth Groups
                     </NavLink>
                     <NavLink to="/group-setup/ggli-students" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
                       GGLI Students
