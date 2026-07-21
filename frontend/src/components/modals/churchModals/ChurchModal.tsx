@@ -52,7 +52,7 @@ export default function ChurchModal({ isOpen, onClose }: ChurchModalProps) {
       <div className={`bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden border border-slate-200/80 flex flex-col max-h-[92vh] ${isClosing ? 'modal-content closing' : 'modal-content'}`}>
         
         {/* Header - Dynamic bg consistent sa theme */}
-        <div className="px-8 py-6 bg-[#0284c7] flex items-center justify-between text-white flex-shrink-0">
+        <div className="px-8 py-6 bg-[var(--active-parent,rgb(99,102,241))] flex items-center justify-between text-white flex-shrink-0">
           <div>
             <h2 className="text-xl font-extrabold tracking-tight">
                 Church Registration
@@ -150,12 +150,7 @@ export default function ChurchModal({ isOpen, onClose }: ChurchModalProps) {
             >
                 <X size={15} /> Cancel
             </button>
-            <button 
-              type="submit" 
-              form="church-form" 
-            //   disabled={pendingAddChurch}
-              className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-[#0284c7] hover:bg-[#026ca1] rounded-xl shadow-lg shadow-sky-600/10 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-            >
+            <button type="submit" form="church-form" className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2">
                 <Save size={15} /> Save Church
             </button>
         </div>
