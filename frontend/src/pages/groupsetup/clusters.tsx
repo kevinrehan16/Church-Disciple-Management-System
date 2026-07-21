@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { FaFacebookSquare, FaMobile, FaEnvelope, FaUserFriends, FaMapMarkedAlt } from "react-icons/fa";
-import { Plus, Search, Filter, ArrowUpDown, Mars, Venus, Eye, Calendar, Clock, Layers, ChevronDown, ChevronUp, Church, Pencil, Trash2, Hash, MapPin } from 'lucide-react';
+import { FaMapMarkedAlt } from "react-icons/fa";
+import { Plus, Search, Filter, ArrowUpDown, FingerprintPattern, Database, ChevronDown, ShieldUser, Church, Pencil, Trash2, MapPinHouse, MapPin } from 'lucide-react';
 import { useClusters } from '../../hooks/useClusters';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
@@ -101,7 +101,7 @@ export default function Clusters() {
             </div>
           )}
 
-          {filteredData.map((church) => {
+          {filteredData.map((church : any) => {
             const isOpen = openChurchIds.includes(church.id);
 
             return (
@@ -115,13 +115,13 @@ export default function Clusters() {
                   className="w-full px-6 py-5 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors text-left group"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-xl transition-colors ${church.is_main_campus ? 'bg-sky-50 text-[#0284c7]' : 'bg-slate-100 text-slate-500 group-hover:text-sky-600'}`}>
+                    <div className={`p-3 rounded-xl transition-colors bg-slate-100 text-slate-500 group-hover:bg-[var(--active-parent,rgb(99,102,241))]/10 group-hover:text-[var(--active-parent,rgb(99,102,241))] group-hover:border-[var(--active-parent,rgb(99,102,241))] transition-colors`}>
                       <Church size={22} />
                     </div>
                     
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-lg font-bold text-slate-900">{church.name}</h3>
+                        <h3 className="text-lg font-bold text-slate-900 group-hover:text-[var(--active-parent,rgb(99,102,241))]">{church.name}</h3>
                         {church.is_main_campus && (
                           <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wide rounded-md">
                             Main Campus
@@ -129,7 +129,7 @@ export default function Clusters() {
                         )}
                       </div>
                       <div className="flex items-center gap-3 text-sm text-slate-500 font-medium">
-                        <span className="flex items-center gap-1"><Hash size={13}/> {church.code}</span>
+                        <span className="flex items-center gap-1"><FingerprintPattern size={13}/> {church.code}</span>
                         <span className="text-slate-300">•</span>
                         <span className="flex items-center gap-1"><MapPin size={13}/> {church.address}</span>
                       </div>
@@ -138,7 +138,7 @@ export default function Clusters() {
 
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
-                      <Layers size={14} className="text-slate-400" />
+                      <Database size={14} className="text-slate-400" />
                       {church.clusters.length} Clusters
                     </div>
                     <div className={`p-2 rounded-full transition-transform duration-300 border border-slate-200 ${isOpen ? 'rotate-180 bg-slate-100 text-slate-600' : 'bg-white text-slate-400 hover:bg-slate-50'}`}>
@@ -151,14 +151,14 @@ export default function Clusters() {
                 <div className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                   <div className="overflow-hidden">
                     <div className="p-6 pt-0 border-t border-slate-100 bg-slate-50/30">
-                      <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                      <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5">
                         
                         {church.clusters.map((cluster) => (
                           <div 
                             key={cluster.id} 
-                            className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-sky-300 hover:shadow-lg hover:shadow-sky-500/5 transition-all group relative overflow-hidden flex flex-col justify-between"
+                            className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-[var(--active-parent,rgb(99,102,241))] hover:shadow-lg hover:shadow-sky-500/5 transition-all group relative overflow-hidden flex flex-col justify-between"
                           >
-                            <div className={`absolute left-0 top-0 bottom-0 w-1 ${cluster.is_active ? 'bg-[#0284c7]' : 'bg-slate-300'}`} />
+                            <div className={`absolute left-0 top-0 bottom-0 w-1 ${cluster.is_active ? 'bg-emerald-600' : 'bg-slate-300'}`} />
                             <div>
                               <div className="flex items-start justify-between mb-3 pl-2">
                                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider block">
@@ -169,16 +169,33 @@ export default function Clusters() {
                                   {cluster.is_active ? 'Active' : 'Inactive'}
                                 </span>
                               </div>
-                              <h4 className="text-base font-bold text-slate-900 group-hover:text-[#0284c7] transition-colors pl-2">
-                                {cluster.name} Cluster
-                              </h4>
+
+                              {/* INAYOS NA DESIGN NG ICON AT HEADER */}
+                              <div className="pl-2 space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <div className="p-1.5 bg-sky-50 text-rose-700 rounded-lg">
+                                    <MapPinHouse size={16} />
+                                  </div>
+                                  <h4 className="text-base font-bold text-slate-900 group-hover:text-[var(--active-parent,rgb(99,102,241))] transition-colors">
+                                    {cluster.name} Cluster
+                                  </h4>
+                                </div>
+
+                                {/* BAGONG FIELD PARA SA HEAD / FULLNAME NG TAO */}
+                                <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 pt-1">
+                                  <div className="p-1.5 bg-slate-100 text-slate-500 rounded-md">
+                                    <ShieldUser size={16} />
+                                  </div>
+                                  <span>{cluster.head_name || 'No Head Assigned'}</span>
+                                </div>
+                              </div>
                             </div>
 
                             <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end gap-2 pl-2">
-                              <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all active:scale-95">
+                              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-blue-600 text-xs font-semibold text-white hover:bg-blue-800 hover:border-blue-900 transition-all duration-200 active:scale-95">
                                 <Pencil size={14} /> Edit
                               </button>
-                              <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all active:scale-95">
+                              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50/80 hover:border-rose-200 transition-all duration-200 active:scale-95">
                                 <Trash2 size={14} /> Delete
                               </button>
                             </div>
