@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { Plus, Star, Filter, ArrowUpDown, FingerprintPattern, Database, ChevronDown, ShieldUser, Church, Pencil, Trash2, MapPinHouse, MapPin } from 'lucide-react';
 import { useClusters } from '../../hooks/useClusters';
+import ClusterModal from '../../components/modals/clusterModals/ClusterModal';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
 import { TableLoading, TableError, TableEmpty } from '../../components/ui/TableStates';
@@ -10,6 +11,9 @@ export default function Clusters() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [isClusterModalOpen, setIsClusterModalOpen] = useState(false);
+  const [selectedClusterId, setSelectedClusterId] = useState('');
+
   const { data: apiResponse, isLoading, isError, refetch } = useClusters({
     search: searchTerm,
     page: currentPage,
@@ -17,8 +21,6 @@ export default function Clusters() {
   
   const currentClusters = apiResponse?.data || [];
   const meta = apiResponse?.meta;
-
-  console.log(currentClusters);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= (meta?.last_page || 1)) {
@@ -48,6 +50,11 @@ export default function Clusters() {
     );
     return matchChurch || matchCluster;
   });
+
+  const handleViewCluster = (id: string) => {
+    setSelectedClusterId(id);
+    setIsClusterModalOpen(true);
+  };
   
   return (
     /* 1. ROOT CONTAINER: Nilagyan ng h-full, flex-col, at overflow-hidden para hindi mag-scroll ang body */
@@ -62,10 +69,10 @@ export default function Clusters() {
           actions={
             <button 
               className="group flex items-center gap-2 px-5 py-2.5 bg-[#0284c7] hover:bg-[#026ca1] active:scale-95 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-rose-500/10"
-              // onClick={() => handleViewVisitor('')}
+              onClick={() => handleViewCluster('')}
             >
               <Plus size={16} className="transition-transform group-hover:rotate-90" />
-              Add New Visitor
+              Add New Cluster
             </button>
           }
         />
@@ -213,13 +220,13 @@ export default function Clusters() {
         </div>
       </div>
       
-      {/* {isVisitorModalOpen && (
-        <VisitorModal 
-          isOpen={isVisitorModalOpen}
-          onClose={() => setIsVisitorModalOpen(false)} 
-          visitorId={selectedVisitorId}
+      {isClusterModalOpen && (
+        <ClusterModal 
+          isOpen={isClusterModalOpen}
+          onClose={() => setIsClusterModalOpen(false)} 
+          // clusterId={selectedClusterId}
         />
-      )} */}
+      )}
     </div>
   );
 }
