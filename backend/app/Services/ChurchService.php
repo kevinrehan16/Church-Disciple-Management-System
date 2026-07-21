@@ -40,7 +40,7 @@ class ChurchService
         }
 
         return $query->orderBy('is_main_campus', 'desc')
-            ->orderBy('name', 'asc')
+            ->orderBy('id', 'desc')
             ->paginate($perPage);
     }
 

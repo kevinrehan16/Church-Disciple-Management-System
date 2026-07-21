@@ -30,7 +30,7 @@ class ChurchController extends Controller
 
         $churches = $this->churchService->getPaginatedChurches(
             $request->only(['search', 'is_active']),
-            $request->integer('per_page', 10)
+            $request->integer('per_page', 6)
         );
 
         return ChurchResource::collection($churches);

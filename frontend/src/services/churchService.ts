@@ -1,5 +1,5 @@
 import apiClient from '../api/axiosInstance';
-import type { Church } from '../types/typeChurch';
+import type { Church, CreateChurchPayload } from '../types/typeChurch';
 import type { Pagination } from '../types/typePagination';
 
 export interface ChurchFilters {
@@ -17,6 +17,11 @@ export const churchService = {
             }
         });
         return response.data;
+    },
+
+    registerChurch: async (churchData: CreateChurchPayload): Promise<Church> => {
+        const { data } = await apiClient.post('churches/', churchData);
+        return data;
     },
     
 }

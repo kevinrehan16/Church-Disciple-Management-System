@@ -1,105 +1,198 @@
 import { useState } from 'react';
 import { FaFacebookSquare, FaMobile, FaEnvelope, FaUserFriends, FaMapMarkedAlt } from "react-icons/fa";
-import { Plus, Search, Filter, ArrowUpDown, Mars, Venus, Eye, Calendar, Clock } from 'lucide-react';
+import { Plus, Search, Filter, ArrowUpDown, Mars, Venus, Eye, Calendar, Clock, Layers, ChevronDown, ChevronUp, Church, Pencil, Trash2, Hash, MapPin } from 'lucide-react';
+import { useClusters } from '../../hooks/useClusters';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
 import { TableLoading, TableError, TableEmpty } from '../../components/ui/TableStates';
-import { getLifestageStyles } from '../../utils/formatters';
 
 export default function Clusters() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { data: apiResponse, isLoading, isError, refetch } = useClusters({
+    search: searchTerm,
+    page: currentPage,
+  });
+  
+  const currentClusters = apiResponse?.data || [];
+  const meta = apiResponse?.meta;
+
+  console.log(currentClusters);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= (meta?.last_page || 1)) {
+      setCurrentPage(newPage);
+    }
+  };
+  
+  // Awtomatikong kunin ang ID ng Main Campus para i-open agad
+  const mainCampusIds = currentClusters
+    .filter(church => church.is_main_campus)
+    .map(church => church.id);
+
+  const [openChurchIds, setOpenChurchIds] = useState<number[]>(mainCampusIds);
+
+  // Toggle Function
+  const toggleAccordion = (id: number) => {
+    setOpenChurchIds(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  // Filter Logic (Frontend mockup for the search bar)
+  const filteredData = currentClusters.filter(church => {
+    const matchChurch = church.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchCluster = church.clusters.some(c => 
+      c.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    return matchChurch || matchCluster;
+  });
   
   return (
-    <div className="w-full bg-slate-50 text-slate-800 px-6 py-4 space-y-6">
+    /* 1. ROOT CONTAINER: Nilagyan ng h-full, flex-col, at overflow-hidden para hindi mag-scroll ang body */
+    <div className="flex flex-col h-full w-full bg-slate-50 text-slate-800 overflow-hidden">
       
-      <ModuleHeader
-        title="Clusters"
-        description="Centralized management of visitor profiles, visit history, follow-up activities, and church engagement."
-        icon={<FaMapMarkedAlt size={24} />}
-        actions={
-          <button 
-            className="group flex items-center gap-2 px-5 py-2.5 bg-[#0284c7] hover:bg-[#026ca1] active:scale-95 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-rose-500/10"
-            // onClick={() => handleViewVisitor('')}
-          >
-            <Plus size={16} className="transition-transform group-hover:rotate-90" />
-            Add New Visitor
-          </button>
-        }
-      />
-
-      <div className="flex flex-col md:flex-row items-center gap-4 justify-between w-full bg-transparent">
-        <SearchInput 
-        //   value={searchTerm}
-        //   onChange={(val) => {
-            // setSearchTerm(val);
-            // setCurrentPage(1); // I-reset sa Page 1 tuwing nag-a-update ang search
-        //   }}
-          placeholder="Search visitor by information..."
+      {/* 2. HEADER & SEARCH SECTION: Naka-shrink-0 para hindi lumiit at laging nasa taas */}
+      <div className="shrink-0 space-y-6 px-6 pt-4 pb-2">
+        <ModuleHeader
+          title="Clusters"
+          description="Centralized management of visitor profiles, visit history, follow-up activities, and church engagement."
+          icon={<FaMapMarkedAlt size={24} />}
+          actions={
+            <button 
+              className="group flex items-center gap-2 px-5 py-2.5 bg-[#0284c7] hover:bg-[#026ca1] active:scale-95 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-rose-500/10"
+              // onClick={() => handleViewVisitor('')}
+            >
+              <Plus size={16} className="transition-transform group-hover:rotate-90" />
+              Add New Visitor
+            </button>
+          }
         />
-        
-        <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-600 rounded-xl text-sm font-semibold shadow-sm transition-all">
-            <Filter size={14} /> Advanced Filter
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-600 rounded-xl text-sm font-semibold shadow-sm transition-all">
-            <ArrowUpDown size={14} /> Sort By
-          </button>
+
+        <div className="flex flex-col md:flex-row items-center gap-4 justify-between w-full bg-transparent">
+          <SearchInput 
+            value={searchTerm}
+            onChange={(val) => {
+              setSearchTerm(val);
+              setCurrentPage(1); // I-reset sa Page 1 tuwing nag-a-update ang search
+            }}
+            placeholder="Search visitor by information..."
+          />
+          
+          <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
+            <button className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-600 rounded-xl text-sm font-semibold shadow-sm transition-all">
+              <Filter size={14} /> Advanced Filter
+            </button>
+            <button className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-600 rounded-xl text-sm font-semibold shadow-sm transition-all">
+              <ArrowUpDown size={14} /> Sort By
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="w-full bg-white border border-slate-200/60 rounded-xl shadow-sm overflow-hidden">
-        <div className="overflow-y-auto overflow-x-auto h-[calc(100vh-325px)] border border-slate-200/60 rounded-lg">
-            <table className="w-full text-left text-sm border-separate border-spacing-0">
-                <thead className="sticky top-0 z-10 bg-[var(--active-parent,rgb(99,102,241))]">
-                  <tr className="text-white uppercase tracking-wider text-[10px] font-extrabold border-b border-slate-200/60">
-                    <th className="w-[25%] px-6 py-4">Visitor Details</th>
-                    <th className="w-[14%] px-6 py-4 text-center">Age Group</th>
-                    <th className="w-[8%] px-6 py-4">Gender</th>
-                    <th className="w-[8%] px-6 py-4 text-center">Life-Stage</th>
-                    <th className="w-[15%] px-6 py-4">Contacts</th>
-                    <th className="w-[15%] px-6 py-4">Visited Schedule</th>
-                    <th className="w-[10%] px-6 py-4 text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 bg-white">
-                
-              </tbody>
-            </table>
-        </div>
-        
-        {/* 3. DYNAMIC PAGINATION FOOTER */}
-        {/* <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-100/50">
-          <p className="text-xs text-slate-500 font-medium">
-            Showing <span className="text-slate-800 font-bold">{meta?.from || 0}</span> to <span className="text-slate-800 font-bold">{meta?.to || 0}</span> of <span className="text-slate-800 font-bold">{meta?.total || 0}</span> entries
-          </p>
+      {/* 3. SCROLLABLE AREA: Dito lang iikot ang scroll bar (flex-1 overflow-y-auto min-h-0) */}
+      <div className="flex-1 overflow-y-auto min-h-0 px-6 pb-6 pt-2 scroll-smooth">
+        <div className="w-full space-y-4">
+          
+          {filteredData.length === 0 && (
+            <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300">
+              <p className="text-slate-500 font-medium">No churches or clusters found.</p>
+            </div>
+          )}
 
-          <div className="flex items-center gap-1">
-            <button 
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
-              disabled={!meta || meta.current_page === 1} 
-              className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 transition-colors cursor-pointer disabled:cursor-not-allowed"
-            >
-              Prev
-            </button>
-            
-            {meta && Array.from({ length: meta.last_page }, (_, i) => i + 1).map((page) => (
-              <button 
-                key={page} 
-                onClick={() => setCurrentPage(page)} 
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${meta.current_page === page ? 'bg-[var(--active-parent,rgb(99,102,241))] text-white' : 'text-slate-600 hover:bg-slate-200'}`}
+          {filteredData.map((church) => {
+            const isOpen = openChurchIds.includes(church.id);
+
+            return (
+              <div 
+                key={church.id} 
+                className="bg-white rounded-2xl border border-slate-200 shadow-[0_2px_10px_-3px_rgba(2,132,199,0.05)] overflow-hidden transition-all duration-300"
               >
-                {page}
-              </button>
-            ))}
+                {/* Accordion Header */}
+                <button
+                  onClick={() => toggleAccordion(church.id)}
+                  className="w-full px-6 py-5 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors text-left group"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-xl transition-colors ${church.is_main_campus ? 'bg-sky-50 text-[#0284c7]' : 'bg-slate-100 text-slate-500 group-hover:text-sky-600'}`}>
+                      <Church size={22} />
+                    </div>
+                    
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-lg font-bold text-slate-900">{church.name}</h3>
+                        {church.is_main_campus && (
+                          <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wide rounded-md">
+                            Main Campus
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3 text-sm text-slate-500 font-medium">
+                        <span className="flex items-center gap-1"><Hash size={13}/> {church.code}</span>
+                        <span className="text-slate-300">•</span>
+                        <span className="flex items-center gap-1"><MapPin size={13}/> {church.address}</span>
+                      </div>
+                    </div>
+                  </div>
 
-            <button 
-              onClick={() => setCurrentPage(prev => (!meta ? prev : Math.min(prev + 1, meta.last_page)))} 
-              disabled={!meta || meta.current_page === meta.last_page || meta.last_page === 0} 
-              className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 transition-colors cursor-pointer disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
-          </div>
-        </div> */}
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+                      <Layers size={14} className="text-slate-400" />
+                      {church.clusters.length} Clusters
+                    </div>
+                    <div className={`p-2 rounded-full transition-transform duration-300 border border-slate-200 ${isOpen ? 'rotate-180 bg-slate-100 text-slate-600' : 'bg-white text-slate-400 hover:bg-slate-50'}`}>
+                      <ChevronDown size={18} />
+                    </div>
+                  </div>
+                </button>
+
+                {/* Accordion Body */}
+                <div className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                  <div className="overflow-hidden">
+                    <div className="p-6 pt-0 border-t border-slate-100 bg-slate-50/30">
+                      <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                        
+                        {church.clusters.map((cluster) => (
+                          <div 
+                            key={cluster.id} 
+                            className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-sky-300 hover:shadow-lg hover:shadow-sky-500/5 transition-all group relative overflow-hidden flex flex-col justify-between"
+                          >
+                            <div className={`absolute left-0 top-0 bottom-0 w-1 ${cluster.is_active ? 'bg-[#0284c7]' : 'bg-slate-300'}`} />
+                            <div>
+                              <div className="flex items-start justify-between mb-3 pl-2">
+                                <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider block">
+                                  {cluster.code}
+                                </span>
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold ${cluster.is_active ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${cluster.is_active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                                  {cluster.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                              </div>
+                              <h4 className="text-base font-bold text-slate-900 group-hover:text-[#0284c7] transition-colors pl-2">
+                                {cluster.name} Cluster
+                              </h4>
+                            </div>
+
+                            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end gap-2 pl-2">
+                              <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all active:scale-95">
+                                <Pencil size={14} /> Edit
+                              </button>
+                              <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all active:scale-95">
+                                <Trash2 size={14} /> Delete
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+              </div>
+            );
+          })}
+        </div>
       </div>
       
       {/* {isVisitorModalOpen && (

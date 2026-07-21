@@ -63,7 +63,7 @@ export default function Churches() {
               setSearchTerm(val);
               setCurrentPage(1);
             }}
-            placeholder="Search visitor by information..."
+            placeholder="Search church by information..."
           />
           
           <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
@@ -172,6 +172,7 @@ export default function Churches() {
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
               <button 
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/80 hover:border-indigo-200 transition-all duration-200 active:scale-95"
+                  onClick={()=> handleViewChurch(church.id)}
               >
                   <Pencil size={14} />
                   Edit
@@ -226,7 +227,7 @@ export default function Churches() {
         <ChurchModal 
         isOpen={isChurchModalOpen}
         onClose={() => setIsChurchModalOpen(false)} 
-        // ChurchId={selectedChurchId}
+        // churchId={selectedChurchId}
         />
       )}
     </div>

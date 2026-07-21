@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Cluster;
+use App\Models\Church;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ClusterService
@@ -41,6 +42,47 @@ class ClusterService
         }
 
         return $query->orderBy('name', 'asc')
+            ->paginate($perPage);
+    }
+
+    public function getGroupedClusters(array $filters = [], int $perPage = 10): LengthAwarePaginator
+    {
+        // Kukunin ang Church at ire-relate ang Clusters
+        $query = Church::query()
+            ->with(['clusters' => function ($q) use ($filters) {
+                // Pag may search filter, i-fifilter din ang clusters
+                if (!empty($filters['search'])) {
+                    $search = $filters['search'];
+                    $q->where(function ($sub) use ($search) {
+                        $sub->where('name', 'ILIKE', "%{$search}%")
+                            ->orWhere('code', 'ILIKE', "%{$search}%");
+                    });
+                }
+
+                if (isset($filters['is_active'])) {
+                    $q->where('is_active', filter_var($filters['is_active'], FILTER_VALIDATE_BOOLEAN));
+                }
+            }]);
+
+        // Search filter: puwedeng pangalan ng Church O pangalan ng Cluster
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'ILIKE', "%{$search}%")
+                    ->orWhere('code', 'ILIKE', "%{$search}%")
+                    ->orWhereHas('clusters', function ($clusterQuery) use ($search) {
+                        $clusterQuery->where('name', 'ILIKE', "%{$search}%")
+                            ->orWhere('code', 'ILIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', filter_var($filters['is_active'], FILTER_VALIDATE_BOOLEAN));
+        }
+
+        return $query->orderBy('is_main_campus', 'desc')
+            ->orderBy('name', 'asc')
             ->paginate($perPage);
     }
 

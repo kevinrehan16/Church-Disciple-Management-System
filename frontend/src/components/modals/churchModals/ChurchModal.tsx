@@ -5,6 +5,7 @@ import { modalAnimation } from '../../../utils/ModalAnimation';
 import SectionHeader from '../../ui/SectionHeader';
 import { InputField } from '../../inputs/InputField';
 import { SelectField } from '../../inputs/SelectField';
+import { useRegisterChurch } from '../../../hooks/useChurches';
 
 interface ChurchModalProps {
   isOpen: boolean;
@@ -13,22 +14,31 @@ interface ChurchModalProps {
 
 export default function ChurchModal({ isOpen, onClose }: ChurchModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
+  const { mutate: addChurch, isPending: pendingAddChurch } = useRegisterChurch();
   
   // I-adjust ang hook na ito base sa actual mutation hook mo para sa Churches
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
 
-    // IMPORTANT: Convert string values to correct types (Boolean)
+    // Gamitin ang CreateChurchPayload para sa type-checking
     const formattedData = {
-        ...data,
-        is_main_campus: data.is_main_campus === 'true',
-        is_active: data.is_active === 'true',
+        name: formData.get('name') as string,
+        code: formData.get('code') as string,
+        address: formData.get('address') as string,
+        contact_number: (formData.get('contact_number') as string) || null,
+        email: (formData.get('email') as string) || null,
+        is_main_campus: formData.get('is_main_campus') === 'true',
+        is_active: formData.get('is_active') === 'true',
     };
 
-    // addChurch(formattedData, { onSuccess: () => startClose() });
+    // Safe na ipasa dahil compliant na sa CreateChurchPayload interface
+    addChurch(formattedData, { 
+        onSuccess: () => {
+            startClose();
+        }
+    });
   };
 
   if (!isOpen) return null;
