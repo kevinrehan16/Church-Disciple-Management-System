@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { FaChurch } from "react-icons/fa";
+import { FaChurch, FaCross } from "react-icons/fa";
 import { 
-  Pencil, Trash2, MapPin, Phone, Mail, Users, Layers, 
+  Pencil, Trash2, MapPin, Phone, Mail, Users, Layers, FingerprintPattern, 
   Plus, Star, Filter, ArrowUpDown, ChevronLeft, ChevronRight 
 } from 'lucide-react';
 import { useChurches } from '../../hooks/useChurches';
@@ -94,20 +94,26 @@ export default function Churches() {
               {/* Card Header: Code, Main Campus Badge, & Animated Status Indicator */}
               <div className="flex items-start justify-between mb-3">
                   <div>
-                  <div className="flex items-center gap-2 mb-4 flex-wrap">
-                      <span className="text-xs font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded border border-slate-200">
-                      {church.code}
-                      </span>
-                      {church.is_main_campus && (
-                      <span className="flex items-center gap-1 text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full">
-                          <Star size={12} className="fill-amber-500 text-amber-500" />
-                          Main
-                      </span>
-                      )}
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-800 leading-tight group-hover:text-[var(--active-parent)] transition-colors">
-                      {church.name}
-                  </h3>
+                    <div className="flex items-center gap-2 mb-4 flex-wrap">
+                        <span className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded border border-slate-200">
+                          <FingerprintPattern size={12} className="fill-slate-500 text-slate-500" />
+                          {church.code}
+                        </span>
+                        {church.is_main_campus && (
+                        <span className="flex items-center gap-1 text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full">
+                            <Star size={12} className="fill-amber-500 text-amber-500" />
+                            Main
+                        </span>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-[var(--active-parent)]/50 text-white rounded-full group-hover:bg-[var(--active-parent)] group-hover:text-white transition-all shadow-sm">
+                        <FaCross size={16} />
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-800 leading-tight group-hover:text-[var(--active-parent)] transition-colors">
+                        {church.name}
+                      </h3>
+                    </div>
                   </div>
 
                   {/* 2. ANIMATED STATUS DOT (PULSING EFFECT) */}

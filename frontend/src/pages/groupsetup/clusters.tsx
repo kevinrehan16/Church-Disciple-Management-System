@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FaMapMarkedAlt } from "react-icons/fa";
-import { Plus, Search, Filter, ArrowUpDown, FingerprintPattern, Database, ChevronDown, ShieldUser, Church, Pencil, Trash2, MapPinHouse, MapPin } from 'lucide-react';
+import { Plus, Star, Filter, ArrowUpDown, FingerprintPattern, Database, ChevronDown, ShieldUser, Church, Pencil, Trash2, MapPinHouse, MapPin } from 'lucide-react';
 import { useClusters } from '../../hooks/useClusters';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
@@ -107,12 +107,12 @@ export default function Clusters() {
             return (
               <div 
                 key={church.id} 
-                className="bg-white rounded-2xl border border-slate-200 shadow-[0_2px_10px_-3px_rgba(2,132,199,0.05)] overflow-hidden transition-all duration-300"
+                className={`bg-white rounded-2xl border border-slate-200 shadow-[0_2px_10px_-3px_rgba(2,132,199,0.05)] overflow-hidden transition-all duration-300 ${isOpen ? '!border-[var(--active-parent,rgb(99,102,241))]' : 'bg-slate-200'}`}
               >
                 {/* Accordion Header */}
                 <button
                   onClick={() => toggleAccordion(church.id)}
-                  className="w-full px-6 py-5 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors text-left group"
+                  className={`w-full px-6 py-5 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors text-left group ${isOpen ? '!bg-slate-200' : 'bg-white'}`}
                 >
                   <div className="flex items-center gap-4">
                     <div className={`p-3 rounded-xl transition-colors bg-slate-100 text-slate-500 group-hover:bg-[var(--active-parent,rgb(99,102,241))]/10 group-hover:text-[var(--active-parent,rgb(99,102,241))] group-hover:border-[var(--active-parent,rgb(99,102,241))] transition-colors`}>
@@ -123,8 +123,9 @@ export default function Clusters() {
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-lg font-bold text-slate-900 group-hover:text-[var(--active-parent,rgb(99,102,241))]">{church.name}</h3>
                         {church.is_main_campus && (
-                          <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wide rounded-md">
-                            Main Campus
+                          <span className="flex items-center gap-1 text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full">
+                            <Star size={12} className="fill-amber-500 text-amber-500" />
+                            Main
                           </span>
                         )}
                       </div>
@@ -139,7 +140,7 @@ export default function Clusters() {
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
                       <Database size={14} className="text-slate-400" />
-                      {church.clusters.length} Clusters
+                      {church.clusters.length} {church.clusters.length > 1 ? "Clusters" : "Cluster"}
                     </div>
                     <div className={`p-2 rounded-full transition-transform duration-300 border border-slate-200 ${isOpen ? 'rotate-180 bg-slate-100 text-slate-600' : 'bg-white text-slate-400 hover:bg-slate-50'}`}>
                       <ChevronDown size={18} />
