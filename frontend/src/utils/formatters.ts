@@ -30,9 +30,9 @@ export const getLifestageStyles = (stage: string) => {
   const styles: Record<string, string> = {
     'Single': 'bg-blue-50 text-blue-600 border-blue-100',
     'Married': 'bg-emerald-50 text-emerald-600 border-emerald-100',
-    'Divorced': 'bg-amber-50 text-amber-600 border-amber-100',
+    'Separated': 'bg-amber-50 text-amber-600 border-amber-100',
     'Widowed': 'bg-slate-100 text-slate-600 border-slate-200',
-    'Separated': 'bg-rose-100 text-rose-600 border-rose-200',
+    'Divorced': 'bg-rose-100 text-rose-600 border-rose-200',
   };
   // Default style kung walang match
   return styles[stage] || 'bg-slate-50 text-slate-500 border-slate-100';

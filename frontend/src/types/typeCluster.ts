@@ -3,6 +3,7 @@ export interface Cluster {
   church_id: number;
   name: string;
   code: string;
+  head_id: number;
   is_active: boolean;
   created_at?: string;
   updated_at?: string;
@@ -18,15 +19,10 @@ export interface GroupedChurch {
   clusters: Cluster[];
 }
 
-export interface CreateClusterPayload {
+export interface CreateUpdateCluster {
   church_id: number;
   name: string;
   code: string;
-  is_active?: boolean;
-}
-
-export interface UpdateClusterPayload {
-  name?: string;
-  code?: string;
+  head_id: number;
   is_active?: boolean;
 }

@@ -8,12 +8,13 @@ interface SelectFieldProps {
   icon?: React.ReactNode;
   defaultValue?: string;
   readOnly?: boolean;
+  required?: boolean;
 }
 
-export const SelectField = ({ label, name, error, options, icon, defaultValue, readOnly = false }: SelectFieldProps) => {
+export const SelectField = ({ label, name, error, options, icon, defaultValue, readOnly = false, required = false }: SelectFieldProps) => {
   return (
     <div className="space-y-1.5 w-full">
-      <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider ml-1">{label}</label>
+      <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider ml-1">{label} {required && <span className="text-red-500">*</span>}</label>
       <div className="relative group">
         {/* Left Icon (optional) */}
         {icon && (

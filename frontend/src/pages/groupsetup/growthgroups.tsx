@@ -4,7 +4,6 @@ import { Plus, Search, Filter, ArrowUpDown, Mars, Venus, Eye, Calendar, Clock } 
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
 import { TableLoading, TableError, TableEmpty } from '../../components/ui/TableStates';
-import { getLifestageStyles } from '../../utils/formatters';
 
 export default function GrowthGroups() {
   

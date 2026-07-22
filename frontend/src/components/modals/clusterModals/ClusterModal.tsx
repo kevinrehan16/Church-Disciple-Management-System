@@ -1,5 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Church, Tag, UserCheck, ShieldCheck, Layers, Search, Check, ChevronDown } from 'lucide-react';
+import { X, Church, Tag, UserCheck, ShieldCheck, Layers, Search, Check, ChevronDown, Save } from 'lucide-react';
+// I-adjust ang import path base sa kung nasaan ang components mo
+import { modalAnimation } from '../../../utils/ModalAnimation';
+import SectionHeader from '../../ui/SectionHeader';
+import { InputField } from '../../inputs/InputField';
+import { SelectField } from '../../inputs/SelectField';
 
 interface ClusterModalProps {
   isOpen: boolean;
@@ -23,7 +28,15 @@ const MOCK_HEADS = [
   { id: 6, name: "Ptr. Alexander Lim" },
 ];
 
+const CHURCH_OPTIONS = [
+  { value: '1', label: 'GCF SouthMetro (Main Campus)' },
+  { value: '2', label: 'GCF Bacoor' },
+  { value: '3', label: 'GCF Alfonso' },
+];
+
 export default function ClusterModal({ isOpen, onClose, initialData }: ClusterModalProps) {
+  const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
+  
   const [formData, setFormData] = useState({
     church_id: initialData?.church_id || 1,
     name: initialData?.name || '',
@@ -58,207 +71,206 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Payload to POST:", formData);
     alert("Check console for POST payload structure!");
-    onClose();
+    startClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fadeIn">
+    <div 
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 ${isClosing ? 'modal-overlay closing' : 'modal-overlay'}`}
+      onAnimationEnd={handleAnimationEnd}
+    >
       {/* Modal Container */}
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-lg overflow-hidden transition-all transform scale-100">
+      <div className={`bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden border border-slate-200/80 flex flex-col max-h-[92vh] ${isClosing ? 'modal-content closing' : 'modal-content'}`}>
         
-        {/* Modal Header */}
-        <div className="px-8 py-6 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-sky-50 text-[#0284c7] rounded-2xl shadow-sm">
-              <Layers size={20} />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-slate-900">
-                {initialData ? 'Edit Cluster' : 'Create New Cluster'}
-              </h3>
-              <p className="text-xs text-slate-500 font-medium">
-                Fill in the details to configure church cluster structure.
-              </p>
-            </div>
+        {/* Header - Dynamic background consistent sa theme */}
+        <div className="px-8 py-6 bg-[var(--active-parent)] flex items-center justify-between text-white flex-shrink-0">
+          <div>
+            <h2 className="text-xl font-extrabold tracking-tight">
+              {initialData ? 'Edit Cluster' : 'Create New Cluster'}
+            </h2>
+            <p className="text-white/80 text-xs mt-0.5 font-medium">
+              Fill in the details to configure church cluster structure.
+            </p>
           </div>
-          
           <button 
-            onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 rounded-full transition-all"
+            onClick={startClose} 
+            className="p-2 hover:bg-white/10 active:scale-95 rounded-full transition-all"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 
-        {/* Modal Form Body */}
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
-          
-          {/* Church Selection */}
-          <div className="space-y-2">
-            <label className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
-              <Church size={14} className="text-[#0284c7]" /> Associated Church
-            </label>
-            <select
-              value={formData.church_id}
-              onChange={(e) => setFormData({ ...formData, church_id: Number(e.target.value) })}
-              className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0284c7]/20 focus:border-[#0284c7] transition-all"
-            >
-              <option value={1}>GCF SouthMetro (Main Campus)</option>
-              <option value={2}>GCF Bacoor</option>
-              <option value={3}>GCF Alfonso</option>
-            </select>
-          </div>
-
-          {/* Grid for Name & Code */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Scrollable Form Body */}
+        <div className="p-6 overflow-y-auto space-y-6 flex-1">
+          <form id="cluster-form" onSubmit={handleSubmit} className="space-y-6">
             
-            {/* Cluster Name */}
-            <div className="md:col-span-2 space-y-2">
-              <label className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
-                <Tag size={14} className="text-[#0284c7]" /> Cluster Name
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. Dasma"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0284c7]/20 focus:border-[#0284c7] transition-all"
-                required
-              />
+            {/* Section 1: Associated Church */}
+            <div>
+              <SectionHeader title="Associated Church" icon={Church} />
+              <div className="mt-2">
+                <SelectField 
+                  label="Church" 
+                  name="church_id" 
+                  options={CHURCH_OPTIONS}
+                  required
+                />
+              </div>
             </div>
 
-            {/* Cluster Code */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
-                Code
-              </label>
-              <input
-                type="text"
-                placeholder="DSM"
-                value={formData.code}
-                onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-bold uppercase tracking-widest text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0284c7]/20 focus:border-[#0284c7] transition-all"
-                required
-              />
-            </div>
-          </div>
-
-          {/* SEARCHABLE SELECTBOX PARA SA CLUSTER HEAD (`head_id`) */}
-          <div className="space-y-2 relative" ref={dropdownRef}>
-            <label className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
-              <UserCheck size={14} className="text-[#0284c7]" /> Cluster Head (Leader)
-            </label>
-
-            {/* Trigger Button */}
-            <div
-              onClick={() => setIsHeadOpen(!isHeadOpen)}
-              className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 flex items-center justify-between cursor-pointer hover:border-slate-300 transition-all shadow-sm"
-            >
-              <span>{selectedHeadName}</span>
-              <ChevronDown size={16} className={`text-slate-400 transition-transform duration-200 ${isHeadOpen ? 'rotate-180' : ''}`} />
-            </div>
-
-            {/* Dropdown Menu na may Search Feature */}
-            {isHeadOpen && (
-              <div className="absolute left-0 right-0 mt-2 bg-white rounded-2xl border border-slate-200 shadow-xl z-50 overflow-hidden animate-fadeIn">
-                
-                {/* Search Input sa loob ng dropdown */}
-                <div className="p-3 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
-                  <Search size={15} className="text-slate-400 ml-1" />
-                  <input
-                    type="text"
-                    placeholder="Search leader name..."
-                    value={headSearchQuery}
-                    onChange={(e) => setHeadSearchQuery(e.target.value)}
-                    className="w-full bg-transparent text-sm font-medium text-slate-800 focus:outline-none placeholder:text-slate-400"
-                    autoFocus
+            {/* Section 2: Cluster Information */}
+            <div>
+              <SectionHeader title="Cluster Information" icon={Layers} />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                {/* Cluster Name */}
+                <div className="md:col-span-2">
+                  <InputField
+                    label="Cluster Name"
+                    name="name"
+                    placeholder="e.g. Dasma"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
                   />
                 </div>
 
-                {/* List ng Results */}
-                <div className="max-h-52 overflow-y-auto p-1.5 space-y-1">
-                  {filteredHeads.length === 0 ? (
-                    <div className="text-center py-4 text-xs text-slate-400 font-medium">
-                      No leader found.
-                    </div>
-                  ) : (
-                    filteredHeads.map((head) => {
-                      const isSelected = formData.head_id === head.id;
-                      return (
-                        <div
-                          key={head.id}
-                          onClick={() => {
-                            setFormData({ ...formData, head_id: head.id });
-                            setIsHeadOpen(false);
-                            setHeadSearchQuery('');
-                          }}
-                          className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all ${
-                            isSelected 
-                              ? 'bg-sky-50 text-[#0284c7]' 
-                              : 'text-slate-700 hover:bg-slate-100/70'
-                          }`}
-                        >
-                          <span>{head.name}</span>
-                          {isSelected && <Check size={16} className="text-[#0284c7]" />}
-                        </div>
-                      );
-                    })
-                  )}
+                {/* Cluster Code */}
+                <div>
+                  <InputField
+                    label="Code"
+                    name="code"
+                    placeholder="DSM"
+                    value={formData.code}
+                    onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                    required
+                  />
                 </div>
-              </div>
-            )}
-          </div>
-
-          {/* Active Status Toggle */}
-          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-xl ${formData.is_active ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-200 text-slate-500'}`}>
-                <ShieldCheck size={18} />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-slate-900">Cluster Status</h4>
-                <p className="text-xs text-slate-500">Enable this cluster for operational use.</p>
               </div>
             </div>
 
-            {/* Custom Toggle Switch */}
-            <button
-              type="button"
-              onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                formData.is_active ? 'bg-[#0284c7]' : 'bg-slate-300'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  formData.is_active ? 'translate-x-6' : 'translate-x-1'
+            {/* Section 3: Cluster Leadership (Searchable Dropdown) */}
+            <div>
+              <SectionHeader title="Cluster Leadership" icon={UserCheck} />
+              <div className="space-y-2 relative mt-2" ref={dropdownRef}>
+                <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider ml-1">Cluster Head (Leader) <span className="text-red-500">*</span></label>
+
+                {/* Trigger Button */}
+                <div
+                  onClick={() => setIsHeadOpen(!isHeadOpen)}
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 flex items-center justify-between cursor-pointer hover:border-slate-300 transition-all shadow-sm"
+                >
+                  <span className="font-medium">{selectedHeadName}</span>
+                  <ChevronDown size={16} className={`text-slate-400 transition-transform duration-200 ${isHeadOpen ? 'rotate-180' : ''}`} />
+                </div>
+
+                {/* Dropdown Menu na may Search Feature */}
+                {isHeadOpen && (
+                  <div className="absolute left-0 right-0 mt-0 bg-white rounded-xl border border-slate-200 shadow-xl z-50 overflow-hidden animate-fadeIn">
+                    
+                    {/* Search Input sa loob ng dropdown */}
+                    <div className="relative group p-3 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                      <Search size={15} className="text-slate-400 group-focus-within:text-[var(--active-parent,rgb(99,102,241))] transition-colors" />
+                      <input
+                        type="text"
+                        placeholder="Search leader name..."
+                        value={headSearchQuery}
+                        onChange={(e) => setHeadSearchQuery(e.target.value)}
+                        className="w-full bg-transparent text-sm text-slate-800 focus:outline-none placeholder:text-slate-400"
+                        autoFocus
+                      />
+                    </div>
+
+                    {/* List ng Results */}
+                    <div className="max-h-52 overflow-y-auto p-1.5 space-y-1">
+                      {filteredHeads.length === 0 ? (
+                        <div className="text-center py-4 text-xs text-slate-400 font-medium">
+                          No leader found.
+                        </div>
+                      ) : (
+                        filteredHeads.map((head) => {
+                          const isSelected = formData.head_id === head.id;
+                          return (
+                            <div
+                              key={head.id}
+                              onClick={() => {
+                                setFormData({ ...formData, head_id: head.id });
+                                setIsHeadOpen(false);
+                                setHeadSearchQuery('');
+                              }}
+                              className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm cursor-pointer transition-all ${
+                                isSelected 
+                                  ? 'bg-[var(--active-parent,rgb(99,102,241))]/70 text-white font-medium' 
+                                  : 'text-slate-700 hover:bg-slate-50'
+                              }`}
+                            >
+                              <span>{head.name}</span>
+                              {isSelected && (
+                                <div className="w-4 h-4 rounded-full bg-emerald-600 border-emerald-300 flex items-center justify-center">
+                                  <Check size={14} className="text-white" />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Section 4: Active Status Toggle */}
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200/80">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${formData.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
+                  <ShieldCheck size={18} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900">Cluster Status</h4>
+                  <p className="text-xs text-slate-500">Enable this cluster for operational use.</p>
+                </div>
+              </div>
+
+              {/* Custom Toggle Switch */}
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                  formData.is_active ? 'bg-emerald-600' : 'bg-slate-300'
                 }`}
-              />
-            </button>
-          </div>
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    formData.is_active ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
 
-          {/* Footer Actions */}
-          <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold transition-all shadow-sm active:scale-95"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-2.5 bg-[#0284c7] hover:bg-[#026ca1] text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-sky-500/20 active:scale-95"
-            >
-              Save Cluster
-            </button>
-          </div>
+          </form>
+        </div>
 
-        </form>
+        {/* Footer Actions - Sticky (Consistent with VisitorModal) */}
+        <div className="px-8 py-4 bg-slate-50 border-t border-slate-200/60 flex gap-3 justify-end flex-shrink-0">
+          <button 
+            type="button" 
+            onClick={startClose} 
+            className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider border border-slate-200 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all flex items-center gap-2"
+          >
+            <X size={15} /> Cancel
+          </button>
+          <button 
+            type="submit" 
+            form="cluster-form" 
+            className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2"
+          >
+            <Save size={15} /> Save Cluster
+          </button>
+        </div>
+
       </div>
     </div>
   );

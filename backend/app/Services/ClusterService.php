@@ -45,7 +45,7 @@ class ClusterService
             ->paginate($perPage);
     }
 
-    public function getGroupedClusters(array $filters = [], int $perPage = 10): LengthAwarePaginator
+    public function getGroupedClusters(array $filters = [], int $perPage = 5): LengthAwarePaginator
     {
         // Kukunin ang Church at ire-relate ang Clusters
         $query = Church::query()
