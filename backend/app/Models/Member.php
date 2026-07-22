@@ -121,4 +121,12 @@ class Member extends Model
     {
         return $this->belongsTo(cluster::class);
     }
+
+    public function spiritualGifts()
+    {
+        return $this->belongsToMany(SpiritualGift::class, 'member_spiritual_gifts')
+            ->using(MemberSpiritualGift::class)
+            ->withPivot('id', 'level', 'score', 'notes')
+            ->withTimestamps();
+    }
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\Visitors\VisitorController;
 use App\Http\Controllers\Api\V1\Churches\ChurchController;
 use App\Http\Controllers\Api\V1\Clusters\ClusterController;
 use App\Http\Controllers\Api\V1\GrowthGroups\GrowthGroupController;
+use App\Http\Controllers\Api\V1\SpiritualGifts\SpiritualGiftController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -47,5 +48,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/growth-groups', [GrowthGroupController::class, 'index']);
         Route::post('/growth-groups', [GrowthGroupController::class, 'store']);
         Route::put('/growth-groups/{growth_group}', [GrowthGroupController::class, 'update']);
+
+        Route::prefix('spiritual-gifts')->group(function () {
+            Route::get('/', [SpiritualGiftController::class, 'index']);
+            Route::get('/{spiritualGift}', [SpiritualGiftController::class, 'show']);
+        });
     });
 });

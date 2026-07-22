@@ -32,9 +32,9 @@ class AuthService
                 'role'     => 'member', // Default role
             ]);
 
-            // 2. Create Member Profile
-            $user->member()->create([
-                'mem_id'          => 'MEM-' . time(),
+            // 2. Create Member Profile (I-save natin sa $member variable)
+            $member = $user->member()->create([
+                'mem_id'             => 'MEM-' . time(),
 
                 // Personal Information
                 'first_name'         => $data['first_name'],
@@ -76,7 +76,7 @@ class AuthService
                 'purpose_reg'        => $data['purpose_reg'] ?? null,
                 'prev_church'        => $data['prev_church'] ?? null,
                 'church_affiliation' => $data['church_affiliation'] ?? null,
-                'church_id'       => $data['church_id'] ?? null,
+                'church_id'          => $data['church_id'] ?? null,
                 'member_position'    => $data['member_position'] ?? null,
                 'member_status'      => $data['member_status'] ?? 'Active',
                 'membership_date'    => $data['membership_date'] ?? null,
@@ -84,10 +84,16 @@ class AuthService
                 'rec_for_membership' => $data['rec_for_membership'] ?? false,
                 'comment'            => $data['comment'] ?? null,
 
-                // Audit Fields (Hindi galing sa request, galing sa system)
-                'user_added'         => auth()->id(), // Sino ang nag-register
+                // Audit Fields
+                'user_added'         => auth()->id(),
                 'user_updated'       => auth()->id(),
             ]);
+
+            // 3. ATTACH SPIRITUAL GIFTS (Heto yung idinagdag natin)
+            if (!empty($data['spiritual_gifts']) && is_array($data['spiritual_gifts'])) {
+                // I-sync ang array of IDs sa member na kakagawa lang
+                $member->spiritualGifts()->sync($data['spiritual_gifts']);
+            }
 
             return $user;
         });

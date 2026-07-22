@@ -4,6 +4,7 @@ import {
   Globe, Briefcase, FileText, Building, Award, Church, Users
 } from 'lucide-react';
 import { useRegisterMember } from '../../../hooks/useMembers';
+import { useSpiritualGift } from '../../../hooks/useSpiritualGift';
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import { InputField } from '../../inputs/InputField';
 import { SelectField } from '../../inputs/SelectField';
@@ -18,30 +19,22 @@ interface ModalProps {
 export default function RegisterMemberModal({ isOpen, onClose, memberId }: ModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addMember, isPending: pendingAddMember } = useRegisterMember();
+  const { data: apiResponse, isLoading, isError, refetch } = useSpiritualGift();
+
+  // FIX 1: Mas maayos na pag-extract ng array from API
+  const giftsList = Array.isArray(apiResponse) 
+    ? apiResponse 
+    : Array.isArray(apiResponse?.data) 
+      ? apiResponse.data 
+      : [];
+
+  const [selectedGiftIds, setSelectedGiftIds] = useState<number[]>([]);
   
-  const [selectedGifts, setSelectedGifts] = useState<string[]>([]);
-  const giftOptions = [
-  "Prophecy",
-  "Serving",
-  "Teaching",
-  "Encouragement",
-  "Giving",
-  "Leadership",
-  "Mercy",
-  "Wisdom",
-  "Knowledge",
-  "Faith",
-  "Healing",
-  "Miracles",
-  "Discernment of Spirits",
-  "Tongues",
-  "Interpretation of Tongues",
-  "Apostleship",
-  "Evangelism",
-  "Pastoring (Shepherding)",
-  "Helps",
-  "Administration"
-];
+  const giftOptions = giftsList.map((gift: any) => ({
+    value: gift.id,                
+    label: gift.name,              
+    description: gift.description, 
+  }));
 
   if (!isOpen) return null;
 
@@ -57,6 +50,9 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
         rec_for_baptism: data.rec_for_baptism === '1',
         rec_for_membership: data.rec_for_membership === '1',
         age: parseInt(data.age as string) || 0,
+        
+        // FIX 2: Isinama na ang selected gifts papuntang backend!
+        spiritual_gifts: selectedGiftIds, 
     };
 
     addMember(formattedData, { onSuccess: () => startClose() });
@@ -68,7 +64,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
         
         <div className={`bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden border border-slate-200/80 flex flex-col max-h-[92vh] ${isClosing ? 'modal-content closing' : 'modal-content'}`}>
           
-          {/* HEADER - RESTORED */}
+          {/* HEADER */}
           <div className="px-8 py-6 bg-[var(--active-parent)] flex items-center justify-between text-white flex-shrink-0">
             <div>
               <h2 className="text-xl font-extrabold tracking-tight">
@@ -117,24 +113,26 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider pl-4">Birthday</label>
                     </div>
 
-                    {/* FUSED CONTAINER (Dito nakalagay yung class mo) */}
+                    {/* FUSED CONTAINER */}
                     <div className={`flex w-full rounded-xl border border-slate-200 focus-within:border-[var(--active-parent,rgb(99,102,241))] focus-within:ring-4 focus-within:ring-[var(--active-parent,rgb(99,102,241))]/10 transition-all overflow-hidden`}>
                       
-                      {/* BIRTHDAY INPUT (borderless inside) */}
+                      {/* BIRTHDAY INPUT */}
                       <div className="relative flex-grow border-r border-slate-200">
                         <div className="absolute left-3 top-3 text-slate-400">
                           <Calendar size={15} />
                         </div>
                         <input 
                           type="date" 
+                          name="birthday" // Added name prop so it's captured in FormData
                           className="w-full pl-10 pr-4 py-2.5 outline-none bg-transparent text-sm" 
                         />
                       </div>
 
-                      {/* AGE INPUT (borderless inside) */}
+                      {/* AGE INPUT */}
                       <div className="w-24">
                         <input 
-                          type="number" 
+                          type="number"
+                          name="age" // Added name prop just in case
                           placeholder="Age"
                           className="w-full px-4 py-2.5 outline-none bg-transparent text-sm text-center" 
                         />
@@ -177,14 +175,11 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                   <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {/* Home Address (Naka-wrap sa div para sigurado ang span) */}
                   <div className="md:col-span-2">
                     <InputField label="Home Address" name="home_address" icon={<MapPin size={15}/>} />
                   </div>
-                  {/* Barangay & City (Column 1 & 2) */}
                   <InputField label="Barangay" name="barangay" />
                   <InputField label="City" name="city" />
-                  {/* Region & Country (Column 1 & 2) */}
                   <InputField label="Region" name="region" />
                   <InputField label="Country" name="country" />
                 </div>
@@ -213,15 +208,19 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   <InputField label="Date Received Jesus" name="received_jesus" type="date" />
-                  <SelectField label="Baptized (Immersion)?" name="baptized_immersion" options={[{label: 'Yes', value: 'Yes'}, {label: 'No', value: 'No'}]} />
+                  <SelectField label="Baptized (Immersion)?" name="baptized_immersion" options={[{label: 'Yes', value: '1'}, {label: 'No', value: '0'}]} />
                   <InputField label="Baptism Date" name="baptized_date" type="date" />
                   <div className="md:col-span-3">
+                    
+                    {/* MULTISELECT PARA SA GIFTS */}
                     <MultiSelect 
                       label="Spiritual Gifts" 
                       options={giftOptions} 
-                      selected={selectedGifts} 
-                      onChange={setSelectedGifts} 
+                      selected={selectedGiftIds} 
+                      onChange={setSelectedGiftIds} 
+                      disabled={isLoading} 
                     />
+
                   </div>
                 </div>
               </div>
@@ -240,12 +239,6 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                   <InputField label="Church Affiliation" name="church_affiliation" />
                   <InputField label="Satellite ID" name="church_id" icon={<Church size={15}/>} />
                   <InputField label="Picture Path" name="picture" />
-                  {/* <SelectField label="Member Position" name="member_position" options={[{label: 'Leader', value: 'Leader'}, {label: 'Member', value: 'Member'}]} />
-                  <SelectField label="Member Status" name="member_status" options={[{label: 'Active', value: 'Active'}, {label: 'Inactive', value: 'Inactive'}]} />
-                  <InputField label="Membership Date" name="membership_date" type="date" />
-                  <SelectField label="Rec. for Baptism" name="rec_for_baptism" options={[{label: 'Yes', value: '1'}, {label: 'No', value: '0'}]} />
-                  <SelectField label="Rec. for Membership" name="rec_for_membership" options={[{label: 'Yes', value: '1'}, {label: 'No', value: '0'}]} />
-                  <InputField label="Comment" name="comment" /> */}
                 </div>
               </div>
 
@@ -285,8 +278,8 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
             <button type="button" onClick={startClose} className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider border border-slate-200 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all flex items-center gap-2">
              <X size={15} /> Cancel
             </button>
-            <button type="submit" form="member-form" className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2">
-              <Save size={15} /> Save Registration
+            <button type="submit" disabled={pendingAddMember} form="member-form" className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2">
+              <Save size={15} /> {pendingAddMember ? 'Saving...' : 'Save Registration'}
             </button>
           </div>
         </div>

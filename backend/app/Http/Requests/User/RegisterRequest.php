@@ -75,9 +75,9 @@ class RegisterRequest extends FormRequest
             'rec_for_membership'  => 'nullable|boolean',
             'comment'             => 'nullable|string',
 
-            // Audit fields
-            // Note: Hindi ito dapat galing sa user request, dapat system generated
-            // pero kung kailangan mo talagang i-validate:
+            'spiritual_gifts'     => 'nullable|array',
+            'spiritual_gifts.*'   => 'integer|exists:spiritual_gifts,id',
+
             'user_added'    => 'nullable|string|max:20',
             'user_updated'  => 'nullable|string|max:20',
         ];

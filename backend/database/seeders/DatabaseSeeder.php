@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             VisitorSeeder::class,
+            MemberSeeder::class,
+            SpiritualGiftSeeder::class,
             ChurchSeeder::class,
             ClusterSeeder::class,
             GrowthGroupSeeder::class,
