@@ -2,136 +2,29 @@ import { useState } from 'react';
 import { FaFacebookSquare, FaMobile, FaEnvelope, FaUserFriends, FaBible } from "react-icons/fa";
 import { Plus, Search, Filter, ArrowUpDown, Mars, Venus, Eye, Calendar, Clock, Users, MapPin,ShieldCheck, Building2, Layers, Edit3, Trash2, ChevronLeft, ChevronRight, UserCheck } from 'lucide-react';
 import type { GrowthGroup } from '../../types/typeGrowthGroup';
+import { useGrowthGroup } from '../../hooks/useGrowthGroup';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
 import { TableLoading, TableError, TableEmpty } from '../../components/ui/TableStates';
 
-const MOCK_GROWTH_GROUPS: GrowthGroup[] = [
-  {
-    id: 2,
-    church_id: 1,
-    cluster_id: 2,
-    leader_id: 1,
-    name: "Fan Into Flame",
-    code: "FIFGG",
-    meeting_day: "Saturday",
-    meeting_time: "15:00:00",
-    location_type: "onsite",
-    venue_address: "Youth Hub Main Campus",
-    target_demographic: "youth",
-    is_active: true,
-    church: {
-      id: 1,
-      name: "GCF SouthMetro",
-      code: "GCFSM",
-      address: "123 Faith St., Quezon City",
-      is_main_campus: true
-    },
-    cluster: {
-      id: 2,
-      church_id: 1,
-      name: "Bacoor",
-      code: "BCR"
-    },
-    leader: {
-      id: 1,
-      first_name: "Kevin",
-      last_name: "Godnacam",
-      nickname: "Kevz",
-      mobile_number: "09153169518",
-      member_position: "Pastoral Staff"
-    }
-  },
-  {
-    id: 3,
-    church_id: 1,
-    cluster_id: 1,
-    leader_id: 2,
-    name: "Grace & Truth",
-    code: "GTG",
-    meeting_day: "Friday",
-    meeting_time: "19:00:00",
-    location_type: "online",
-    venue_address: "Google Meet (Virtual)",
-    target_demographic: "young_adults",
-    is_active: true,
-    church: {
-      id: 1,
-      name: "GCF SouthMetro",
-      code: "GCFSM",
-      address: "123 Faith St., Quezon City",
-      is_main_campus: true
-    },
-    cluster: {
-      id: 1,
-      church_id: 1,
-      name: "Dasma",
-      code: "DSM"
-    },
-    leader: {
-      id: 2,
-      first_name: "Mark",
-      last_name: "Santos",
-      nickname: "Marky",
-      mobile_number: "09181234567",
-      member_position: "Volunteer Leader"
-    }
-  },
-  {
-    id: 4,
-    church_id: 2,
-    cluster_id: 3,
-    leader_id: 3,
-    name: "Light Bearers",
-    code: "LBG",
-    meeting_day: "Sunday",
-    meeting_time: "13:30:00",
-    location_type: "onsite",
-    venue_address: "Fellowship Hall, Bacoor Branch",
-    target_demographic: "family",
-    is_active: false,
-    church: {
-      id: 2,
-      name: "GCF Bacoor",
-      code: "GCFBAC",
-      address: "Aguinaldo Highway, Bacoor",
-      is_main_campus: false
-    },
-    cluster: {
-      id: 3,
-      church_id: 2,
-      name: "Alfonso",
-      code: "ALF"
-    },
-    leader: {
-      id: 3,
-      first_name: "Sarah",
-      last_name: "Jenkins",
-      nickname: "Sar",
-      mobile_number: "09229876543",
-      member_position: "Deaconess"
-    }
-  }
-];
-
 export default function GrowthGroups() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedChurch, setSelectedChurch] = useState('all');
-  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // Filtering logic
-  const filteredGroups = MOCK_GROWTH_GROUPS.filter(gg => {
-    const matchesSearch = 
-      gg.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      gg.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      gg.leader.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      gg.leader.last_name.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesChurch = selectedChurch === 'all' || gg.church_id.toString() === selectedChurch;
-    const matchesStatus = selectedStatus === 'all' || (selectedStatus === 'active' ? gg.is_active : !gg.is_active);
+  const [selectedChurch, setSelectedChurch] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
 
-    return matchesSearch && matchesChurch && matchesStatus;
+  const { data: apiResponse, isLoading, isError, refetch } = useGrowthGroup({
+    search: searchTerm,
+    page: currentPage,
+    church_id: selectedChurch,
+    cluster_id: '',
   });
+  
+  const currentGrowthGroups = apiResponse?.data || [];
+  const meta = apiResponse?.meta;
+
+  console.log(currentGrowthGroups);
 
   // Format time (e.g. 15:00:00 -> 3:00 PM)
   const formatTime = (timeStr: string) => {
@@ -167,8 +60,8 @@ export default function GrowthGroups() {
       <div className="flex flex-col md:flex-row items-center gap-4 justify-between w-full bg-transparent">
         <SearchInput 
           placeholder="Search group name, code, or leader..."
-          value={searchQuery}
-          onChange={(val) => setSearchQuery(val)}
+          value={searchTerm}
+          onChange={(val) => setSearchTerm(val)}
         />
         
         <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
@@ -178,7 +71,7 @@ export default function GrowthGroups() {
               onChange={(e) => setSelectedChurch(e.target.value)}
               className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-indigo-500 transition-all cursor-pointer"
             >
-              <option value="all">All Churches</option>
+              <option value="">All Churches</option>
               <option value="1">GCF SouthMetro</option>
               <option value="2">GCF Bacoor</option>
             </select>
@@ -217,14 +110,14 @@ export default function GrowthGroups() {
             </thead>
 
             <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
-              {filteredGroups.length === 0 ? (
+              {currentGrowthGroups.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-center py-12 text-slate-400 font-medium">
                     No growth groups found matching your criteria.
                   </td>
                 </tr>
               ) : (
-                filteredGroups.map((gg) => (
+                currentGrowthGroups.map((gg) => (
                   <tr key={gg.id} className="hover:bg-slate-50/80 transition-colors group">
                     
                     {/* Name & Code */}
