@@ -1,5 +1,5 @@
 import apiClient from '../api/axiosInstance';
-import type { GroupedChurch, Cluster, CreateClusterPayload, UpdateClusterPayload } from '../types/typeCluster';
+import type { GroupedChurch, Cluster, CreateUpdateCluster } from '../types/typeCluster';
 import type { Pagination } from '../types/typePagination';
 
 export interface ChurchFilters {
@@ -17,4 +17,19 @@ export const clusterService = {
         });
         return response.data;
     },
+
+    createCluster: async (payload: CreateUpdateCluster): Promise<Cluster> => {
+        const response = await apiClient.post('clusters/', payload);
+        return response.data.data;
+    },
+
+    // async updateCluster(id: number, payload: UpdateClusterPayload): Promise<Cluster> {
+    //     const response = await api.put(`/clusters/${id}`, payload);
+    //     return response.data.data || response.data;
+    // },
+
+    // // Mag-delete ng cluster
+    // async deleteCluster(id: number): Promise<void> {
+    //     await api.delete(`/clusters/${id}`);
+    // }
 }

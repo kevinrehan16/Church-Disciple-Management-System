@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Church, Tag, UserCheck, ShieldCheck, Layers, Search, Check, ChevronDown, Save } from 'lucide-react';
+import { useRegisterCluster } from '../../../hooks/useClusters';
 // I-adjust ang import path base sa kung nasaan ang components mo
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import SectionHeader from '../../ui/SectionHeader';
@@ -36,6 +37,7 @@ const CHURCH_OPTIONS = [
 
 export default function ClusterModal({ isOpen, onClose, initialData }: ClusterModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
+  const { mutate: addCluster, isPending: pendingAddCluster } = useRegisterCluster();
   
   const [formData, setFormData] = useState({
     church_id: initialData?.church_id || 1,
@@ -73,9 +75,8 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Payload to POST:", formData);
-    alert("Check console for POST payload structure!");
-    startClose();
+    
+    addCluster(formData, { onSuccess: () => startClose() });
   };
 
   return (
@@ -115,8 +116,10 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
                 <SelectField 
                   label="Church" 
                   name="church_id" 
+                  defaultValue={formData.church_id}
                   options={CHURCH_OPTIONS}
                   required
+                  onChange={(e) => setFormData({ ...formData, church_id: Number(e.target.value) })}
                 />
               </div>
             </div>
@@ -181,6 +184,7 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
                         className="w-full bg-transparent text-sm text-slate-800 focus:outline-none placeholder:text-slate-400"
                         autoFocus
                       />
+                      <input type="hidden" name="head_id" value={formData.head_id} />
                     </div>
 
                     {/* List ng Results */}

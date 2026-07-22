@@ -4,14 +4,15 @@ interface SelectFieldProps {
   label: string;
   name: string;
   error?: string[];
-  options: { label: string; value: string }[];
+  options: { label: string; value: string | number }[];
   icon?: React.ReactNode;
-  defaultValue?: string;
+  defaultValue?: string | number;
   readOnly?: boolean;
   required?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
-export const SelectField = ({ label, name, error, options, icon, defaultValue, readOnly = false, required = false }: SelectFieldProps) => {
+export const SelectField = ({ label, name, error, options, icon, defaultValue, readOnly = false, required = false, onChange }: SelectFieldProps) => {
   return (
     <div className="space-y-1.5 w-full">
       <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider ml-1">{label} {required && <span className="text-red-500">*</span>}</label>
@@ -33,6 +34,8 @@ export const SelectField = ({ label, name, error, options, icon, defaultValue, r
           focus:border-[var(--active-parent,rgb(99,102,241))] 
           focus:ring-4 focus:ring-[var(--active-parent,rgb(99,102,241))]/10 
           outline-none transition-all text-sm bg-white appearance-none cursor-pointer ${error ? 'border-red-500 focus:border-red-500' : 'border-slate-200'} ${readOnly ? 'bg-slate-50 cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
+          required
+          onChange={onChange}
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
