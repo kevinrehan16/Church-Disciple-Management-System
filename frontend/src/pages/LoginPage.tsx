@@ -100,19 +100,18 @@ export default function LoginPage() {
         >
           <div className="mb-8">
             <h2 className="font-heading text-3xl font-bold text-slate-900">Welcome Back</h2>
-            <p className="text-slate-500 mt-2">Sign in to the Disciple Network portal.</p>
+            <p className="text-slate-500 mt-2">Sign in to the Disciple Network System.</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3.5 w-5 h-5 text-slate-400" />
+              <div className="relative group">
+                <Mail className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 group-focus-within:!text-[var(--active-parent,rgb(99,102,241))] transition-colors" />
                 <input 
                   type="email"
                   {...register('email')} 
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none transition-all text-slate-900 placeholder:text-slate-400 focus:ring-2"
-                  style={{ '--tw-ring-color': theme.activeParentBg } as React.CSSProperties}
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none transition-all text-slate-900 placeholder:text-slate-400 focus:border-[var(--active-parent,rgb(99,102,241))] focus:ring-4 focus:ring-[var(--active-parent,rgb(99,102,241))]/10 outline-none transition-all"
                   placeholder="admin@church.com"
                   value={"superadmin@gcfbacoor.com"}
                 />
@@ -122,13 +121,12 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3.5 w-5 h-5 text-slate-400" />
+              <div className="relative group">
+                <Lock className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 group-focus-within:!text-[var(--active-parent,rgb(99,102,241))] transition-colors" />
                 <input 
                   type="password" 
                   {...register('password')} 
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none transition-all text-slate-900 placeholder:text-slate-400 focus:ring-2"
-                  style={{ '--tw-ring-color': theme.activeParentBg } as React.CSSProperties}
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none transition-all text-slate-900 placeholder:text-slate-400 focus:border-[var(--active-parent,rgb(99,102,241))] focus:ring-4 focus:ring-[var(--active-parent,rgb(99,102,241))]/10 outline-none transition-all"
                   placeholder="••••••••"
                 />
               </div>
