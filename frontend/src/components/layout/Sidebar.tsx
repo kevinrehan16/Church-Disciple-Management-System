@@ -19,7 +19,7 @@ export default function Sidebar({
 
   // 1. STATE: Initialized base sa URL pag load
   const [isMembersOpen, setIsMembersOpen] = useState(() => location.pathname.startsWith('/members'));
-  const [isBillingOpen, setIsBillingOpen] = useState(() => location.pathname.startsWith('/billing'));
+  const [isGroupsOpen, setIsGroupsOpen] = useState(() => location.pathname.startsWith('/groups'));
   const [isGroupSetupOpen, setIsGroupSetupOpen] = useState(() => location.pathname.startsWith('/group-setup'));
 
   // 2. AUTO-CLOSE LOGIC: Kapag lumipat ng page, isasara ang menu na hindi kasama sa path
@@ -27,8 +27,8 @@ export default function Sidebar({
     if (!location.pathname.startsWith('/members')) {
       setIsMembersOpen(false);
     }
-    if (!location.pathname.startsWith('/billing')) {
-      setIsBillingOpen(false);
+    if (!location.pathname.startsWith('/groups')) {
+      setIsGroupsOpen(false);
     }
     if (!location.pathname.startsWith('/group-setup')) {
       setIsGroupSetupOpen(false);
@@ -38,24 +38,24 @@ export default function Sidebar({
   // Handler para sa pag-toggle (Accordion style)
   const toggleMembers = () => {
     setIsMembersOpen(!isMembersOpen);
-    setIsBillingOpen(false);
-    setIsGroupSetupOpen(false); // Close billing pag binuksan members
+    setIsGroupsOpen(false);
+    setIsGroupSetupOpen(false); // Close Groups pag binuksan members
   };
 
-  const toggleBilling = () => {
-    setIsBillingOpen(!isBillingOpen);
+  const toggleGroups = () => {
+    setIsGroupsOpen(!isGroupsOpen);
     setIsMembersOpen(false); 
-    setIsGroupSetupOpen(false);// Close members pag binuksan billing
+    setIsGroupSetupOpen(false);// Close members pag binuksan Groups
   };
 
   const toggleGroupSetup = () => {
-    setIsGroupSetupOpen(!isGroupSetupOpen);// Close members pag binuksan billing
-    setIsBillingOpen(false);
+    setIsGroupSetupOpen(!isGroupSetupOpen);// Close members pag binuksan Groups
+    setIsGroupsOpen(false);
     setIsMembersOpen(false); 
   };
 
   // Active States
-  const isBillingActive = location.pathname.startsWith('/billing');
+  const isGroupsActive = location.pathname.startsWith('/groups');
   const isMembersActive = location.pathname.startsWith('/members');
   const isGroupSetupActive = location.pathname.startsWith('/group-setup');
 
@@ -234,7 +234,7 @@ export default function Sidebar({
             {/* GROUPS DROPDOWN WITH POP-OUT MENU */}
             {/* FIXED: Tinanggal ang flex at w-full dito para hindi mag-row layout ang accordion items */}
             <div className="relative group/groups">
-              <button onClick={toggleBilling} className={`${navLinkBase} justify-between ${isBillingActive ? activeParentClass : inactiveParentClass} ${isCollapsed ? 'justify-center px-0' : ''}`}>
+              <button onClick={toggleGroups} className={`${navLinkBase} justify-between ${isGroupsActive ? activeParentClass : inactiveParentClass} ${isCollapsed ? 'justify-center px-0' : ''}`}>
                 <div className="flex items-center">
                   <FaLayerGroup size={18} className="shrink-0" />
                   <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3 text-left'}`}>
@@ -242,12 +242,12 @@ export default function Sidebar({
                   </span>
                 </div>
                 <div className={`overflow-hidden transition-all duration-300 flex items-center justify-end ${isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[20px] opacity-100'}`}>
-                  {isBillingOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                  {isGroupsOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                 </div>
               </button>
               
               {/* Accordion */}
-              {!isCollapsed && isBillingOpen && (
+              {!isCollapsed && isGroupsOpen && (
                 <div className="mt-1 relative w-full space-y-1 animate-in slide-in-from-top-2 fade-in duration-200"> 
                    <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />
                    
