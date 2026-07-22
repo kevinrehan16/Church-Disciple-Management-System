@@ -26,7 +26,7 @@ class UpdateGrowthGroupRequest extends FormRequest
             'meeting_time'       => 'nullable|date_format:H:i:s,H:i',
             'location_type'      => 'nullable|in:onsite,online,hybrid',
             'venue_address'      => 'nullable|string',
-            'target_demographic' => 'nullable|in:all,men,women,youth,couples,single_professionals',
+            'target_demographic' => 'nullable|in:all,men,women,youth,nextgen,growkids,couples,singles,professionals',
             'is_active'          => 'boolean',
         ];
     }

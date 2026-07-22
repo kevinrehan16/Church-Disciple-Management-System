@@ -5,8 +5,8 @@ import { growthGroupService } from '../services/growthgroupService';
 export interface GrowthGroupFilters {
   search?: string;
   page?: number;
-  church_id?: number;
-  cluster_id?: number;
+  church_id?: string;
+  cluster_id?: string;
 }
 
 export const useGrowthGroup = (filters: GrowthGroupFilters) => {

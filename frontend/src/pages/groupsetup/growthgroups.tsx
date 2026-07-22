@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { FaFacebookSquare, FaMobile, FaEnvelope, FaUserFriends, FaBible } from "react-icons/fa";
-import { Plus, Search, Filter, ArrowUpDown, Mars, Venus, Eye, Calendar, Clock, Users, MapPin,ShieldCheck, Building2, Layers, Edit3, Trash2, ChevronLeft, ChevronRight, UserCheck } from 'lucide-react';
+import { FaBible, FaLaptopHouse, FaLaptop, FaMobileAlt } from "react-icons/fa";
+import { Plus, Sprout, CalendarClock, MapPinHouse, Church, MapPinned, Edit3, Trash2, ShieldUser } from 'lucide-react';
 import type { GrowthGroup } from '../../types/typeGrowthGroup';
 import { useGrowthGroup } from '../../hooks/useGrowthGroup';
 import ModuleHeader from '../../components/ui/ModuleHeader';
@@ -23,8 +23,6 @@ export default function GrowthGroups() {
   
   const currentGrowthGroups = apiResponse?.data || [];
   const meta = apiResponse?.meta;
-
-  console.log(currentGrowthGroups);
 
   // Format time (e.g. 15:00:00 -> 3:00 PM)
   const formatTime = (timeStr: string) => {
@@ -94,18 +92,17 @@ export default function GrowthGroups() {
 
       <div className="w-full bg-white border border-slate-200/60 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-y-auto overflow-x-auto h-[calc(100vh-325px)] border border-slate-200/60 rounded-lg">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left text-sm border-separate border-spacing-0">
             
             {/* Sticky Table Header */}
-            <thead className="bg-slate-50 sticky top-0 z-10 border-b border-slate-200 text-slate-500 text-[11px] font-bold uppercase tracking-wider">
-              <tr>
-                <th className="py-3.5 px-5">Growth Group</th>
-                <th className="py-3.5 px-4">Hierarchy (Church / Cluster)</th>
-                <th className="py-3.5 px-4">Leader</th>
-                <th className="py-3.5 px-4">Schedule & Venue</th>
-                <th className="py-3.5 px-4">Demographic</th>
-                <th className="py-3.5 px-4">Status</th>
-                <th className="py-3.5 px-5 text-right">Actions</th>
+            <thead className="sticky top-0 z-10 bg-[var(--active-parent)]">
+              <tr className="text-white uppercase tracking-wider text-[10px] font-extrabold border-b border-slate-200/60">
+                <th className="py-4 px-6">Growth Group</th>
+                <th className="py-4 px-6">Church & Cluster</th>
+                <th className="py-4 px-6">Leader</th>
+                <th className="py-4 px-6">Schedule & Venue</th>
+                <th className="py-4 px-6 text-center">Demographic</th>
+                <th className="py-4 px-6 text-center">Actions</th>
               </tr>
             </thead>
 
@@ -121,64 +118,72 @@ export default function GrowthGroups() {
                   <tr key={gg.id} className="hover:bg-slate-50/80 transition-colors group">
                     
                     {/* Name & Code */}
-                    <td className="py-4 px-5">
-                      <div className="font-bold text-slate-900 text-sm">{gg.name}</div>
-                      <div className="inline-block mt-0.5 px-2 py-0.5 bg-slate-100 font-mono text-[10px] text-slate-600 rounded">
-                        {gg.code}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs border border-emerald-200 group-hover:bg-[var(--active-parent,rgb(99,102,241))]/10 group-hover:text-[var(--active-parent,rgb(99,102,241))] group-hover:border-[var(--active-parent,rgb(99,102,241))] transition-colors">
+                          <Sprout size={16} />
+                        </div>
+                        <div>
+                          <p className={`text-[12px] font-semibold transition-colors ${
+                            gg.is_active 
+                              ? 'text-slate-800 group-hover:text-indigo-600' 
+                              : 'text-slate-400 line-through'
+                          }`}>
+                            {gg.name}
+                          </p>
+                          <p className={`text-[10px] font-medium ${gg.is_active ? 'text-emerald-600' : 'text-slate-600'}`}>
+                            {gg.code}
+                          </p>
+                        </div>
                       </div>
                     </td>
 
                     {/* Hierarchy: Church & Cluster */}
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-6">
                       <div className="flex items-center gap-1.5 font-medium text-slate-800">
-                        <Building2 size={13} className="text-indigo-500 flex-shrink-0" />
+                        <Church size={13} className="text-indigo-500 flex-shrink-0" />
                         <span>{gg.church.name}</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-slate-500 text-[11px] mt-0.5">
-                        <Layers size={12} className="text-slate-400 flex-shrink-0" />
+                        <MapPinned size={12} className="text-slate-400 flex-shrink-0" />
                         <span>Cluster: <strong className="text-slate-700">{gg.cluster.name}</strong></span>
                       </div>
                     </td>
 
                     {/* Leader */}
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-6">
                       <div className="font-semibold text-slate-900 flex items-center gap-1.5">
-                        <UserCheck size={13} className="text-emerald-600 flex-shrink-0" />
-                        <span>{gg.leader.first_name} {gg.leader.last_name} {gg.leader.nickname ? `(${gg.leader.nickname})` : ''}</span>
+                        <ShieldUser size={13} className="text-emerald-600 flex-shrink-0" />
+                        <span>{gg.leader.first_name} {gg.leader.last_name}</span>
                       </div>
-                      <div className="text-slate-400 text-[11px] mt-0.5 font-mono">
-                        {gg.leader.mobile_number}
+                      <div className="flex items-center gap-1.5 text-slate-500 text-[11px] mt-0.5">
+                        <FaMobileAlt size={12} className="text-slate-400 flex-shrink-0" />
+                        <span className="text-slate-400">{gg.leader.mobile_number}</span>
                       </div>
                     </td>
 
                     {/* Schedule & Venue */}
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-6">
                       <div className="flex items-center gap-1.5 text-slate-800 font-medium">
-                        <Calendar size={13} className="text-amber-500 flex-shrink-0" />
+                        <CalendarClock  size={13} className="text-amber-500 flex-shrink-0" />
                         <span>{gg.meeting_day} @ {formatTime(gg.meeting_time)}</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-slate-500 text-[11px] mt-0.5">
-                        <MapPin size={12} className="text-rose-500 flex-shrink-0" />
+                        {gg.location_type === 'onsite' ? (
+                          <MapPinHouse size={12} className="text-rose-500 flex-shrink-0" />
+                        ) : gg.location_type === 'hybrid' ? (
+                          <FaLaptopHouse size={14} className="text-emerald-500 flex-shrink-0" />
+                        ) : (
+                          <FaLaptop size={12} className="text-blue-500 flex-shrink-0" />
+                        )}
                         <span className="truncate max-w-[200px]" title={gg.venue_address}>{gg.venue_address}</span>
                       </div>
                     </td>
 
                     {/* Demographic */}
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-6 text-center">
                       <span className="capitalize px-2.5 py-1 bg-indigo-50 text-indigo-700 font-semibold rounded-lg text-[10px]">
                         {gg.target_demographic.replace('_', ' ')}
-                      </span>
-                    </td>
-
-                    {/* Status */}
-                    <td className="py-4 px-4">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                        gg.is_active 
-                          ? 'bg-emerald-50 text-emerald-700' 
-                          : 'bg-slate-100 text-slate-500'
-                      }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${gg.is_active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-                        {gg.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
 

@@ -5,8 +5,8 @@ import type { Pagination } from '../types/typePagination';
 export interface growthgroupFilters {
   search?: string;
   page?: number;
-  church_id?: number;
-  cluster_id?: number;
+  church_id?: string;
+  cluster_id?: string;
 }
 
 export const growthGroupService = {

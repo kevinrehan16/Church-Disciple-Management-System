@@ -33,8 +33,11 @@ return new class extends Migration
                 'men',
                 'women',
                 'youth',
+                'nextgen',
+                'growkids',
                 'couples',
-                'single_professionals'
+                'singles',
+                'professionals'
             ])->default('all');
 
             // Status

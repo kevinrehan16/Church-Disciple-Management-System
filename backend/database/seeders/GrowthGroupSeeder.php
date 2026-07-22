@@ -34,7 +34,7 @@ class GrowthGroupSeeder extends Seeder
                     'meeting_time' => '19:30:00',
                     'location_type' => 'hybrid',
                     'venue_address' => 'Church Rm 201 / Zoom',
-                    'target_demographic' => 'single_professionals',
+                    'target_demographic' => 'single',
                     'is_active' => true,
                 ]
             );
