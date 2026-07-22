@@ -3,7 +3,7 @@ export interface Cluster {
   church_id: number;
   name: string;
   code: string;
-  head_id: number;
+  member_id: number;
   is_active: boolean;
   created_at?: string;
   updated_at?: string;
@@ -23,6 +23,6 @@ export interface CreateUpdateCluster {
   church_id: number;
   name: string;
   code: string;
-  head_id: number;
+  member_id: number;
   is_active?: boolean;
 }

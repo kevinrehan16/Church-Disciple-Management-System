@@ -12,8 +12,8 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('church_id')->constrained('churches')->cascadeOnDelete();
-            $table->string('name'); // Halimbawa: "Youth GG - North", "Couples GG"
-            $table->string('code')->nullable()->unique(); // Halimbawa: "GG-YTH-01"
+            $table->string('name', 60); // Halimbawa: "Youth GG - North", "Couples GG"
+            $table->string('code', 10)->nullable()->unique(); // Halimbawa: "GG-YTH-01"
 
             // Foreign Keys (Referentials)
             // Kung may Cluster table ka na, i-link dito:
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->foreignId('leader_id')->nullable()->constrained('members')->nullOnDelete();
 
             // Schedule & Venue Details
-            $table->string('meeting_day')->nullable(); // Halimbawa: "Friday", "Saturday"
+            $table->string('meeting_day', 12)->nullable(); // Halimbawa: "Friday", "Saturday"
             $table->time('meeting_time')->nullable(); // Halimbawa: "19:00:00"
             $table->enum('location_type', ['onsite', 'online', 'hybrid'])->default('onsite');
             $table->text('venue_address')->nullable(); // Halimbawa: "Church Rm 201" o Zoom link

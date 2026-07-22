@@ -17,7 +17,7 @@ class StoreClusterRequest extends FormRequest
             'church_id'   => 'required|integer|exists:churches,id',
             'name'        => 'required|string|max:255',
             'code'        => 'nullable|string|max:255',
-            'head_id'     => 'nullable|integer',
+            'member_id'     => 'nullable|integer',
             'is_active'   => 'boolean',
         ];
     }

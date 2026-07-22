@@ -16,7 +16,7 @@ class Cluster extends Model
         'church_id',
         'name',
         'code',
-        'head_id',
+        'member_id',
         'is_active',
     ];
 
@@ -31,7 +31,7 @@ class Cluster extends Model
 
     public function head(): BelongsTo
     {
-        return $this->belongsTo(Member::class, 'head_id');
+        return $this->belongsTo(Member::class);
     }
 
     public function growthGroups(): HasMany

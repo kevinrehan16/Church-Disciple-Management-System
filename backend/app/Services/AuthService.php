@@ -34,7 +34,7 @@ class AuthService
 
             // 2. Create Member Profile
             $user->member()->create([
-                'member_id'          => 'MEM-' . time(),
+                'mem_id'          => 'MEM-' . time(),
 
                 // Personal Information
                 'first_name'         => $data['first_name'],
@@ -72,12 +72,11 @@ class AuthService
                 'received_jesus'     => $data['received_jesus'] ?? null,
                 'baptized_immersion' => $data['baptized_immersion'] ?? false,
                 'baptized_date'      => $data['baptized_date'] ?? null,
-                'spiritual_gift'     => $data['spiritual_gift'] ?? null,
                 'picture'            => $data['picture'] ?? null,
                 'purpose_reg'        => $data['purpose_reg'] ?? null,
                 'prev_church'        => $data['prev_church'] ?? null,
                 'church_affiliation' => $data['church_affiliation'] ?? null,
-                'satellite_id'       => $data['satellite_id'] ?? null,
+                'church_id'       => $data['church_id'] ?? null,
                 'member_position'    => $data['member_position'] ?? null,
                 'member_status'      => $data['member_status'] ?? 'Active',
                 'membership_date'    => $data['membership_date'] ?? null,

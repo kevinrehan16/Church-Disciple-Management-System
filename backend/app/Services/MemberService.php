@@ -9,7 +9,7 @@ class MemberService
 
     public function getPaginatedMembers($request, ?string $position = null, ?int $rank = null)
     {
-        return Member::with('user')
+        return Member::with(['user', 'church', 'cluster'])
             // 1. FILTER: Piliin lang ang specific na group (gamit ang scope)
             ->byPosition($position)
             ->byRank($rank)
@@ -23,7 +23,7 @@ class MemberService
                     $q->where('first_name', 'ILIKE', "%{$search}%")
                         ->orWhere('last_name', 'ILIKE', "%{$search}%")
                         ->orWhere('nickname', 'ILIKE', "%{$search}%")
-                        ->orWhere('member_id', 'ILIKE', "%{$search}%");
+                        ->orWhere('mem_id', 'ILIKE', "%{$search}%");
                 });
             })
             ->paginate(10);

@@ -16,9 +16,9 @@ class GrowthGroupService
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('code', 'like', "%{$search}%")
-                    ->orWhere('venue_address', 'like', "%{$search}%");
+                $q->where('name', 'ILIKE', "%{$search}%")
+                    ->orWhere('code', 'ILIKE', "%{$search}%")
+                    ->orWhere('venue_address', 'ILIKE', "%{$search}%");
             });
         }
 

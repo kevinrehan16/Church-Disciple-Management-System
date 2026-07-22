@@ -23,7 +23,7 @@ class ClusterSeeder extends Seeder
                 [
                     'church_id' => $mainChurch->id,
                     'name' => 'North Cluster',
-                    'head_id' => $firstMember?->id,
+                    'member_id' => $firstMember?->id,
                     'is_active' => true,
                 ]
             );
@@ -33,7 +33,7 @@ class ClusterSeeder extends Seeder
                 [
                     'church_id' => $mainChurch->id,
                     'name' => 'Youth Ministry Cluster',
-                    'head_id' => $firstMember?->id,
+                    'member_id' => $firstMember?->id,
                     'is_active' => true,
                 ]
             );
@@ -45,7 +45,7 @@ class ClusterSeeder extends Seeder
                 [
                     'church_id' => $southChurch->id,
                     'name' => 'Alabang District Cluster',
-                    'head_id' => $firstMember?->id,
+                    'member_id' => $firstMember?->id,
                     'is_active' => true,
                 ]
             );

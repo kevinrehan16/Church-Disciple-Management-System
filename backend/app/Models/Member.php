@@ -11,7 +11,7 @@ class Member extends Model
 {
     protected $fillable = [
         'user_id',
-        'member_id',
+        'mem_id',
         'nickname',
         'last_name',
         'first_name',
@@ -39,12 +39,11 @@ class Member extends Model
         'received_jesus',
         'baptized_immersion',
         'baptized_date',
-        'spiritual_gift',
         'picture',
         'purpose_reg',
         'prev_church',
         'church_affiliation',
-        'satellite_id',
+        'church_id',
         'member_position',
         'member_status',
         'Active',
@@ -84,10 +83,10 @@ class Member extends Model
     const RANK_MAP = [
         'Senior Pastor'         => 1,
         'Pastoral Staff'        => 2,
-        'Elders'                => 2,
-        'Deacons'               => 2,
-        'Growth Group Leaders'  => 3,
-        'Growth Group Members'  => 4,
+        'Elder'                 => 2,
+        'Deacon'                => 2,
+        'Growth Group Leader'   => 3,
+        'Growth Group Member'   => 4,
         'No Growth Group'       => 5,
     ];
 
@@ -95,8 +94,8 @@ class Member extends Model
     protected static function booted()
     {
         static::saving(function ($member) {
-            // I-lookup ang rank base sa position. Default is 99.
-            $member->position_rank = self::RANK_MAP[$member->member_position] ?? 99;
+            // I-lookup ang rank base sa position. Default is 5.
+            $member->position_rank = self::RANK_MAP[$member->member_position] ?? 5;
         });
     }
 
@@ -111,5 +110,15 @@ class Member extends Model
         return $this->belongsToMany(GrowthGroup::class, 'growth_group_member')
             ->withPivot('role', 'joined_at')
             ->withTimestamps();
+    }
+
+    public function church()
+    {
+        return $this->belongsTo(Church::class);
+    }
+
+    public function cluster()
+    {
+        return $this->belongsTo(cluster::class);
     }
 }

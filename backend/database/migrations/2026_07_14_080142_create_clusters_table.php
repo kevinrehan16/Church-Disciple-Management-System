@@ -14,11 +14,11 @@ return new class extends Migration
             // Naka-link sa Church
             $table->foreignId('church_id')->constrained('churches')->cascadeOnDelete();
 
-            $table->string('name'); // e.g. "North Cluster", "Men's Ministry Cluster"
-            $table->string('code')->nullable()->unique();
+            $table->string('name', 100); // e.g. "North Cluster", "Men's Ministry Cluster"
+            $table->string('code', 10)->nullable()->unique();
 
             // Ang Cluster Head / Overseer ay galing din sa Members
-            $table->foreignId('head_id')->nullable()->constrained('members')->nullOnDelete();
+            $table->unsignedBigInteger('member_id')->nullable();
 
             $table->boolean('is_active')->default(true);
             $table->timestamps();

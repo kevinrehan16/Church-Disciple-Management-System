@@ -63,12 +63,11 @@ class RegisterRequest extends FormRequest
             'received_jesus'      => 'nullable|date',
             'baptized_immersion'  => 'nullable|boolean', // Assuming boolean base sa migration
             'baptized_date'       => 'nullable|date',
-            'spiritual_gift'      => 'nullable|string',
             'picture'             => 'nullable|string|max:20', // Or 'image' if file upload
             'purpose_reg'         => 'nullable|string|max:200',
             'prev_church'         => 'nullable|string|max:50',
             'church_affiliation'  => 'nullable|string|max:60',
-            'satellite_id'        => 'nullable|string|max:30',
+            'church_id'        => 'nullable|string|max:30',
             'member_position'     => 'nullable|string|max:30',
             'member_status'       => 'nullable|string|max:20',
             'membership_date'     => 'nullable|date',

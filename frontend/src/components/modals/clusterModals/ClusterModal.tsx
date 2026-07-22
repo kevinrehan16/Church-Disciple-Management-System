@@ -14,7 +14,7 @@ interface ClusterModalProps {
     church_id: number;
     name: string;
     code: string;
-    head_id: number;
+    member_id: number;
     is_active: boolean;
   };
 }
@@ -43,7 +43,7 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
     church_id: initialData?.church_id || 1,
     name: initialData?.name || '',
     code: initialData?.code || '',
-    head_id: initialData?.head_id || 2,
+    member_id: initialData?.member_id || 2,
     is_active: initialData?.is_active ?? true,
   });
 
@@ -53,7 +53,7 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Hanapin ang pangkasalukuyang napiling head para ma-display sa trigger button
-  const selectedHeadName = MOCK_HEADS.find(h => h.id === formData.head_id)?.name || "Select cluster head...";
+  const selectedHeadName = MOCK_HEADS.find(h => h.id === formData.member_id)?.name || "Select cluster head...";
 
   // Filtered heads base sa tina-type sa search box
   const filteredHeads = MOCK_HEADS.filter(head => 
@@ -184,7 +184,7 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
                         className="w-full bg-transparent text-sm text-slate-800 focus:outline-none placeholder:text-slate-400"
                         autoFocus
                       />
-                      <input type="hidden" name="head_id" value={formData.head_id} />
+                      <input type="hidden" name="member_id" value={formData.member_id} />
                     </div>
 
                     {/* List ng Results */}
@@ -195,12 +195,12 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
                         </div>
                       ) : (
                         filteredHeads.map((head) => {
-                          const isSelected = formData.head_id === head.id;
+                          const isSelected = formData.member_id === head.id;
                           return (
                             <div
                               key={head.id}
                               onClick={() => {
-                                setFormData({ ...formData, head_id: head.id });
+                                setFormData({ ...formData, member_id: head.id });
                                 setIsHeadOpen(false);
                                 setHeadSearchQuery('');
                               }}

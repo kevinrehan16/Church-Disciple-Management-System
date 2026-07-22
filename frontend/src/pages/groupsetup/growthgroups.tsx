@@ -182,7 +182,7 @@ export default function GrowthGroups() {
 
                     {/* Demographic */}
                     <td className="py-4 px-6 text-center">
-                      <span className="capitalize px-2.5 py-1 bg-indigo-50 text-indigo-700 font-semibold rounded-lg text-[10px]">
+                      <span className="capitalize px-2.5 py-1 bg-indigo-50 text-[var(--active-parent)] font-semibold rounded-lg text-[10px]">
                         {gg.target_demographic.replace('_', ' ')}
                       </span>
                     </td>
@@ -216,7 +216,7 @@ export default function GrowthGroups() {
         </div>
         
         {/* 3. DYNAMIC PAGINATION FOOTER */}
-        {/* <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-100/50">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-100/50">
           <p className="text-xs text-slate-500 font-medium">
             Showing <span className="text-slate-800 font-bold">{meta?.from || 0}</span> to <span className="text-slate-800 font-bold">{meta?.to || 0}</span> of <span className="text-slate-800 font-bold">{meta?.total || 0}</span> entries
           </p>
@@ -248,7 +248,7 @@ export default function GrowthGroups() {
               Next
             </button>
           </div>
-        </div> */}
+        </div>
       </div>
       
       {/* {isVisitorModalOpen && (

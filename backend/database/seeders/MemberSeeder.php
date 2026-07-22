@@ -20,7 +20,7 @@ class MemberSeeder extends Seeder
         if ($user) {
             Member::create([
                 'user_id' => $user->id, // Dito papasok ang UUID ng user
-                'member_id' => 'GCF-M-M-0000001',
+                'mem_id' => 'GCF-M-M-0000001',
                 'first_name' => 'Kevin',
                 'last_name' => 'Godnacam',
                 'mobile_number' => '09153169518',

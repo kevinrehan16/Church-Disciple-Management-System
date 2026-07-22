@@ -1,7 +1,7 @@
 export interface Member {
   // Primary & Auth
   id?: string;             // Optional dahil sa create (galing sa DB)
-  member_id: string;
+  mem_id: string;
   username?: string;
   email: string;
   password?: string;
@@ -42,12 +42,11 @@ export interface Member {
   received_jesus?: string;
   baptized_immersion: string; // 'Yes' or 'No'
   baptized_date?: string;
-  spiritual_gift?: string;
   picture?: string;
   purpose_reg?: string;
   prev_church?: string;
   church_affiliation?: string;
-  satellite_id?: string;
+  church_id?: string;
   member_position?: string;
   member_status: string;      // Default 'Active'
   membership_date?: string;

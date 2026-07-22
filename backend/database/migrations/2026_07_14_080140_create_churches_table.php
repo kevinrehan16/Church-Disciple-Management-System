@@ -10,11 +10,11 @@ return new class extends Migration
     {
         Schema::create('churches', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // e.g. "Main Campus", "QC Satellite", "Cavite Satellite"
-            $table->string('code')->nullable()->unique(); // e.g. "CH-MAIN", "CH-QC"
+            $table->string('name', 100); // e.g. "Main Campus", "QC Church", "Cavite Church"
+            $table->string('code', 10)->nullable()->unique(); // e.g. "CH-MAIN", "CH-QC"
             $table->text('address')->nullable();
-            $table->string('contact_number')->nullable();
-            $table->string('email')->nullable();
+            $table->string('contact_number', 20)->nullable();
+            $table->string('email', 100)->nullable();
             $table->boolean('is_main_campus')->default(false); // Para matukoy kung main branch
             $table->boolean('is_active')->default(true);
             $table->timestamps();

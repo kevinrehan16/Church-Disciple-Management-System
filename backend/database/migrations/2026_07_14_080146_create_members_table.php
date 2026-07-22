@@ -16,12 +16,12 @@ return new class extends Migration
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade'); // Link sa users table
 
             // Personal Info
-            $table->string('member_id', 20)->unique();
+            $table->string('mem_id', 30)->unique();
             $table->string('nickname', 30)->nullable();
-            $table->string('last_name', 50);
-            $table->string('first_name', 50);
-            $table->string('middle_name', 50)->nullable();
-            $table->string('gender', 8);
+            $table->string('last_name', 60);
+            $table->string('first_name', 60);
+            $table->string('middle_name', 60)->nullable();
+            $table->string('gender', 7);
             $table->date('birthday')->nullable();
             $table->integer('age')->default(0);
 
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('father_name', 100)->nullable();
             $table->string('mother_name', 100)->nullable();
             $table->string('facebook_name', 100)->nullable();
-            $table->string('lifestage', 20)->nullable();
+            $table->string('lifestage', 12)->nullable();
 
             // Contact & Address
             $table->string('mobile_number', 20);
@@ -44,22 +44,22 @@ return new class extends Migration
             // Professional
             $table->string('occupation', 50)->nullable();
             $table->string('industry', 50)->nullable();
-            $table->string('college_school', 150)->nullable();
+            $table->string('college_school', 100)->nullable();
             $table->string('college_degree', 100)->nullable();
-            $table->string('high_school', 150)->nullable();
+            $table->string('high_school', 100)->nullable();
 
             // Religious/Membership
             $table->date('received_jesus')->nullable();
             $table->string('baptized_immersion', 3)->default('No');
             $table->date('baptized_date')->nullable();
-            $table->text('spiritual_gift')->nullable();
-            $table->string('picture', 60)->nullable();
-            $table->string('purpose_reg', 200)->nullable();
+            $table->string('picture', 191)->nullable();
+            $table->text('purpose_reg')->nullable();
             $table->string('prev_church', 100)->nullable();
             $table->string('church_affiliation', 60)->nullable();
-            $table->string('satellite_id', 30)->nullable();
+            $table->foreignId('church_id')->nullable()->constrained('churches')->nullOnDelete();
+            $table->foreignId('cluster_id')->nullable()->constrained('clusters')->nullOnDelete();
             $table->string('member_position', 30)->nullable();
-            $table->string('member_status', 20)->default('Active');
+            $table->string('member_status', 15)->default('Active');
             $table->date('membership_date')->nullable();
             $table->boolean('rec_for_baptism')->default(false); // Ginawang boolean
             $table->boolean('rec_for_membership')->default(false); // Ginawang boolean

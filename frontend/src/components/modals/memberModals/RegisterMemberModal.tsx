@@ -94,7 +94,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                   <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  <InputField label="Member ID" name="member_id" icon={<FileText size={15}/>} />
+                  <InputField label="Member ID" name="mem_id" icon={<FileText size={15}/>} />
                   <InputField label="Email Address" name="email" type="email" icon={<Mail size={15}/>} />
                   <InputField label="Password" name="password" type="password" icon={<Lock size={15}/>} />
                 </div>
@@ -215,14 +215,12 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                   <InputField label="Date Received Jesus" name="received_jesus" type="date" />
                   <SelectField label="Baptized (Immersion)?" name="baptized_immersion" options={[{label: 'Yes', value: 'Yes'}, {label: 'No', value: 'No'}]} />
                   <InputField label="Baptism Date" name="baptized_date" type="date" />
-                  {/* <InputField label="Spiritual Gift" name="spiritual_gift" icon={<Award size={15}/>} /> */}
                   <div className="md:col-span-3">
                     <MultiSelect 
                       label="Spiritual Gifts" 
                       options={giftOptions} 
                       selected={selectedGifts} 
                       onChange={setSelectedGifts} 
-                      name="spiritual_gift"
                     />
                   </div>
                 </div>
@@ -240,7 +238,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                   </div>
                   <InputField label="Previous Church" name="prev_church" />
                   <InputField label="Church Affiliation" name="church_affiliation" />
-                  <InputField label="Satellite ID" name="satellite_id" icon={<Church size={15}/>} />
+                  <InputField label="Satellite ID" name="church_id" icon={<Church size={15}/>} />
                   <InputField label="Picture Path" name="picture" />
                   {/* <SelectField label="Member Position" name="member_position" options={[{label: 'Leader', value: 'Leader'}, {label: 'Member', value: 'Member'}]} />
                   <SelectField label="Member Status" name="member_status" options={[{label: 'Active', value: 'Active'}, {label: 'Inactive', value: 'Inactive'}]} />

@@ -80,7 +80,7 @@ export default function Members() {
                     <th className="px-6 py-4">Birthday/ Age / Gender</th>
                     <th className="px-6 py-4">Contacts</th>
                     <th className="px-6 py-4 text-center">Life-Stage</th>
-                    <th className="px-6 py-4 text-center">Address</th>
+                    <th className="px-6 py-4">Address</th>
                     <th className="px-6 py-4 text-center">Actions</th>
                   </tr>
                 </thead>
@@ -104,7 +104,7 @@ export default function Members() {
                                       ? "text-emerald-600" 
                                       : "line-through decoration-slate-400 decoration-1 text-slate-400"
                                 }`}>
-                                  {String(member.member_id)}
+                                  {String(member.mem_id)}
                                 </p>
                                 {member.nickname && <p className="text-[10px] font-normal text-slate-400">-{String(member.nickname)}-</p>}
                               </div>

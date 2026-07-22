@@ -33,6 +33,6 @@ class MemberController extends Controller
         $members = $this->memberService->getPaginatedMembers($request, $position, $rank);
 
         // 4. Return via Resource
-        return MemberResource::collection($members);
+        return $members;
     }
 }

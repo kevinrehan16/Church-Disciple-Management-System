@@ -17,9 +17,10 @@ class MemberResource extends JsonResource
         return [
             // Users info
             'email' => $this->user->email,
+            'role' => $this->user->role,
             // Identifiers
             'id' => $this->id,
-            'member_id' => $this->member_id,
+            'mem_id' => $this->mem_id,
 
             // Name Info
             'first_name' => $this->first_name,
@@ -58,12 +59,11 @@ class MemberResource extends JsonResource
             'received_jesus' => $this->received_jesus,
             'baptized_immersion' => $this->baptized_immersion, // 'Yes'/'No'
             'baptized_date' => $this->baptized_date,
-            'spiritual_gift' => $this->spiritual_gift,
             'picture' => $this->picture,
             'purpose_reg' => $this->purpose_reg,
             'prev_church' => $this->prev_church,
             'church_affiliation' => $this->church_affiliation,
-            'satellite_id' => $this->satellite_id,
+            'church_id' => $this->church_id,
             'member_position' => $this->member_position,
             'member_status' => $this->member_status,
             'membership_date' => $this->membership_date,
