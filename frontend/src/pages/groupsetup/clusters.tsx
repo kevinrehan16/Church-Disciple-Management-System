@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FaMapMarkedAlt } from "react-icons/fa";
-import { Plus, Star, Filter, ArrowUpDown, FingerprintPattern, Database, ChevronDown, ShieldUser, Church, Pencil, Trash2, MapPinHouse, MapPin } from 'lucide-react';
+import { Plus, Star, Filter, ArrowUpDown, FingerprintPattern, Database, ChevronDown, ShieldUser, Church, Pencil, Trash2, MapPinHouse, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useClusters } from '../../hooks/useClusters';
 import ClusterModal from '../../components/modals/clusterModals/ClusterModal';
 import ModuleHeader from '../../components/ui/ModuleHeader';
@@ -219,6 +219,37 @@ export default function Clusters() {
           })}
         </div>
       </div>
+
+      {/* -- PAGINATION (FIXED BOTTOM) -- */}
+      {meta && meta.last_page > 1 && (
+        <div className="shrink-0 px-6 py-4 border-t border-slate-200 bg-white flex flex-col md:flex-row items-center justify-between gap-4 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+          <div className="text-sm text-slate-600">
+            Showing <span className="font-semibold text-slate-800">{meta.from || 0}</span> to <span className="font-semibold text-slate-800">{meta.to || 0}</span> of <span className="font-semibold text-slate-800">{meta.total}</span> entries
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="p-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            
+            <span className="text-sm font-semibold text-slate-700 px-3">
+              Page {currentPage} of {meta.last_page}
+            </span>
+
+            <button 
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === meta.last_page}
+              className="p-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      )}
       
       {isClusterModalOpen && (
         <ClusterModal 

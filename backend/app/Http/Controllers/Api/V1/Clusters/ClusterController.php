@@ -36,7 +36,7 @@ class ClusterController extends Controller
     {
         $groupedClusters = $this->clusterService->getGroupedClusters(
             $request->only(['search', 'is_active']),
-            $request->integer('per_page', 10)
+            $request->integer('per_page', 5)
         );
 
         return ChurchWithClustersResource::collection($groupedClusters);

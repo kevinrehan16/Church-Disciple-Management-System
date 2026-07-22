@@ -389,7 +389,7 @@ export default function Sidebar({
       </nav>
 
       {/* FOOTER */}
-      <div className="p-4 border-t border-slate-400/50 mt-auto bg-slate-800 shrink-0">
+      <div className="p-3 border-t border-slate-400/50 mt-auto bg-slate-800 shrink-0">
         <div className={`flex items-center transition-all duration-300 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
            
            {/* Profile Details Container */}
