@@ -9,15 +9,16 @@ class MemberService
 
     public function getPaginatedMembers($request, ?string $position = null, ?int $rank = null)
     {
-        return Member::with(['user', 'church', 'cluster'])
-            // 1. FILTER: Piliin lang ang specific na group (gamit ang scope)
+        return Member::with(['user', 'church', 'cluster', 'spiritualGifts'])
+            // 1. FILTER
             ->byPosition($position)
             ->byRank($rank)
 
-            // 2. SORT: I-arrange sila base sa rank (Auto-managed by Model)
-            ->orderedByPosition()
+            // 2. CUSTOM SORT: Rank 1 muna, tapos pinakabagong ID pababa
+            ->orderByRaw("CASE WHEN position_rank = 1 THEN 0 ELSE 1 END")
+            ->orderBy('id', 'desc')
 
-            // 3. SEARCH: Hanapin ang name/ID
+            // 3. SEARCH
             ->when($request->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('first_name', 'ILIKE', "%{$search}%")

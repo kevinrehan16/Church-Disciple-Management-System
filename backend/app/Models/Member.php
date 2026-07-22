@@ -124,7 +124,12 @@ class Member extends Model
 
     public function spiritualGifts()
     {
-        return $this->belongsToMany(SpiritualGift::class, 'member_spiritual_gifts')
+        return $this->belongsToMany(
+            SpiritualGift::class,
+            'member_spiritual_gifts', // Pivot table name
+            'member_id',             // Foreign key sa pivot table para sa Member
+            'spiritual_gift_id'      // Foreign key sa pivot table para sa SpiritualGift
+        )
             ->using(MemberSpiritualGift::class)
             ->withPivot('id', 'level', 'score', 'notes')
             ->withTimestamps();

@@ -74,6 +74,17 @@ class MemberResource extends JsonResource
 
             'comment' => $this->comment,
             'created_at' => $this->created_at ? $this->created_at->format('Y-m-d') : null,
+
+            // CHURCH DATA
+            'church_name' => $this->church?->name,
+
+            // CLUSTER DATA
+            'cluster_id' => $this->cluster?->id,
+            'cluster_name' => $this->cluster?->name,
+
+            // SPIRITUAL GIFTS
+            'spiritual_gifts' => SpiritualGiftResource::collection($this->whenLoaded('spiritualGifts')),
+
         ];
     }
 }

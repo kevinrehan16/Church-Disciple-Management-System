@@ -17,11 +17,17 @@ class SpiritualGiftResource extends JsonResource
             'description'          => $this->description,
             'scripture_references' => $this->scripture_references,
             'is_active'            => $this->is_active,
-            'created_at'           => $this->created_at?->toIso8601String(),
-            'updated_at'           => $this->updated_at?->toIso8601String(),
 
             // Optionally includes total members using this gift if loaded
             'members_count'        => $this->whenCounted('members'),
+
+            'pivot'                => $this->when($this->pivot, function () {
+                return [
+                    'level' => $this->pivot->level,
+                    'score' => $this->pivot->score,
+                    'notes' => $this->pivot->notes,
+                ];
+            }),
         ];
     }
 }
