@@ -104,7 +104,7 @@ export default function Visitors() {
                             {visitor.firstName?.[0]}{visitor.lastName?.[0]}
                           </div>
                           <div>
-                            <p className="font-semibold text-slate-800 group-hover:text-indigo-600 transition-colors">
+                            <p className="font-semibold text-slate-800 group-hover:text-[var(--active-parent,rgb(99,102,241))] transition-colors">
                               {visitor.fullName}
                             </p>
                             <p className="text-[11px] font-mono text-slate-400">
