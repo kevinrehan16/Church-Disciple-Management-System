@@ -1,18 +1,157 @@
 import { useState } from 'react';
 import { FaFacebookSquare, FaMobile, FaEnvelope, FaUserFriends, FaBible } from "react-icons/fa";
-import { Plus, Search, Filter, ArrowUpDown, Mars, Venus, Eye, Calendar, Clock } from 'lucide-react';
+import { Plus, Search, Filter, ArrowUpDown, Mars, Venus, Eye, Calendar, Clock, Users, MapPin,ShieldCheck, Building2, Layers, Edit3, Trash2, ChevronLeft, ChevronRight, UserCheck } from 'lucide-react';
+import type { GrowthGroup } from '../../types/typeGrowthGroup';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
 import { TableLoading, TableError, TableEmpty } from '../../components/ui/TableStates';
 
+const MOCK_GROWTH_GROUPS: GrowthGroup[] = [
+  {
+    id: 2,
+    church_id: 1,
+    cluster_id: 2,
+    leader_id: 1,
+    name: "Fan Into Flame",
+    code: "FIFGG",
+    meeting_day: "Saturday",
+    meeting_time: "15:00:00",
+    location_type: "onsite",
+    venue_address: "Youth Hub Main Campus",
+    target_demographic: "youth",
+    is_active: true,
+    church: {
+      id: 1,
+      name: "GCF SouthMetro",
+      code: "GCFSM",
+      address: "123 Faith St., Quezon City",
+      is_main_campus: true
+    },
+    cluster: {
+      id: 2,
+      church_id: 1,
+      name: "Bacoor",
+      code: "BCR"
+    },
+    leader: {
+      id: 1,
+      first_name: "Kevin",
+      last_name: "Godnacam",
+      nickname: "Kevz",
+      mobile_number: "09153169518",
+      member_position: "Pastoral Staff"
+    }
+  },
+  {
+    id: 3,
+    church_id: 1,
+    cluster_id: 1,
+    leader_id: 2,
+    name: "Grace & Truth",
+    code: "GTG",
+    meeting_day: "Friday",
+    meeting_time: "19:00:00",
+    location_type: "online",
+    venue_address: "Google Meet (Virtual)",
+    target_demographic: "young_adults",
+    is_active: true,
+    church: {
+      id: 1,
+      name: "GCF SouthMetro",
+      code: "GCFSM",
+      address: "123 Faith St., Quezon City",
+      is_main_campus: true
+    },
+    cluster: {
+      id: 1,
+      church_id: 1,
+      name: "Dasma",
+      code: "DSM"
+    },
+    leader: {
+      id: 2,
+      first_name: "Mark",
+      last_name: "Santos",
+      nickname: "Marky",
+      mobile_number: "09181234567",
+      member_position: "Volunteer Leader"
+    }
+  },
+  {
+    id: 4,
+    church_id: 2,
+    cluster_id: 3,
+    leader_id: 3,
+    name: "Light Bearers",
+    code: "LBG",
+    meeting_day: "Sunday",
+    meeting_time: "13:30:00",
+    location_type: "onsite",
+    venue_address: "Fellowship Hall, Bacoor Branch",
+    target_demographic: "family",
+    is_active: false,
+    church: {
+      id: 2,
+      name: "GCF Bacoor",
+      code: "GCFBAC",
+      address: "Aguinaldo Highway, Bacoor",
+      is_main_campus: false
+    },
+    cluster: {
+      id: 3,
+      church_id: 2,
+      name: "Alfonso",
+      code: "ALF"
+    },
+    leader: {
+      id: 3,
+      first_name: "Sarah",
+      last_name: "Jenkins",
+      nickname: "Sar",
+      mobile_number: "09229876543",
+      member_position: "Deaconess"
+    }
+  }
+];
+
 export default function GrowthGroups() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedChurch, setSelectedChurch] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('all');
+
+  // Filtering logic
+  const filteredGroups = MOCK_GROWTH_GROUPS.filter(gg => {
+    const matchesSearch = 
+      gg.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      gg.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      gg.leader.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      gg.leader.last_name.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesChurch = selectedChurch === 'all' || gg.church_id.toString() === selectedChurch;
+    const matchesStatus = selectedStatus === 'all' || (selectedStatus === 'active' ? gg.is_active : !gg.is_active);
+
+    return matchesSearch && matchesChurch && matchesStatus;
+  });
+
+  // Format time (e.g. 15:00:00 -> 3:00 PM)
+  const formatTime = (timeStr: string) => {
+    try {
+      const [hours, minutes] = timeStr.split(':');
+      const h = parseInt(hours, 10);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const formattedHours = h % 12 || 12;
+      return `${formattedHours}:${minutes} ${ampm}`;
+    } catch {
+      return timeStr;
+    }
+  };
   
   return (
     <div className="w-full bg-slate-50 text-slate-800 px-6 py-4 space-y-6">
       
       <ModuleHeader
         title="Growth Groups"
-        description="Centralized management of visitor profiles, visit history, follow-up activities, and church engagement."
+        description="Monitor and organize small groups, leadership structures, and schedules."
         icon={<FaBible size={24} />}
         actions={
           <button 
@@ -27,42 +166,155 @@ export default function GrowthGroups() {
 
       <div className="flex flex-col md:flex-row items-center gap-4 justify-between w-full bg-transparent">
         <SearchInput 
-        //   value={searchTerm}
-        //   onChange={(val) => {
-            // setSearchTerm(val);
-            // setCurrentPage(1); // I-reset sa Page 1 tuwing nag-a-update ang search
-        //   }}
-          placeholder="Search visitor by information..."
+          placeholder="Search group name, code, or leader..."
+          value={searchQuery}
+          onChange={(val) => setSearchQuery(val)}
         />
         
         <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-600 rounded-xl text-sm font-semibold shadow-sm transition-all">
-            <Filter size={14} /> Advanced Filter
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-600 rounded-xl text-sm font-semibold shadow-sm transition-all">
-            <ArrowUpDown size={14} /> Sort By
-          </button>
+          <div className="relative">
+            <select
+              value={selectedChurch}
+              onChange={(e) => setSelectedChurch(e.target.value)}
+              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-indigo-500 transition-all cursor-pointer"
+            >
+              <option value="all">All Churches</option>
+              <option value="1">GCF SouthMetro</option>
+              <option value="2">GCF Bacoor</option>
+            </select>
+          </div>
+
+          {/* Filter by Status */}
+          <div className="relative">
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-indigo-500 transition-all cursor-pointer"
+            >
+              <option value="all">All Status (Active & Inactive)</option>
+              <option value="active">Active Only</option>
+              <option value="inactive">Inactive Only</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <div className="w-full bg-white border border-slate-200/60 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-y-auto overflow-x-auto h-[calc(100vh-325px)] border border-slate-200/60 rounded-lg">
-            <table className="w-full text-left text-sm border-separate border-spacing-0">
-                <thead className="sticky top-0 z-10 bg-[var(--active-parent,rgb(99,102,241))]">
-                  <tr className="text-white uppercase tracking-wider text-[10px] font-extrabold border-b border-slate-200/60">
-                    <th className="w-[25%] px-6 py-4">Visitor Details</th>
-                    <th className="w-[14%] px-6 py-4 text-center">Age Group</th>
-                    <th className="w-[8%] px-6 py-4">Gender</th>
-                    <th className="w-[8%] px-6 py-4 text-center">Life-Stage</th>
-                    <th className="w-[15%] px-6 py-4">Contacts</th>
-                    <th className="w-[15%] px-6 py-4">Visited Schedule</th>
-                    <th className="w-[10%] px-6 py-4 text-center">Actions</th>
+          <table className="w-full text-left border-collapse">
+            
+            {/* Sticky Table Header */}
+            <thead className="bg-slate-50 sticky top-0 z-10 border-b border-slate-200 text-slate-500 text-[11px] font-bold uppercase tracking-wider">
+              <tr>
+                <th className="py-3.5 px-5">Growth Group</th>
+                <th className="py-3.5 px-4">Hierarchy (Church / Cluster)</th>
+                <th className="py-3.5 px-4">Leader</th>
+                <th className="py-3.5 px-4">Schedule & Venue</th>
+                <th className="py-3.5 px-4">Demographic</th>
+                <th className="py-3.5 px-4">Status</th>
+                <th className="py-3.5 px-5 text-right">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
+              {filteredGroups.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="text-center py-12 text-slate-400 font-medium">
+                    No growth groups found matching your criteria.
+                  </td>
+                </tr>
+              ) : (
+                filteredGroups.map((gg) => (
+                  <tr key={gg.id} className="hover:bg-slate-50/80 transition-colors group">
+                    
+                    {/* Name & Code */}
+                    <td className="py-4 px-5">
+                      <div className="font-bold text-slate-900 text-sm">{gg.name}</div>
+                      <div className="inline-block mt-0.5 px-2 py-0.5 bg-slate-100 font-mono text-[10px] text-slate-600 rounded">
+                        {gg.code}
+                      </div>
+                    </td>
+
+                    {/* Hierarchy: Church & Cluster */}
+                    <td className="py-4 px-4">
+                      <div className="flex items-center gap-1.5 font-medium text-slate-800">
+                        <Building2 size={13} className="text-indigo-500 flex-shrink-0" />
+                        <span>{gg.church.name}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-slate-500 text-[11px] mt-0.5">
+                        <Layers size={12} className="text-slate-400 flex-shrink-0" />
+                        <span>Cluster: <strong className="text-slate-700">{gg.cluster.name}</strong></span>
+                      </div>
+                    </td>
+
+                    {/* Leader */}
+                    <td className="py-4 px-4">
+                      <div className="font-semibold text-slate-900 flex items-center gap-1.5">
+                        <UserCheck size={13} className="text-emerald-600 flex-shrink-0" />
+                        <span>{gg.leader.first_name} {gg.leader.last_name} {gg.leader.nickname ? `(${gg.leader.nickname})` : ''}</span>
+                      </div>
+                      <div className="text-slate-400 text-[11px] mt-0.5 font-mono">
+                        {gg.leader.mobile_number}
+                      </div>
+                    </td>
+
+                    {/* Schedule & Venue */}
+                    <td className="py-4 px-4">
+                      <div className="flex items-center gap-1.5 text-slate-800 font-medium">
+                        <Calendar size={13} className="text-amber-500 flex-shrink-0" />
+                        <span>{gg.meeting_day} @ {formatTime(gg.meeting_time)}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-slate-500 text-[11px] mt-0.5">
+                        <MapPin size={12} className="text-rose-500 flex-shrink-0" />
+                        <span className="truncate max-w-[200px]" title={gg.venue_address}>{gg.venue_address}</span>
+                      </div>
+                    </td>
+
+                    {/* Demographic */}
+                    <td className="py-4 px-4">
+                      <span className="capitalize px-2.5 py-1 bg-indigo-50 text-indigo-700 font-semibold rounded-lg text-[10px]">
+                        {gg.target_demographic.replace('_', ' ')}
+                      </span>
+                    </td>
+
+                    {/* Status */}
+                    <td className="py-4 px-4">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
+                        gg.is_active 
+                          ? 'bg-emerald-50 text-emerald-700' 
+                          : 'bg-slate-100 text-slate-500'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${gg.is_active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                        {gg.is_active ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+
+                    {/* Actions */}
+                    <td className="py-4 px-5 text-right">
+                      <div className="flex items-center justify-end gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => alert(`Edit GG ID: ${gg.id}`)}
+                          className="p-1.5 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 rounded-lg transition-colors"
+                          title="Edit Growth Group"
+                        >
+                          <Edit3 size={15} />
+                        </button>
+                        <button 
+                          onClick={() => alert(`Delete GG ID: ${gg.id}`)}
+                          className="p-1.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 rounded-lg transition-colors"
+                          title="Delete Growth Group"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </td>
+
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 bg-white">
-                
-              </tbody>
-            </table>
+                ))
+              )}
+            </tbody>
+
+          </table>
         </div>
         
         {/* 3. DYNAMIC PAGINATION FOOTER */}

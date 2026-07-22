@@ -177,7 +177,7 @@ export default function Churches() {
               {/* 3. EDIT & DELETE BUTTONS WITH HOVER BORDER & BACKGROUND */}
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
               <button 
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/80 hover:border-indigo-200 transition-all duration-200 active:scale-95"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-blue-600 text-xs font-semibold text-white hover:bg-blue-800 hover:border-blue-900 transition-all duration-200 active:scale-95"
                   onClick={()=> handleViewChurch(church.id)}
               >
                   <Pencil size={14} />
