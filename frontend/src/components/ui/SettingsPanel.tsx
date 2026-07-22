@@ -1,4 +1,5 @@
 import { X, Check } from 'lucide-react';
+import { FaPalette } from 'react-icons/fa';
 import { useTheme } from '../../contexts/ThemeContext';
 
 export const SettingsPanel = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
@@ -14,17 +15,21 @@ export const SettingsPanel = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
   // Presets para sa Topbar Design
   const topbarPresets = [
     { name: 'Light', bg: '#ffffff', border: '#e2e8f0', color: '#1e293b' },
-    { name: 'Dark', bg: '#1e293b', border: '#334155', color: '#f8fafc' },
-    { name: 'Blue', bg: '#0284c7', border: '#e2e8f0', color: '#ffffff' },
-    { name: 'Green', bg: '#059669', border: '#e2e8f0', color: '#ffffff' },
+    { name: 'Midnight', bg: '#1e293b', border: '#334155', color: '#f8fafc' },
+    { name: 'Dark', bg: '#0f172a', border: '#080c16', color: '#f8fafc' },
+    { name: 'Blue', bg: '#00316E', border: '#e2e8f0', color: '#ffffff' },
+    { name: 'Green', bg: '#115e59', border: '#e2e8f0', color: '#ffffff' },
+    { name: 'ArmyGreen', bg: '#3C5D48', border: '#e2e8f0', color: '#ffffff' },
     { name: 'Red', bg: '#e11d48', border: '#e2e8f0', color: '#ffffff' },
     { name: 'pink', bg: '#db2777', border: '#e2e8f0', color: '#ffffff' },
     { name: 'Purple', bg: '#7c3aed', border: '#e2e8f0', color: '#ffffff' },
     { name: 'Orange', bg: '#ea580c', border: '#e2e8f0', color: '#ffffff' },
+    { name: 'Gold', bg: '#A49325', border: '#e2e8f0', color: '#ffffff' },
+    { name: 'Maroon', bg: '#542033', border: '#e2e8f0', color: '#ffffff' },
   ];
 
   // Presets para sa Accent/Active Colors
-  const accentPresets = ['#0284c7', '#059669', '#e11d48', '#db2777', '#7c3aed', '#ea580c'];
+  const accentPresets = ['#00316E', '#115e59', '#3C5D48', '#e11d48', '#db2777', '#7c3aed', '#ea580c', '#A49325', '#542033'];
 
   return (
     <>
@@ -34,7 +39,7 @@ export const SettingsPanel = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
       <div className={`fixed inset-y-0 right-0 z-[100] w-72 bg-white shadow-2xl transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="font-bold text-slate-800 text-lg">Theme Settings</h2>
+            <h2 className="flex align-items-center justify-center gap-1 font-bold text-slate-800 text-lg"><FaPalette className='mt-1' /> Theme Settings</h2>
             <button onClick={onClose} className="p-1 rounded-full hover:bg-slate-100 transition-colors cursor-pointer">
               <X size={20} className="text-slate-500" />
             </button>
@@ -44,7 +49,12 @@ export const SettingsPanel = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
             
             {/* 1. Sidebar Background */}
             <div>
-              <p className="text-sm font-semibold text-slate-700 mb-3">Sidebar Background</p>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                  Sidebar Design
+                </span>
+                <div className="h-px flex-1 bg-slate-400" />
+              </div>
               <div className="grid grid-cols-3 gap-3">
                 {sidebarPresets.map((preset) => (
                   <button
@@ -61,7 +71,12 @@ export const SettingsPanel = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
 
             {/* 2. Topbar Design */}
             <div>
-              <p className="text-sm font-semibold text-slate-700 mb-3">Topbar Design</p>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                  Topbar Design
+                </span>
+                <div className="h-px flex-1 bg-slate-400" />
+              </div>
               <div className="grid grid-cols-3 gap-3">
                 {topbarPresets.map((preset) => (
                   <button
@@ -76,11 +91,14 @@ export const SettingsPanel = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
               </div>
             </div>
             
-            <hr />
-
             {/* 3. Other Background Accent */}
             <div>
-              <p className="text-sm font-semibold text-slate-700 mb-3">Other Background Accent</p>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                  Other Background Accent
+                </span>
+                <div className="h-px flex-1 bg-slate-400" />
+              </div>
               <div className="flex flex-wrap gap-3">
                 {accentPresets.map((color) => (
                   <button

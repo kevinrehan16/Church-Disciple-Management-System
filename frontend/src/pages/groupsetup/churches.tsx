@@ -88,7 +88,7 @@ export default function Churches() {
               className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 p-5 flex flex-col justify-between relative overflow-hidden group"
           >
               {/* Top Border Indicator */}
-              <div className={`absolute top-0 left-0 right-0 h-1.5 ${church.is_active ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+              <div className={`absolute top-0 left-0 right-0 h-1.5 ${church.is_active ? 'bg-[var(--active-parent)]' : 'bg-slate-300'}`} />
 
               <div>
               {/* Card Header: Code, Main Campus Badge, & Animated Status Indicator */}
@@ -107,7 +107,7 @@ export default function Churches() {
                         )}
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-[var(--active-parent)]/50 text-white rounded-full group-hover:bg-[var(--active-parent)] group-hover:text-white transition-all shadow-sm">
+                      <div className="p-2 bg-[var(--active-parent)]/50 text-white rounded-full group-hover:bg-[var(--active-parent)]/80 group-hover:text-white transition-all shadow-sm">
                         <FaCross size={16} />
                       </div>
                       <h3 className="text-lg font-bold text-slate-800 leading-tight group-hover:text-[var(--active-parent)] transition-colors">

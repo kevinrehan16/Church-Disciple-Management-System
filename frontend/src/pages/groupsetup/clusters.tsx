@@ -122,7 +122,7 @@ export default function Clusters() {
                   className={`w-full px-6 py-5 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors text-left group ${isOpen ? '!bg-slate-200' : 'bg-white'}`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-xl transition-colors bg-slate-100 text-slate-500 group-hover:bg-[var(--active-parent,rgb(99,102,241))]/10 group-hover:text-[var(--active-parent,rgb(99,102,241))] group-hover:border-[var(--active-parent,rgb(99,102,241))] transition-colors`}>
+                    <div className={`p-3 rounded-xl transition-colors border border-slate-200 bg-slate-100 text-slate-500 group-hover:bg-[var(--active-parent,rgb(99,102,241))]/10 group-hover:text-[var(--active-parent,rgb(99,102,241))] group-hover:border-[var(--active-parent,rgb(99,102,241))] transition-colors`}>
                       <Church size={22} />
                     </div>
                     
@@ -137,9 +137,9 @@ export default function Clusters() {
                         )}
                       </div>
                       <div className="flex items-center gap-3 text-sm text-slate-500 font-medium">
-                        <span className="flex items-center gap-1"><FingerprintPattern size={13}/> {church.code}</span>
+                        <span className="flex items-center gap-1"><FingerprintPattern size={13} className='text-cyan-600'/> {church.code}</span>
                         <span className="text-slate-300">•</span>
-                        <span className="flex items-center gap-1"><MapPin size={13}/> {church.address}</span>
+                        <span className="flex items-center gap-1"><MapPin size={13} className='text-rose-600'/> {church.address}</span>
                       </div>
                     </div>
                   </div>
@@ -166,7 +166,7 @@ export default function Clusters() {
                             key={cluster.id} 
                             className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-[var(--active-parent,rgb(99,102,241))] hover:shadow-lg hover:shadow-sky-500/5 transition-all group relative overflow-hidden flex flex-col justify-between"
                           >
-                            <div className={`absolute left-0 top-0 bottom-0 w-1 ${cluster.is_active ? 'bg-emerald-600' : 'bg-slate-300'}`} />
+                            <div className={`absolute left-0 top-0 bottom-0 w-1 ${cluster.is_active ? 'bg-[var(--active-parent,rgb(99,102,241))]' : 'bg-slate-300'}`} />
                             <div>
                               <div className="flex items-start justify-between mb-3 pl-2">
                                 <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider block">

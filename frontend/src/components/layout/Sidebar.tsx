@@ -60,7 +60,7 @@ export default function Sidebar({
   const isGroupSetupActive = location.pathname.startsWith('/group-setup');
 
   // Classes
-  const activeParentClass = `bg-[var(--active-parent)] text-white font-medium shadow-md shadow-blue-500/20`;
+  const activeParentClass = `bg-gradient-to-br from-[var(--active-parent)] to-black/30 rounded-2xl text-white font-medium`;
   const inactiveParentClass = `text-[var(--menu-text)] hover:bg-slate-700/40 hover:text-white`;
   
   // Tinanggal ang gap-3 dito at nilipat sa loob para sa mas maayos na animation
