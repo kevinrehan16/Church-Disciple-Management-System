@@ -47,7 +47,9 @@ function App() {
               <Route element={<ProtectedRoute />}>
                 <Route element={<MainLayout />}>
                   <Route path="/" element={<AdminDashboard />} />
-                  <Route path="/profile" element={<Profiles />} />
+                  <Route path="/profile/me" element={<Profiles />} />
+                  <Route path="/profile/:id" element={<Profiles />} />
+                  
                   <Route path="/members/all" element={<Members />} />
                   <Route path="/members/pastoral-staff" element={<PastoralStaffs />} />
                   <Route path="/members/elders" element={<Elders />} />

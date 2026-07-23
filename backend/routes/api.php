@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Models\Member;
+use App\Http\Resources\MemberResource;
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Members\MemberController;
@@ -26,6 +28,47 @@ Route::prefix('v1')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/user', [AuthController::class, 'user']);
 
+        // PROFILE ROUTES
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::get('/profile/me', function (Request $request) {
+                // 1. Kukunin ang kasalukuyang logged-in user
+                $user = $request->user();
+
+                // 2. Kukunin ang Member record na nakakabit sa user na ito
+                // (Isasama rin natin ang spiritual gifts at growth groups)
+                $member = Member::with(['Church', 'Cluster', 'spiritualGifts'])
+                    ->where('user_id', $user->id) // o kung paano man naka-foreign key sa DB mo
+                    ->first();
+
+                if (!$member) {
+                    return response()->json(['message' => 'Member profile not found'], 404);
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'data' => new MemberResource($member)
+                ]);
+            });
+
+            Route::get('/profile/{id}', function ($id) {
+                // 1. Kukunin ang kasalukuyang logged-in user
+                $member = Member::with(['Church', 'Cluster', 'spiritualGifts'])
+                    ->find($id);
+
+                if (!$member) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Member not found'
+                    ], 404);
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'data' => new MemberResource($member)
+                ]);
+            });
+        });
+
         // MEMBERS ROUTES
         Route::get('/members', [MemberController::class, 'index']);
 
@@ -49,6 +92,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/growth-groups', [GrowthGroupController::class, 'store']);
         Route::put('/growth-groups/{growth_group}', [GrowthGroupController::class, 'update']);
 
+        // SPIRITUAL GIFTS ROUTES
         Route::prefix('spiritual-gifts')->group(function () {
             Route::get('/', [SpiritualGiftController::class, 'index']);
             Route::get('/{spiritualGift}', [SpiritualGiftController::class, 'show']);
