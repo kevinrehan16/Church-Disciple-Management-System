@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { FaBible, FaLaptopHouse, FaLaptop, FaMobileAlt } from "react-icons/fa";
 import { Plus, Sprout, CalendarClock, MapPinHouse, Church, MapPinned, Edit3, Trash2, ShieldUser } from 'lucide-react';
-import type { GrowthGroup } from '../../types/typeGrowthGroup';
+import GrowthGroupModal from '../../components/modals/growthgroupModals/GrowthGroupModal';
 import { useGrowthGroup } from '../../hooks/useGrowthGroup';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
+import { formatTime } from '../../utils/formatters';
 import { TableLoading, TableError, TableEmpty } from '../../components/ui/TableStates';
 
 export default function GrowthGroups() {
@@ -24,17 +25,12 @@ export default function GrowthGroups() {
   const currentGrowthGroups = apiResponse?.data || [];
   const meta = apiResponse?.meta;
 
-  // Format time (e.g. 15:00:00 -> 3:00 PM)
-  const formatTime = (timeStr: string) => {
-    try {
-      const [hours, minutes] = timeStr.split(':');
-      const h = parseInt(hours, 10);
-      const ampm = h >= 12 ? 'PM' : 'AM';
-      const formattedHours = h % 12 || 12;
-      return `${formattedHours}:${minutes} ${ampm}`;
-    } catch {
-      return timeStr;
-    }
+  const [isGrowthGroupModalOpen, setIsGrowthGroupModalOpen] = useState(false);
+  const [selectedGrowthGroupId, setSelectedGrowthGroupId] = useState('');
+
+  const handleViewGrowthGroup = (id: string) => {
+    setSelectedGrowthGroupId(id);
+    setIsGrowthGroupModalOpen(true);
   };
   
   return (
@@ -47,10 +43,10 @@ export default function GrowthGroups() {
         actions={
           <button 
             className="group flex items-center gap-2 px-5 py-2.5 bg-[#0284c7] hover:bg-[#026ca1] active:scale-95 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-rose-500/10"
-            // onClick={() => handleViewVisitor('')}
+            onClick={() => handleViewGrowthGroup('')}
           >
             <Plus size={16} className="transition-transform group-hover:rotate-90" />
-            Add New Visitor
+            Add New Growth Group
           </button>
         }
       />
@@ -251,13 +247,13 @@ export default function GrowthGroups() {
         </div>
       </div>
       
-      {/* {isVisitorModalOpen && (
-        <VisitorModal 
-          isOpen={isVisitorModalOpen}
-          onClose={() => setIsVisitorModalOpen(false)} 
-          visitorId={selectedVisitorId}
+      {isGrowthGroupModalOpen && (
+        <GrowthGroupModal 
+          isOpen={isGrowthGroupModalOpen}
+          onClose={() => setIsGrowthGroupModalOpen(false)} 
+          GrowthGroupId={selectedGrowthGroupId}
         />
-      )} */}
+      )}
     </div>
   );
 }

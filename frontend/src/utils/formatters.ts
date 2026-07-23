@@ -37,3 +37,15 @@ export const getLifestageStyles = (stage: string) => {
   // Default style kung walang match
   return styles[stage] || 'bg-slate-50 text-slate-500 border-slate-100';
 };
+
+export const formatTime = (timeStr: string) => {
+  try {
+    const [hours, minutes] = timeStr.split(':');
+    const h = parseInt(hours, 10);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const formattedHours = h % 12 || 12;
+    return `${formattedHours}:${minutes} ${ampm}`;
+  } catch {
+    return timeStr;
+  }
+};
