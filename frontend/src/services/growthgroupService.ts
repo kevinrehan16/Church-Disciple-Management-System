@@ -1,5 +1,5 @@
 import apiClient from '../api/axiosInstance';
-import type { GrowthGroup } from '../types/typeGrowthGroup';
+import type { GrowthGroup, SaveGrowthGroupPayload } from '../types/typeGrowthGroup';
 import type { Pagination } from '../types/typePagination';
 
 export interface growthgroupFilters {
@@ -20,6 +20,11 @@ export const growthGroupService = {
             }
         });
         return response.data;
+    },
+
+    createGrowthGroup: async (payload: SaveGrowthGroupPayload): Promise<GrowthGroup> => {
+        const response = await apiClient.post('growth-groups/', payload);
+        return response.data.data;
     },
 
 }

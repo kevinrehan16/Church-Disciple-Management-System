@@ -13,6 +13,7 @@ import {
   MapPin, 
   Users 
 } from 'lucide-react';
+import { useRegisterGrowthGroup } from '../../../hooks/useGrowthGroup';
 // I-adjust ang import path base sa folder structure mo
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import SectionHeader from '../../ui/SectionHeader';
@@ -45,6 +46,8 @@ const MOCK_LEADERS = [
   { id: 4, name: "Bro. Christian Lim" },
   { id: 5, name: "Sis. Sarah Jenkins" },
   { id: 6, name: "Bro. Michael Tan" },
+  { id: 7, name: "Bro. Peter Chan" },
+  { id: 8, name: "Bro. Rimer Regalado" },
 ];
 
 const CHURCH_OPTIONS = [
@@ -86,6 +89,7 @@ const DEMOGRAPHIC_OPTIONS = [
 
 export default function GrowthGroupModal({ isOpen, onClose, initialData }: GrowthGroupModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
+  const { mutate: addGrowthGroup, isPending: pendingAddGrowthGroup } = useRegisterGrowthGroup();
   
   const [formData, setFormData] = useState({
     church_id: initialData?.church_id || 1,
@@ -126,10 +130,8 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Payload to submit:', formData);
-    // Dito mo tatawagin ang mutation mo, halimbawa:
-    // addGrowthGroup(formData, { onSuccess: () => startClose() });
-    startClose();
+
+    addGrowthGroup(formData, { onSuccess: () => startClose() });
   };
 
   return (

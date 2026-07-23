@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { GrowthGroup } from '../types/typeGrowthGroup';
+import type { GrowthGroup, SaveGrowthGroupPayload } from '../types/typeGrowthGroup';
 import { growthGroupService } from '../services/growthgroupService';
 
 export interface GrowthGroupFilters {
@@ -15,5 +15,19 @@ export const useGrowthGroup = (filters: GrowthGroupFilters) => {
     queryFn: () => growthGroupService.getGrowthGroup(filters),
     staleTime: 1000 * 60 * 5,
     placeholderData: (previousData) => previousData,
+  });
+};
+
+export const useRegisterGrowthGroup = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (GrowthGroupData: SaveGrowthGroupPayload) => growthGroupService.createGrowthGroup(GrowthGroupData), // Gagamitin ang method mula sa object
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['growth-group'] });
+    },
+    onError: (error: any) => {
+      console.error("Growth Group Registration failed:", error.response?.data || error.message);
+    }
   });
 };
