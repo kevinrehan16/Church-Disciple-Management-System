@@ -18,6 +18,7 @@ import Visitors from './pages/visitors/visitors';
 import GrowthGroups from './pages/groupsetup/growthgroups';
 import Clusters from './pages/groupsetup/clusters';
 import Churches from './pages/groupsetup/churches';
+import Profiles from './pages/profiles/Profiles';
 
 // Protected Route Component
 const ProtectedRoute = () => {
@@ -46,6 +47,7 @@ function App() {
               <Route element={<ProtectedRoute />}>
                 <Route element={<MainLayout />}>
                   <Route path="/" element={<AdminDashboard />} />
+                  <Route path="/profile" element={<Profiles />} />
                   <Route path="/members/all" element={<Members />} />
                   <Route path="/members/pastoral-staff" element={<PastoralStaffs />} />
                   <Route path="/members/elders" element={<Elders />} />

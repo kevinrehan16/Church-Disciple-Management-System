@@ -258,8 +258,8 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                     label="Member Position" 
                     name="member_position" 
                     options={[ 
-                      {label: 'Member', value: 'Member'}, 
-                      {label: 'Pastor Staff', value: 'Pastor Staff'}, 
+                      {label: 'Member', value: 'Growth Group Member'}, 
+                      {label: 'Pastoral Staff', value: 'Pastoral Staff'}, 
                       {label: 'Deacon', value: 'Deacon'}, 
                       {label: 'Elder', value: 'Elder'}, 
                       {label: 'Pastor', value: 'Pastor'}, 
