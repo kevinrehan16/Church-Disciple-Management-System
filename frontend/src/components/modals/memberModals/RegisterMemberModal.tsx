@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
-  X, User, Mail, Calendar, Phone, MapPin, Lock, Save, 
-  Globe, Briefcase, FileText, Building, Award, Church, Users
+  X, Mail, Calendar, Phone, MapPin, Lock, Save, ShieldCheck, 
+  Briefcase, FileText, Church,
 } from 'lucide-react';
 import { useRegisterMember } from '../../../hooks/useMembers';
 import { useSpiritualGift } from '../../../hooks/useSpiritualGift';
@@ -20,6 +20,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addMember, isPending: pendingAddMember } = useRegisterMember();
   const { data: apiResponse, isLoading, isError, refetch } = useSpiritualGift();
+  const [isActive, setIsActive] = useState( true);
 
   // FIX 1: Mas maayos na pag-extract ng array from API
   const giftsList = Array.isArray(apiResponse) 
@@ -49,6 +50,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
         baptized_immersion: data.baptized_immersion === '1',
         rec_for_baptism: data.rec_for_baptism === '1',
         rec_for_membership: data.rec_for_membership === '1',
+        member_status: isActive ? 'Active' : 'Inactive',
         age: parseInt(data.age as string) || 0,
         
         // FIX 2: Isinama na ang selected gifts papuntang backend!
@@ -249,7 +251,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                   <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Elder's Recommendation</h3>
                   <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   <InputField label="Interview Conducted By" type='text' placeholder='Not yet working...' />
                   <InputField label="Membership Date" name="membership_date" type="date" />
                   <SelectField 
@@ -263,14 +265,42 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                       {label: 'Pastor', value: 'Pastor'}, 
                       {label: 'Senior Pastor', value: 'Senior Pastor'}, 
                     ]} />
-                  <SelectField label="Member Status" name="member_status" options={[{label: 'Active', value: 'Active'}, {label: 'Inactive', value: 'Inactive'}]} />
                   <div className='hidden'>
                     <SelectField label="Recommendation for Membership" name="rec_for_membership" options={[{label: 'Yes', value: '1'}, {label: 'No', value: '0'}]} />
                   </div>
-                  <div className="md:col-span-2">
+                  <div className="md:col-span-3">
                     <InputField label="Comment" name="comment" />
                   </div>
                 </div>
+              </div>
+
+              {/* Section 4: Active Status Toggle */}
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200/80">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg ${isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
+                    <ShieldCheck size={18} />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900">Membership Status</h4>
+                    <p className="text-xs text-slate-500">Enable this status for operational use.</p>
+                  </div>
+                </div>
+
+                {/* Custom Toggle Switch */}
+                <button
+                  type="button"
+                  onClick={() => setIsActive(!isActive)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    isActive ? 'bg-emerald-600' : 'bg-slate-300'
+                  }`}
+                >
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    isActive ? 'translate-x-6' : 'translate-x-1'
+                  }`} />
+                </button>
+              </div>
+              <div className='hidden'>
+                <InputField label="Member Status" name="member_status"/>
               </div>
             </form>
           </div>
