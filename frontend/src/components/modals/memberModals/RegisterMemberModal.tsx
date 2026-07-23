@@ -206,11 +206,12 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                   <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Christian Experience</h3>
                   <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <InputField label="Date Received Jesus" name="received_jesus" type="date" />
-                  <SelectField label="Baptized (Immersion)?" name="baptized_immersion" options={[{label: 'Yes', value: '1'}, {label: 'No', value: '0'}]} />
+                  <SelectField label="Baptized (Immersion)?" name="baptized_immersion" options={[{label: 'Yes', value: '1'}, {label: 'Not yet', value: '0'}]} />
+                  <SelectField label="Recommendation for Baptism" name="rec_for_baptism" options={[{label: 'Yes', value: '1'}, {label: 'No', value: '0'}]} />
                   <InputField label="Baptism Date" name="baptized_date" type="date" />
-                  <div className="md:col-span-3">
+                  <div className="md:col-span-2">
                     
                     {/* MULTISELECT PARA SA GIFTS */}
                     <MultiSelect 
@@ -263,8 +264,9 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                       {label: 'Senior Pastor', value: 'Senior Pastor'}, 
                     ]} />
                   <SelectField label="Member Status" name="member_status" options={[{label: 'Active', value: 'Active'}, {label: 'Inactive', value: 'Inactive'}]} />
-                  <SelectField label="Rec. for Baptism" name="rec_for_baptism" options={[{label: 'Yes', value: '1'}, {label: 'No', value: '0'}]} />
-                  <SelectField label="Rec. for Membership" name="rec_for_membership" options={[{label: 'Yes', value: '1'}, {label: 'No', value: '0'}]} />
+                  <div className='hidden'>
+                    <SelectField label="Recommendation for Membership" name="rec_for_membership" options={[{label: 'Yes', value: '1'}, {label: 'No', value: '0'}]} />
+                  </div>
                   <div className="md:col-span-2">
                     <InputField label="Comment" name="comment" />
                   </div>
