@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FaFacebookF, FaMobile, FaEnvelope, FaUsers } from "react-icons/fa";
 import { Plus, Search, Filter, ArrowUpDown, Users, Eye, Mars, Venus, Cake, User, MapPin } from 'lucide-react';
 import ModuleHeader from '../../components/ui/ModuleHeader';
@@ -175,14 +176,14 @@ export default function Members() {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <button 
-                            onClick={() => handleViewProfile(member.id)}
+                          <Link 
+                            to={`/member/${member.id}`}
                             className="inline-flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium 
                             text-slate-600 bg-slate-100 hover:bg-cyan-500 hover:text-white 
-                            transition-all duration-200 active:scale-95 hover:cursor-pointer"
+                            transition-all duration-200 active:scale-95"
                           >
                             <Eye size={14} />
-                          </button>
+                          </Link>
                         </td>
                     </tr>
                     ))

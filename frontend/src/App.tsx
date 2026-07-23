@@ -47,17 +47,22 @@ function App() {
               <Route element={<ProtectedRoute />}>
                 <Route element={<MainLayout />}>
                   <Route path="/" element={<AdminDashboard />} />
+
                   <Route path="/profile/me" element={<Profiles />} />
-                  <Route path="/profile/:id" element={<Profiles />} />
-                  
+                  <Route path="/member/:id" element={<Profiles />} />
+
                   <Route path="/members/all" element={<Members />} />
                   <Route path="/members/pastoral-staff" element={<PastoralStaffs />} />
                   <Route path="/members/elders" element={<Elders />} />
                   <Route path="/members/deacons" element={<Deacons />} />
+
                   <Route path="/visitors" element={<Visitors />} />
-                  <Route path="/group-setup/growth-groups" element={<GrowthGroups />} />
-                  <Route path="/group-setup/clusters" element={<Clusters />} />
+
                   <Route path="/group-setup/churches" element={<Churches />} />
+                  
+                  <Route path="/group-setup/clusters" element={<Clusters />} />
+
+                  <Route path="/group-setup/growth-groups" element={<GrowthGroups />} />
                 </Route>
               </Route>
               
