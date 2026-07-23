@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaUsers, FaUserFriends, FaNetworkWired, FaLayerGroup, FaChartArea, FaCogs } from "react-icons/fa";
+import { FaUsers, FaUserFriends, FaNetworkWired, FaLayerGroup, FaChartArea, FaCogs, FaAddressCard } from "react-icons/fa";
 import { Users, Calendar, Settings, ChevronDown, ChevronRight, MonitorCog } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -123,7 +123,20 @@ export default function Sidebar({
         <div>
           <SectionHeader title="Navigations" />
           <div className="space-y-1.5">
-            
+            {/* PROFILE WITH HOVER TOOLTIP */}
+            <div className="relative group/profile">
+              <NavLink to="/profile/me" className={getNavLinkClass}>
+                <FaAddressCard size={18} className="shrink-0" />
+                <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3'}`}>
+                  Profile
+                </span>
+              </NavLink>
+              {isCollapsed && (
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-md shadow-lg pointer-events-none opacity-0 group-hover/dashboard:opacity-100 transition-opacity duration-150 z-50 whitespace-nowrap border border-slate-700/50">
+                  Profile
+                </div>
+              )}
+            </div>
             {/* MEMBERS DROPDOWN WITH POP-OUT MENU */}
             <div className="relative group/members">
               <button onClick={toggleMembers} className={`${navLinkBase} justify-between ${isMembersActive ? activeParentClass : inactiveParentClass} ${isCollapsed ? 'justify-center px-0' : ''}`}>
