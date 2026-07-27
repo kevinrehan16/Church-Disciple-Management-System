@@ -1,78 +1,119 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-// 1. Siguraduhin na naka-import ang ThemeProvider
-import { ThemeProvider } from './contexts/ThemeContext'; 
-import LoginPage from './pages/LoginPage';
-import MainLayout from './components/layout/MainLayout';
-import LoadingScreen from './components/ui/LoadingScreen';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
 
-// PAGES
-import AdminDashboard from './pages/dashboards/AdminDashboard';
-import Members from './pages/members/members';
-import PastoralStaffs from './pages/members/pastoralStaffs';
-import Elders from './pages/members/elders';
-import Deacons from './pages/members/deacons';
+export default function LoadingScreen() {
+  // Lazy initialization para makuha agad ang kulay mula sa localStorage
+  const [color] = useState(() => {
+    try {
+      const storedTheme = localStorage.getItem('salus-theme');
+      if (storedTheme) {
+        const themeData = JSON.parse(storedTheme);
+        return themeData.activeParentBg || '#0284c7';
+      }
+    } catch (e) {
+      console.error("Error parsing theme:", e);
+    }
+    return '#0284c7'; // Fallback
+  });
 
-import Visitors from './pages/visitors/visitors';
-import GrowthGroups from './pages/groupsetup/growthgroups';
-import Clusters from './pages/groupsetup/clusters';
-import Churches from './pages/groupsetup/churches';
-import Profiles from './pages/profiles/Profiles';
-
-// Protected Route Component
-const ProtectedRoute = () => {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
-
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
-};
-
-function App() {
-  const queryClient = new QueryClient();
-  
   return (
-    // 2. I-wrap ang buong app sa ThemeProvider
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider> 
-        <AuthProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              
-              {/* Protected Routes */}
-              <Route element={<ProtectedRoute />}>
-                <Route element={<MainLayout />}>
-                  <Route path="/" element={<AdminDashboard />} />
+    <motion.div 
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-gradient-to-r from-purple-950 via-slate-950 to-indigo-950 overflow-hidden p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      {/* Slow Pulsing Divine Gold & Royal Purple Glow Background */}
+      <div className="absolute -top-24 left-1/4 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '6s' }} />
+      <div className="absolute -bottom-24 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '4s' }} />
 
-                  <Route path="/profile/me" element={<Profiles />} />
-                  <Route path="/member/:id" element={<Profiles />} />
+      {/* MASSIVE CENTERED "JESUS" WATERMARK */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
+        <motion.span 
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 2, ease: "easeOut" }}
+          className="font-black text-[12rem] sm:text-[18rem] md:text-[25rem] tracking-tight text-white/[0.03] uppercase leading-none"
+        >
+          JESUS
+        </motion.span>
+      </div>
 
-                  <Route path="/members/all" element={<Members />} />
-                  <Route path="/members/pastoral-staff" element={<PastoralStaffs />} />
-                  <Route path="/members/elders" element={<Elders />} />
-                  <Route path="/members/deacons" element={<Deacons />} />
+      {/* TOP PILLAR TAGS: Discipleship & Disciplemaking */}
+      <div className="absolute top-8 sm:top-12 w-full max-w-2xl px-6 flex items-center justify-between z-10 pointer-events-none">
+        <span className="px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold tracking-widest uppercase bg-white/10 text-amber-200 backdrop-blur-md border border-white/20 shadow-sm flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          Discipleship
+        </span>
+        <span className="px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold tracking-widest uppercase bg-white/10 text-amber-200 backdrop-blur-md border border-white/20 shadow-sm flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          Disciplemaking
+        </span>
+      </div>
 
-                  <Route path="/visitors" element={<Visitors />} />
+      {/* CENTERED CONTENT: CROSS & BRANDING */}
+      <div className="relative z-10 flex flex-col items-center justify-center">
+        {/* DIVINE CROSS & GLOW CORE */}
+        <div className="relative w-40 h-40 sm:w-48 sm:h-48 flex items-center justify-center mb-8">
+          {/* Rotating Golden Divine Ring */}
+          <motion.div 
+            animate={{ rotate: 360 }}
+            transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-0 border-t-2 border-r-2 border-amber-400/50 rounded-full"
+          />
+          
+          {/* Counter-Rotating Ring */}
+          <motion.div 
+            animate={{ rotate: -360 }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-3 border-b-2 border-l-2 border-white/20 rounded-full"
+          />
 
-                  <Route path="/group-setup/churches" element={<Churches />} />
-                  
-                  <Route path="/group-setup/clusters" element={<Clusters />} />
+          {/* Pulsing Cross Icon in Center */}
+          <motion.div 
+            animate={{ scale: [1, 1.1, 1], opacity: [0.8, 1, 0.8] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="text-amber-300 filter drop-shadow-[0_0_15px_rgba(251,191,36,0.6)]"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-20 h-20 sm:w-24 sm:h-24">
+              <path d="M11 2h2v7h7v2h-7v11h-2V11H4V9h7V2z" />
+            </svg>
+          </motion.div>
+        </div>
 
-                  <Route path="/group-setup/growth-groups" element={<GrowthGroups />} />
-                </Route>
-              </Route>
-              
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </BrowserRouter>
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+        {/* BRANDING SECTION */}
+        <div className="text-center space-y-3">
+          <motion.h1 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="text-5xl sm:text-6xl tracking-tight text-white font-extrabold uppercase drop-shadow-lg"
+          >
+            <span>GCF</span>
+          </motion.h1>
+
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="text-xs sm:text-sm font-bold tracking-[0.35em] uppercase text-amber-200/90"
+          >
+            Disciple Network System
+          </motion.p>
+        </div>
+      </div>
+
+      {/* CORE MISSION TAGLINE AT BOTTOM */}
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7, duration: 0.8 }}
+        className="absolute bottom-10 sm:bottom-12 w-full text-center z-10 px-4 pointer-events-none"
+      >
+        <p className="text-[10px] sm:text-xs font-bold tracking-[0.25em] sm:tracking-[0.35em] text-amber-100/80 uppercase drop-shadow">
+          KNOW <span className="text-amber-400 font-extrabold mx-1.5">•</span> LOVE <span className="text-amber-400 font-extrabold mx-1.5">•</span> ABIDE <span className="text-amber-400 font-extrabold mx-1.5">•</span> SERVE <span className="text-amber-400 font-extrabold mx-1.5">•</span> PROCLAIM
+        </p>
+      </motion.div>
+    </motion.div>
   );
 }
-
-export default App;
