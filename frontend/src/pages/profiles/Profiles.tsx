@@ -112,7 +112,7 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
     </div>
 
     {/* Top Row: Discipleship (Left) & Disciplemaking (Right) */}
-    <div className="w-full flex items-center justify-between z-10">
+    <div className="w-full flex items-center justify-between z-0">
       {/* Left Pillar Tag: Discipleship */}
       <span className="px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold tracking-widest uppercase bg-white/10 text-amber-200 backdrop-blur-md border border-white/20 shadow-sm flex items-center gap-1.5">
         <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />

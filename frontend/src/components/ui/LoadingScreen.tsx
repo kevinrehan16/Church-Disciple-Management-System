@@ -27,9 +27,6 @@ export default function LoadingScreen() {
       <div className="absolute -top-24 left-1/4 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '6s' }} />
       <div className="absolute -bottom-24 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '4s' }} />
 
-      {/* Subtle Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-
       {/* MASSIVE CENTERED "JESUS" WATERMARK */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
         <motion.span 
@@ -92,7 +89,7 @@ export default function LoadingScreen() {
             transition={{ delay: 0.3, duration: 0.8 }}
             className="text-5xl sm:text-6xl tracking-tight text-white font-extrabold uppercase drop-shadow-lg"
           >
-            <span>SALUS</span>
+            <span>GCF</span>
           </motion.h1>
 
           <motion.p 
@@ -101,7 +98,7 @@ export default function LoadingScreen() {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="text-xs sm:text-sm font-bold tracking-[0.35em] uppercase text-amber-200/90"
           >
-            Church Management System
+            Disciple Network System
           </motion.p>
         </div>
       </div>
