@@ -174,14 +174,15 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700">Email Address</label>
-              <div className="relative group">
-                <Mail className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 group-focus-within:!text-[var(--active-parent,rgb(99,102,241))] transition-colors" />
+              {/* I-inject ang dynamic color bilang CSS variable dito sa wrapper */}
+              <div className="relative group" style={{ '--active-parent': theme.activeParentBg }}>
+                <Mail className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-[var(--active-parent)] transition-colors" />
                 <input 
                   type="email"
                   {...register('email')} 
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none transition-all text-slate-900 placeholder:text-slate-400 focus:border-[var(--active-parent,rgb(99,102,241))] focus:ring-4 focus:ring-[var(--active-parent,rgb(99,102,241))]/10 outline-none transition-all"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none transition-all text-slate-900 placeholder:text-slate-400 focus:border-[var(--active-parent)] focus:ring-4 focus:ring-[var(--active-parent)]/20"
                   placeholder="admin@church.com"
-                  value={"superadmin@gcfsouthmetro.org"}
+                  defaultValue="superadmin@gcfsouthmetro.org"
                 />
               </div>
               {errors.email && <p className="text-red-600 text-xs font-medium">{errors.email.message as string}</p>}
@@ -189,12 +190,12 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700">Password</label>
-              <div className="relative group">
-                <Lock className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 group-focus-within:!text-[var(--active-parent,rgb(99,102,241))] transition-colors" />
+              <div className="relative group" style={{ '--active-parent': theme.activeParentBg }}>
+                <Lock className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-[var(--active-parent)] transition-colors" />
                 <input 
                   type="password" 
                   {...register('password')} 
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none transition-all text-slate-900 placeholder:text-slate-400 focus:border-[var(--active-parent,rgb(99,102,241))] focus:ring-4 focus:ring-[var(--active-parent,rgb(99,102,241))]/10 outline-none transition-all"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none transition-all text-slate-900 placeholder:text-slate-400 focus:border-[var(--active-parent)] focus:ring-4 focus:ring-[var(--active-parent)]/20"
                   placeholder="••••••••"
                 />
               </div>
