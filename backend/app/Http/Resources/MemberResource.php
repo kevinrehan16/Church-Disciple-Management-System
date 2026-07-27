@@ -93,7 +93,6 @@ class MemberResource extends JsonResource
                 'id' => $family->id,
                 'family_name' => $family->family_name,
                 'my_role' => $membership->role,
-                'address' => $family->address_line1,
 
                 // Ginamitan natin ng reject() para siguradong tanggal ang sarili mo
                 'members' => $family->familyMembers
