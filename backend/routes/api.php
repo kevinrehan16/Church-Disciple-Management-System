@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\Churches\ChurchController;
 use App\Http\Controllers\Api\V1\Clusters\ClusterController;
 use App\Http\Controllers\Api\V1\GrowthGroups\GrowthGroupController;
 use App\Http\Controllers\Api\V1\SpiritualGifts\SpiritualGiftController;
+use App\Http\Controllers\Api\V1\Family\FamilyController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -30,14 +31,18 @@ Route::prefix('v1')->group(function () {
 
         // PROFILE ROUTES
         Route::middleware('auth:sanctum')->group(function () {
+
+            // 1. GET /profile/me
             Route::get('/profile/me', function (Request $request) {
-                // 1. Kukunin ang kasalukuyang logged-in user
                 $user = $request->user();
 
-                // 2. Kukunin ang Member record na nakakabit sa user na ito
-                // (Isasama rin natin ang spiritual gifts at growth groups)
-                $member = Member::with(['Church', 'Cluster', 'spiritualGifts'])
-                    ->where('user_id', $user->id) // o kung paano man naka-foreign key sa DB mo
+                $member = Member::with([
+                    'Church',
+                    'Cluster',
+                    'spiritualGifts',
+                    'familyMembership.family.familyMembers.member' // <--- IDINAGDAG DITO
+                ])
+                    ->where('user_id', $user->id)
                     ->first();
 
                 if (!$member) {
@@ -50,9 +55,14 @@ Route::prefix('v1')->group(function () {
                 ]);
             });
 
+            // 2. GET /profile/{id}
             Route::get('/profile/{id}', function ($id) {
-                // 1. Kukunin ang kasalukuyang logged-in user
-                $member = Member::with(['Church', 'Cluster', 'spiritualGifts'])
+                $member = Member::with([
+                    'Church',
+                    'Cluster',
+                    'spiritualGifts',
+                    'familyMembership.family.familyMembers.member' // <--- IDINAGDAG DITO
+                ])
                     ->find($id);
 
                 if (!$member) {
@@ -96,6 +106,15 @@ Route::prefix('v1')->group(function () {
         Route::prefix('spiritual-gifts')->group(function () {
             Route::get('/', [SpiritualGiftController::class, 'index']);
             Route::get('/{spiritualGift}', [SpiritualGiftController::class, 'show']);
+        });
+
+        // Custom Enterprise Endpoints para sa Family Grouping
+        Route::apiResource('families', FamilyController::class)->only(['index', 'store', 'show']);
+        Route::prefix('families/{family}')->group(function () {
+            // Mag-add ng member sa pamilya
+            Route::post('members', [FamilyController::class, 'addMember']);
+            // Alisin ang member sa pamilya
+            Route::delete('members/{memberId}', [FamilyController::class, 'removeMember']);
         });
     });
 });

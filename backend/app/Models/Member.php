@@ -134,4 +134,22 @@ class Member extends Model
             ->withPivot('id', 'level', 'score', 'notes')
             ->withTimestamps();
     }
+
+    public function familyMembership(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(FamilyMember::class);
+    }
+
+    // Shortcut method para makuha agad ang pamilya ng miyembro
+    public function family()
+    {
+        return $this->hasOneThrough(
+            Family::class,
+            FamilyMember::class,
+            'member_id', // Foreign key sa family_members table
+            'id',        // Foreign key sa families table
+            'id',        // Local key sa members table
+            'family_id'  // Local key sa family_members table
+        );
+    }
 }

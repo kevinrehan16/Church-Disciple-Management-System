@@ -14,6 +14,9 @@ class MemberResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $membership = $this->familyMembership;
+        $family = $membership ? $membership->family : null;
+
         return [
             // Users info
             'email' => $this->user->email,
@@ -84,6 +87,25 @@ class MemberResource extends JsonResource
 
             // SPIRITUAL GIFTS
             'spiritual_gifts' => SpiritualGiftResource::collection($this->whenLoaded('spiritualGifts')),
+
+            // FAMILY
+            'family' => $family ? [
+                'id' => $family->id,
+                'family_name' => $family->family_name,
+                'my_role' => $membership->role,
+                'address' => $family->address_line1,
+
+                // Ginamitan natin ng reject() para siguradong tanggal ang sarili mo
+                'members' => $family->familyMembers
+                    ->reject(fn($fm) => (int) $fm->member_id === (int) $this->id)
+                    ->map(function ($fm) {
+                        return [
+                            'member_id' => $fm->member_id,
+                            'full_name' => $fm->member->first_name . ', ' . $fm->member->last_name ?? null,
+                            'role' => $fm->role,
+                        ];
+                    })->values(),
+            ] : null,
 
         ];
     }
