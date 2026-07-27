@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
     {
         User::create([
             'id'       => Str::uuid(),
-            'email'    => 'superadmin@gcfbacoor.com',
+            'email'    => 'superadmin@gcfsouthmetro.org',
             'password' => Hash::make('kevin123'), // palitan mo ito ng secure password
             'role'     => 'admin',
         ]);

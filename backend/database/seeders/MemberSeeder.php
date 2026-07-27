@@ -15,7 +15,7 @@ class MemberSeeder extends Seeder
     public function run(): void
     {
         // Hanapin ang iyong existing test account
-        $user = User::where('email', 'superadmin@gcfbacoor.com')->first();
+        $user = User::where('email', 'superadmin@gcfsouthmetro.org')->first();
 
         if ($user) {
             Member::create([
