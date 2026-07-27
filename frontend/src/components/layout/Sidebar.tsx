@@ -132,7 +132,7 @@ export default function Sidebar({
                 </span>
               </NavLink>
               {isCollapsed && (
-                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-md shadow-lg pointer-events-none opacity-0 group-hover/dashboard:opacity-100 transition-opacity duration-150 z-50 whitespace-nowrap border border-slate-700/50">
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-md shadow-lg pointer-events-none opacity-0 group-hover/profile:opacity-100 transition-opacity duration-150 z-50 whitespace-nowrap border border-slate-700/50">
                   Profile
                 </div>
               )}
@@ -397,12 +397,21 @@ export default function Sidebar({
                 </div>
               )}
             </div>
-            <NavLink to="/ministries" className={getNavLinkClass}>
-              <FaHandHoldingHeart size={18} className="shrink-0" />
-              <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3'}`}>
-                Ministries
-              </span>
-            </NavLink>
+
+            {/* MINISTRIES */}
+            <div className="relative group/ministries">
+              <NavLink to="/ministries" className={getNavLinkClass}>
+                <FaHandHoldingHeart size={18} className="shrink-0" />
+                <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3'}`}>
+                  Ministries
+                </span>
+              </NavLink>
+              {isCollapsed && (
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-md shadow-lg pointer-events-none opacity-0 group-hover/ministries:opacity-100 transition-opacity duration-150 z-50 whitespace-nowrap border border-slate-700/50">
+                  Ministries
+                </div>
+              )}
+            </div>
             
           </div>
         </div>
@@ -424,13 +433,24 @@ export default function Sidebar({
            </div>
 
            {/* Settings Button */}
-           <button 
-             onClick={onOpenSettings} 
-             className="p-2 hover:bg-slate-700 rounded-full text-slate-400 hover:text-white transition-all duration-300 hover:rotate-90 flex items-center justify-center shrink-0" 
-             title="Change Theme"
-           >
-            <Settings size={18} />
-           </button>
+           <div className="relative group flex items-center">
+            <button 
+              onClick={onOpenSettings} 
+              className="p-2 hover:bg-slate-700 rounded-full text-slate-400 hover:text-white transition-all duration-300 hover:rotate-90 flex items-center justify-center shrink-0"
+            >
+              <Settings size={18} />
+            </button>
+
+            {/* Tooltip sa Kanan na may Arrow */}
+            <div className="absolute left-full ml-2.5 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center z-50 pointer-events-none">
+              {/* Maliit na Arrow sa kaliwa ng box */}
+              <div className="w-0 h-0 border-y-[5px] border-y-transparent border-r-[5px] border-r-slate-900"></div>
+              {/* Tooltip Box */}
+              <span className="px-2.5 py-1 bg-slate-900 text-white text-xs font-medium rounded-md shadow-lg whitespace-nowrap">
+                Change Theme
+              </span>
+            </div>
+          </div>
            
         </div>
       </div>
