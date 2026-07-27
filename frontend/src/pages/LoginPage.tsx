@@ -66,7 +66,7 @@ export default function LoginPage() {
         */}
         <div 
           className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-30 transition-all duration-700 grayscale-[30%]"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=2073&auto=format&fit=crop')" }}
+          style={{ backgroundImage: "url('/web_images/worship.avif')" }}
         />
 
         {/* GRADIENT OVERLAYS: Para laging readable ang text kahit anong background image */}

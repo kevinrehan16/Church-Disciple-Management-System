@@ -81,123 +81,126 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
     <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 transition-all">
       
       {/* --- HEADER & BANNER SECTION --- */}
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden mb-6">
-  {/* Royal & Godly Worship Banner with Centered JESUS & Massive Slanted Cross Pointing to 2 o'clock */}
-  <div className="h-48 sm:h-60 bg-gradient-to-r from-purple-950 via-slate-950 to-indigo-950 relative overflow-hidden flex flex-col justify-between p-4 sm:p-6">
-    
-    {/* Slow Pulsing Divine Gold & Royal Purple Glow */}
-    <div className="absolute -top-16 left-1/3 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '6s' }} />
-    <div className="absolute -bottom-16 right-1/4 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '4s' }} />
+      <div className="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden mb-6 relative z-0">
+        {/* Base container for the Banner */}
+        <div className="h-48 sm:h-60 bg-slate-950 relative overflow-hidden flex flex-col justify-between p-4 sm:p-6">
+          
+          {/* 1. ACTUAL BACKGROUND IMAGE (Worship / Church Theme) - Pinalitaw ang opacity */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
+            style={{ backgroundImage: "url('/web_images/bible.avif')" }}
+          />
 
-    {/* Subtle Grid Pattern */}
-    <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:24px_24px]" />
+          {/* 2. TRANSPARENT GRADIENT OVERLAY - Para lumusot ang picture sa likod pero royal theme pa rin */}
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-950/80 via-slate-950/70 to-indigo-950/80 pointer-events-none" />
 
-    {/* Watermark Section */}
-    <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
-      
-      {/* Strictly Centered "JESUS" Text */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="font-black text-8xl sm:text-9xl tracking-[0.25em] text-white/[0.04] uppercase">
-          JESUS
-        </span>
-      </div>
+          {/* 3. Slow Pulsing Divine Gold & Royal Purple Glow */}
+          <div className="absolute -top-16 left-1/3 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '6s' }} />
+          <div className="absolute -bottom-16 right-1/4 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '4s' }} />
 
-      {/* Massive, Long & Slanted Cross pointing to 2 o'clock */}
-      <div className="absolute -right-12 sm:-right-20 -top-32 sm:-top-44 transform rotate-[42deg] opacity-[0.08] text-white">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-[18rem] h-[28rem] sm:w-[26rem] sm:h-[40rem]">
-          <path d="M11 2h2v7h7v2h-7v11h-2V11H4V9h7V2z" />
-        </svg>
-      </div>
-
-    </div>
-
-    {/* Top Row: Discipleship (Left) & Disciplemaking (Right) */}
-    <div className="w-full flex items-center justify-between z-0">
-      {/* Left Pillar Tag: Discipleship */}
-      <span className="px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold tracking-widest uppercase bg-white/10 text-amber-200 backdrop-blur-md border border-white/20 shadow-sm flex items-center gap-1.5">
-        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-        Discipleship
-      </span>
-
-      {/* Right Pillar Tag: Disciplemaking */}
-      <span className="px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold tracking-widest uppercase bg-white/10 text-amber-200 backdrop-blur-md border border-white/20 shadow-sm flex items-center gap-1.5">
-        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-        Disciplemaking
-      </span>
-    </div>
-
-    {/* Bottom Row: Core Tagline / Mission without 'JESUS' */}
-    <div className="w-full text-center z-10 pb-1 sm:pb-2">
-      <p className="text-[9px] sm:text-[11px] font-bold tracking-[0.22em] sm:tracking-[0.3em] text-amber-100/90 uppercase drop-shadow-md">
-        KNOW <span className="text-amber-400 font-extrabold mx-1.5">•</span> LOVE <span className="text-amber-400 font-extrabold mx-1.5">•</span> ABIDE <span className="text-amber-400 font-extrabold mx-1.5">•</span> SERVE <span className="text-amber-400 font-extrabold mx-1.5">•</span> PROCLAIM
-      </p>
-    </div>
-  </div>
-
-  <div className="px-4 sm:px-8 pb-6 relative">
-    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 -mt-16 sm:-mt-20 relative z-10">
-      
-      <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 sm:gap-6">
-        {/* Profile Picture Box with Centered Initials and Overlaid ID */}
-        <div className="h-28 w-28 sm:h-36 sm:w-36 rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-slate-100 flex-shrink-0">
-          <div className="h-full w-full rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white shadow-inner relative overflow-hidden">
-            {/* Centered Initials (Strictly fixed in center) */}
-            <span className="text-2xl sm:text-4xl font-extrabold uppercase tracking-tight">
-              {data.first_name?.[0]}{data.last_name?.[0]}
-            </span>
+          {/* 4. Watermark Section (JESUS & Cross) */}
+          <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
             
-            {/* Member ID Floating/Overlaid on top (Bottom-Right) */}
-            <div className="absolute bottom-2 right-2 z-10">
-              <span className="px-2 py-0.5 rounded-md bg-black/40 text-[9px] sm:text-[10px] font-bold tracking-wider text-amber-200 backdrop-blur-sm border border-white/15 shadow-sm">
-                {data.mem_id}
+            {/* Strictly Centered "JESUS" Text */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="font-black text-8xl sm:text-9xl tracking-[0.25em] text-white/[0.05] uppercase">
+                JESUS
               </span>
+            </div>
+
+            {/* Massive, Long & Slanted Cross pointing to 2 o'clock */}
+            <div className="absolute -right-12 sm:-right-20 -top-32 sm:-top-44 transform rotate-[42deg] opacity-[0.08] text-white">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-[18rem] h-[28rem] sm:w-[26rem] sm:h-[40rem]">
+                <path d="M11 2h2v7h7v2h-7v11h-2V11H4V9h7V2z" />
+              </svg>
+            </div>
+
+          </div>
+
+          {/* 5. Top Row: Discipleship (Left) & Disciplemaking (Right) */}
+          <div className="w-full flex items-center justify-between z-10">
+            <span className="px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold tracking-widest uppercase bg-white/10 text-amber-200 backdrop-blur-md border border-white/20 shadow-sm flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              Discipleship
+            </span>
+            <span className="px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold tracking-widest uppercase bg-white/10 text-amber-200 backdrop-blur-md border border-white/20 shadow-sm flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              Disciplemaking
+            </span>
+          </div>
+
+          {/* 6. Bottom Row: Core Tagline / Mission without 'JESUS' */}
+          <div className="w-full text-center z-10 pb-1 sm:pb-2">
+            <p className="text-[9px] sm:text-[11px] font-bold tracking-[0.22em] sm:tracking-[0.3em] text-amber-100/90 uppercase drop-shadow-md">
+              KNOW <span className="text-amber-400 font-extrabold mx-1.5">•</span> LOVE <span className="text-amber-400 font-extrabold mx-1.5">•</span> ABIDE <span className="text-amber-400 font-extrabold mx-1.5">•</span> SERVE <span className="text-amber-400 font-extrabold mx-1.5">•</span> PROCLAIM
+            </p>
+          </div>
+        </div>
+
+        <div className="px-4 sm:px-8 pb-6 relative">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 -mt-16 sm:-mt-20 relative z-10">
+            
+            <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 sm:gap-6">
+              {/* Profile Picture Box with Centered Initials and Overlaid ID */}
+              <div className="h-28 w-28 sm:h-36 sm:w-36 rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-slate-100 flex-shrink-0">
+                <div className="h-full w-full rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white shadow-inner relative overflow-hidden">
+                  {/* Centered Initials (Strictly fixed in center) */}
+                  <span className="text-2xl sm:text-4xl font-extrabold uppercase tracking-tight">
+                    {data.first_name?.[0]}{data.last_name?.[0]}
+                  </span>
+                  
+                  {/* Member ID Floating/Overlaid on top (Bottom-Right) */}
+                  <div className="absolute bottom-2 right-2 z-10">
+                    <span className="px-2 py-0.5 rounded-md bg-black/40 text-[9px] sm:text-[10px] font-bold tracking-wider text-amber-200 backdrop-blur-sm border border-white/15 shadow-sm">
+                      {data.mem_id}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                    {data.full_name}
+                  </h1>
+                  {data.nickname && (
+                    <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-xs font-medium">
+                      "{data.nickname}"
+                    </span>
+                  )}
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 ${
+                    data.member_status === 'Active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${data.member_status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+                    {data.member_status}
+                  </span>
+                </div>
+
+                {/* Sub-info with Gold Separator Dots */}
+                <p className="text-sm font-medium text-slate-600 flex flex-wrap items-center gap-2">
+                  <span className="text-indigo-600 font-semibold">{data.member_position}</span>
+                  <span className="text-amber-500 font-bold">•</span>
+                  <span>{data.church_name}</span>
+                  <span className="text-amber-500 font-bold">•</span>
+                  <span className="capitalize">{data.role}</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2 md:pt-0">
+              {isSelf ? (
+                <button className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-sm shadow-indigo-200">
+                  <Edit size={16} /> Edit Profile
+                </button>
+              ) : (
+                <button className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-sm">
+                  <ShieldCheck size={16} /> Assign Role
+                </button>
+              )}
             </div>
           </div>
         </div>
-
-        <div className="space-y-1">
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              {data.full_name}
-            </h1>
-            {data.nickname && (
-              <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-xs font-medium">
-                "{data.nickname}"
-              </span>
-            )}
-            <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 ${
-              data.member_status === 'Active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600'
-            }`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${data.member_status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
-              {data.member_status}
-            </span>
-          </div>
-
-          {/* Sub-info with Gold Separator Dots */}
-          <p className="text-sm font-medium text-slate-600 flex flex-wrap items-center gap-2">
-            <span className="text-indigo-600 font-semibold">{data.member_position}</span>
-            <span className="text-amber-500 font-bold">•</span>
-            <span>{data.church_name}</span>
-            <span className="text-amber-500 font-bold">•</span>
-            <span className="capitalize">{data.role}</span>
-          </p>
-        </div>
       </div>
-
-      <div className="flex items-center gap-2 pt-2 md:pt-0">
-        {isSelf ? (
-          <button className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-sm shadow-indigo-200">
-            <Edit size={16} /> Edit Profile
-          </button>
-        ) : (
-          <button className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-sm">
-            <ShieldCheck size={16} /> Assign Role
-          </button>
-        )}
-      </div>
-    </div>
-  </div>
-</div>
 
       {/* --- TAB NAVIGATION --- */}
       <div className="flex items-center gap-1 sm:gap-2 mb-6 border-b border-slate-200/80 overflow-x-auto no-scrollbar">
