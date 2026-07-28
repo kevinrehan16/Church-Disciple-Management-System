@@ -252,7 +252,6 @@ export default function Sidebar({
             </div>
             
             {/* GROUPS DROPDOWN WITH POP-OUT MENU */}
-            {/* FIXED: Tinanggal ang flex at w-full dito para hindi mag-row layout ang accordion items */}
             <div className="relative group/groupsmembers">
               <button onClick={toggleGroups} className={`${navLinkBase} justify-between ${isGroupsActive ? activeParentClass : inactiveParentClass} ${isCollapsed ? 'justify-center px-0' : ''}`}>
                 <div className="flex items-center">
@@ -266,35 +265,41 @@ export default function Sidebar({
                 </div>
               </button>
               
-              {/* Accordion */}
-              {!isCollapsed && isGroupsOpen && (
-                <div className="mt-1 relative w-full space-y-1 animate-in slide-in-from-top-2 fade-in duration-200"> 
-                   <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />
-                   
-                   <NavLink to="/groups-members/clusters" className="group flex items-center w-full text-sm h-9 relative z-10">
-                     {({ isActive }) => (
-                       <div className="pl-[23px] flex items-center w-full h-full">
-                         <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Clusters</div>
-                       </div>
-                     )}
-                   </NavLink>
-                   <NavLink to="/groups-members/growth-groups" className="group flex items-center w-full text-sm h-9 relative z-10">
-                     {({ isActive }) => (
-                       <div className="pl-[23px] flex items-center w-full h-full">
-                         <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Growth Groups</div>
-                       </div>
-                     )}
-                   </NavLink>
-                   <NavLink to="/groups-members/ggli-classes" className="group flex items-center w-full text-sm h-9 relative z-10">
-                     {({ isActive }) => (
-                       <div className="pl-[23px] flex items-center w-full h-full">
-                         <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>GGLI Classes</div>
-                       </div>
-                     )}
-                   </NavLink>
+              {/* Accordion (Smooth Grid Transition) */}
+              {!isCollapsed && (
+                <div 
+                  className={`grid transition-all duration-500 ease-in-out ${
+                    isGroupsOpen ? 'grid-rows-[1fr] opacity-100 mt-1' : 'grid-rows-[0fr] opacity-0'
+                  }`}
+                >
+                  <div className="overflow-hidden relative w-full space-y-1">
+                    <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />
+                    
+                    <NavLink to="/groups-members/clusters" className="group flex items-center w-full text-sm h-9 relative z-10">
+                      {({ isActive }) => (
+                        <div className="pl-[23px] flex items-center w-full h-full">
+                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                          <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Clusters</div>
+                        </div>
+                      )}
+                    </NavLink>
+                    <NavLink to="/groups-members/growth-groups" className="group flex items-center w-full text-sm h-9 relative z-10">
+                      {({ isActive }) => (
+                        <div className="pl-[23px] flex items-center w-full h-full">
+                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                          <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Growth Groups</div>
+                        </div>
+                      )}
+                    </NavLink>
+                    <NavLink to="/groups-members/ggli-classes" className="group flex items-center w-full text-sm h-9 relative z-10">
+                      {({ isActive }) => (
+                        <div className="pl-[23px] flex items-center w-full h-full">
+                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                          <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>GGLI Classes</div>
+                        </div>
+                      )}
+                    </NavLink>
+                  </div>
                 </div>
               )}
 
