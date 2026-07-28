@@ -320,7 +320,7 @@ export default function GrowthGroupsMembers() {
             <button 
               key={page} 
               onClick={() => setCurrentPage(page)} 
-              className={`w-8 h-8 flex items-center justify-center text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-sm ${currentPage === page ? 'bg-[#0284c7] text-white shadow-sky-500/20' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+              className={`w-8 h-8 flex items-center justify-center text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-sm ${currentPage === page ? 'bg-[var(--active-parent,rgb(99,102,241))] text-white shadow-sky-500/20' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
             >
               {page}
             </button>
