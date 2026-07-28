@@ -27,7 +27,13 @@ class GrowthGroupsMembersResource extends JsonResource
                 'mobile_number' => $this->leader->mobile_number,
             ] : null,
             // Listahan ng mga miyembro gamit ang Member Resource
-            'members' => GrowthGroupMemberResource::collection($this->whenLoaded('members')),
+            'members' => GrowthGroupMemberResource::collection(
+                $this->whenLoaded('members', function () {
+                    return $this->members->reject(function ($member) {
+                        return $member->id === $this->leader_id; // Di lalabas yung leader sa members list
+                    });
+                })
+            ),
         ];
     }
 }
