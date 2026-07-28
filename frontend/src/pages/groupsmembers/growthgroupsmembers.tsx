@@ -4,6 +4,7 @@ import { Plus, Sprout, CalendarClock, MapPinHouse } from 'lucide-react';
 import GrowthGroupModal from '../../components/modals/growthgroupModals/GrowthGroupModal';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
+import { useGrowthGroupMembers } from '../../hooks/useGGMembers';
 import { formatTime } from '../../utils/formatters';
 
 // Helper function para sa 2-letter initials
@@ -34,75 +35,8 @@ export default function GrowthGroupsMembers() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  // Hardcoded data batay sa JSON structure
-  const hardcodedApiResponse = {
-    "success": true,
-    "data": [
-        {
-            "id": 1,
-            "name": "God First",
-            "code": "GF",
-            "target_demographic": "professionals",
-            "meeting_day": "Wednesday",
-            "meeting_time": "18:00:00",
-            "location_type": "onsite",
-            "venue_address": "Katarungan",
-            "is_active": true,
-            "leader": {
-                "id": 3,
-                "first_name": "Mark",
-                "last_name": "Magangat",
-                "mobile_number": "09123456789"
-            },
-            "members": [
-                { "member_id": 3, "full_name": "Mark Magangat", "role": "leader", "joined_at": "2023-01-15" },
-                { "member_id": 1, "full_name": "Kevin Godnacam", "role": "member", "joined_at": "2023-02-01" },
-                { "member_id": 8, "full_name": "Rimer Christian Regalado", "role": "member", "joined_at": "2023-03-10" },
-                { "member_id": 9, "full_name": "Jong Navarro", "role": "member", "joined_at": "2023-05-20" },
-                { "member_id": 20, "full_name": "Jeffrey Dominguez", "role": "co-leader", "joined_at": "2026-01-15" }
-            ]
-        },
-        {
-            "id": 2,
-            "name": "Natural Beauty Since Birth",
-            "code": "NBSB",
-            "target_demographic": "nextgen",
-            "meeting_day": "Sunday",
-            "meeting_time": "13:00:00",
-            "location_type": "onsite",
-            "venue_address": "GCFSouthMetro, 2nd Floor, Room 310",
-            "is_active": true,
-            "leader": { "id": 1, "first_name": "Kevin", "last_name": "Godnacam", "mobile_number": "09987654321" },
-            "members": []
-        },
-        {
-            "id": 3,
-            "name": "Fan Into Flame",
-            "code": "FIF",
-            "target_demographic": "nextgen",
-            "meeting_day": "Sunday",
-            "meeting_time": "13:00:00",
-            "location_type": "hybrid",
-            "venue_address": "GCFSouthMetro, 2nd Floor, Room 306",
-            "is_active": true,
-            "leader": { "id": 1, "first_name": "Kevin", "last_name": "Godnacam", "mobile_number": "09987654321" },
-            "members": []
-        },
-        {
-            "id": 4,
-            "name": "Saviours",
-            "code": "SGG",
-            "target_demographic": "nextgen",
-            "meeting_day": "Sunday",
-            "meeting_time": "16:00:00",
-            "location_type": "online",
-            "venue_address": "Zoom Meeting Room A",
-            "is_active": true,
-            "leader": { "id": 8, "first_name": "Rimer Christian", "last_name": "Regalado", "mobile_number": "09112233445" },
-            "members": []
-        }
-    ]
-  };
+  const { data: apiResponse, isLoading, isError, refetch } = useGrowthGroupMembers();
+  const currentGGMembers = apiResponse?.data || [];
 
   const [isGrowthGroupModalOpen, setIsGrowthGroupModalOpen] = useState(false);
   const [selectedGrowthGroupId, setSelectedGrowthGroupId] = useState('');
@@ -113,7 +47,7 @@ export default function GrowthGroupsMembers() {
   };
 
   // Filtering
-  const filteredGroups = hardcodedApiResponse.data.filter((group) => {
+  const filteredGroups = currentGGMembers.filter((group) => {
     const matchesSearch = group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           group.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           `${group.leader.first_name} ${group.leader.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
