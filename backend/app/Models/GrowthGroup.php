@@ -60,7 +60,7 @@ class GrowthGroup extends Model
     public function members(): BelongsToMany
     {
         return $this->belongsToMany(Member::class, 'growth_group_member')
-            ->withPivot('role', 'joined_at')
+            ->withPivot('id', 'role', 'joined_at')
             ->withTimestamps();
     }
 }

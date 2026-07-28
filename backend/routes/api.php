@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\Clusters\ClusterController;
 use App\Http\Controllers\Api\V1\GrowthGroups\GrowthGroupController;
 use App\Http\Controllers\Api\V1\SpiritualGifts\SpiritualGiftController;
 use App\Http\Controllers\Api\V1\Family\FamilyController;
+use App\Http\Controllers\Api\V1\GrowthGroupMember\GrowthGroupMemberController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -101,6 +102,13 @@ Route::prefix('v1')->group(function () {
         Route::get('/growth-groups', [GrowthGroupController::class, 'index']);
         Route::post('/growth-groups', [GrowthGroupController::class, 'store']);
         Route::put('/growth-groups/{growth_group}', [GrowthGroupController::class, 'update']);
+
+        // GROWTH GROUP MEMBERS
+        Route::get('/growth-groups-members', [GrowthGroupMemberController::class, 'index']);
+        Route::get('/growth-groups-members/{id}/members', [GrowthGroupMemberController::class, 'showMembers']);
+        Route::post('/growth-groups-members/{id}/members', [GrowthGroupMemberController::class, 'addMember']);
+        Route::put('/growth-groups-members/{growthGroupId}/members/{memberId}', [GrowthGroupMemberController::class, 'updateMember']);
+        Route::delete('/growth-groups-members/{growthGroupId}/members/{memberId}', [GrowthGroupMemberController::class, 'removeMember']);
 
         // SPIRITUAL GIFTS ROUTES
         Route::prefix('spiritual-gifts')->group(function () {
