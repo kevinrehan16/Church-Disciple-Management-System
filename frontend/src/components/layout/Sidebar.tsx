@@ -294,10 +294,10 @@ export default function Sidebar({
 
               {/* Fly-out Pop-out Menu */}
               {isCollapsed && (
-                <div className="absolute left-full top-0 pl-2 w-52 opacity-0 pointer-events-none group-hover/groups:opacity-100 group-hover/groups:pointer-events-auto transition-all duration-200 ease-in-out z-50">
+                <div className="absolute left-full top-0 pl-2 w-52 opacity-0 pointer-events-none group-hover/groupsmembers:opacity-100 group-hover/groupsmembers:pointer-events-auto transition-all duration-200 ease-in-out z-50">
                   <div className="py-2 rounded-xl shadow-xl border border-slate-700/40 flex flex-col space-y-1 px-1.5 bg-slate-800" style={{ backgroundColor: getColor('--sidebar-bg') }}>
                     <div className="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-700/30 mb-1">
-                      Groups Menu
+                      Groups Members Menu
                     </div>
                     <NavLink to="/groups-members/clusters" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
                       Clusters
