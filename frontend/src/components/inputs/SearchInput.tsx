@@ -40,7 +40,7 @@ export default function SearchInput({
         <button
           type="button"
           onClick={() => onChange('')}
-          className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 
+          className="p-1 rounded-lg text-[var(--active-parent,rgb(99,102,241))] hover:bg-[var(--active-parent,rgb(99,102,241))]/30 hover:text-white 
           active:scale-95 transition-all cursor-pointer shrink-0 ml-1"
           title="Clear search"
         >
