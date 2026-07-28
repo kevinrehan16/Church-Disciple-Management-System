@@ -233,21 +233,37 @@ export default function GrowthGroupsMembers() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="flex -space-x-2.5 overflow-visible py-1.5">
-                          {visibleMembers.map((member, idx) => (
-                            <div
-                              key={member.member_id || idx}
-                              className={`relative group/avatar inline-flex h-8 w-8 rounded-full ring-2 ring-white items-center justify-center text-xs font-extrabold text-white transition-transform duration-200 hover:-translate-y-1.5 hover:scale-110 hover:z-30 cursor-pointer shadow-md ${getColor(member.full_name)}`}
-                            >
-                              <span className="leading-none">{getInitials(member.full_name.split(' ')[0], member.full_name.split(' ').slice(1).join(' '))}</span>
-                              
-                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/avatar:flex flex-col items-center z-40 pointer-events-none">
-                                <span className="bg-slate-900 text-white text-[11px] font-medium px-2.5 py-1 rounded-lg shadow-xl whitespace-nowrap">
-                                  {member.full_name}
+                          {visibleMembers.map((member, idx) => {
+                            const isFirst = idx === 0;
+                            // Inaalis ang comma kung mayroon man sa name (e.g., "Mark, Magangat" -> "Mark Magangat")
+                            const cleanName = member.full_name.replace(',', '');
+
+                            return (
+                              <div
+                                key={member.member_id || idx}
+                                className={`relative group/avatar inline-flex h-8 w-8 rounded-full ring-2 ring-white items-center justify-center text-xs font-extrabold text-white transition-transform duration-200 hover:-translate-y-1.5 hover:scale-110 hover:z-30 cursor-pointer shadow-md ${getColor(cleanName)}`}
+                              >
+                                <span className="leading-none">
+                                  {getInitials(cleanName.split(' ')[0], cleanName.split(' ').slice(1).join(' '))}
                                 </span>
-                                <div className="w-2 h-2 bg-slate-900 rotate-45 -mt-1" />
+                                
+                                {/* Tooltip Container */}
+                                <div 
+                                  className={`absolute bottom-full mb-2 hidden group-hover/avatar:flex flex-col z-40 pointer-events-none ${
+                                    isFirst 
+                                      ? 'left-0 translate-x-0 items-start' 
+                                      : 'left-1/2 -translate-x-1/2 items-center'
+                                  }`}
+                                >
+                                  <span className="bg-slate-900 text-white text-[11px] font-medium px-2.5 py-1 rounded-lg shadow-xl whitespace-nowrap">
+                                    {cleanName}
+                                  </span>
+                                  {/* Arrow Pointer */}
+                                  <div className={`w-2 h-2 bg-slate-900 rotate-45 -mt-1 ${isFirst ? 'ml-3' : ''}`} />
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
 
                         {hiddenCount > 0 && (
