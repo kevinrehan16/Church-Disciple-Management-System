@@ -24,6 +24,7 @@ class GrowthGroupsMembersResource extends JsonResource
                 'id' => $this->leader->id,
                 'first_name' => $this->leader->first_name,
                 'last_name' => $this->leader->last_name,
+                'mobile_number' => $this->leader->mobile_number,
             ] : null,
             // Listahan ng mga miyembro gamit ang Member Resource
             'members' => GrowthGroupMemberResource::collection($this->whenLoaded('members')),
