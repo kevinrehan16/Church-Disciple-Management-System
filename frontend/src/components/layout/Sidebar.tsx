@@ -152,42 +152,48 @@ export default function Sidebar({
               </button>
               
               {/* Accordion (Visible only when sidebar is OPEN) */}
-              {!isCollapsed && isMembersOpen && (
-                <div className="mt-1 relative w-full space-y-1 animate-in slide-in-from-top-2 fade-in duration-200"> 
-                   <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />
-                   
-                   <NavLink to="/members/all" className="group flex items-center w-full text-sm h-9 relative z-10">
-                     {({ isActive }) => (
-                       <div className="pl-[23px] flex items-center w-full h-full">
-                         <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>All Members</div>
-                       </div>
-                     )}
-                   </NavLink>
-                   <NavLink to="/members/pastoral-staff" className="group flex items-center w-full text-sm h-9 relative z-10">
-                     {({ isActive }) => (
-                       <div className="pl-[23px] flex items-center w-full h-full">
-                         <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Pastoral Staff</div>
-                       </div>
-                     )}
-                   </NavLink>
-                   <NavLink to="/members/elders" className="group flex items-center w-full text-sm h-9 relative z-10">
-                     {({ isActive }) => (
-                       <div className="pl-[23px] flex items-center w-full h-full">
-                         <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Elders</div>
-                       </div>
-                     )}
-                   </NavLink>
-                   <NavLink to="/members/deacons" className="group flex items-center w-full text-sm h-9 relative z-10">
-                     {({ isActive }) => (
-                       <div className="pl-[23px] flex items-center w-full h-full">
-                         <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                         <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Deacons</div>
-                       </div>
-                     )}
-                   </NavLink>
+              {!isCollapsed && (
+                <div 
+                  className={`grid transition-all duration-500 ease-in-out ${
+                    isMembersOpen ? 'grid-rows-[1fr] opacity-100 mt-1' : 'grid-rows-[0fr] opacity-0'
+                  }`}
+                >
+                  <div className="overflow-hidden relative w-full space-y-1">
+                    <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />
+                    
+                    <NavLink to="/members/all" className="group flex items-center w-full text-sm h-9 relative z-10">
+                      {({ isActive }) => (
+                        <div className="pl-[23px] flex items-center w-full h-full">
+                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                          <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>All Members</div>
+                        </div>
+                      )}
+                    </NavLink>
+                    <NavLink to="/members/pastoral-staff" className="group flex items-center w-full text-sm h-9 relative z-10">
+                      {({ isActive }) => (
+                        <div className="pl-[23px] flex items-center w-full h-full">
+                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                          <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Pastoral Staff</div>
+                        </div>
+                      )}
+                    </NavLink>
+                    <NavLink to="/members/elders" className="group flex items-center w-full text-sm h-9 relative z-10">
+                      {({ isActive }) => (
+                        <div className="pl-[23px] flex items-center w-full h-full">
+                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                          <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Elders</div>
+                        </div>
+                      )}
+                    </NavLink>
+                    <NavLink to="/members/deacons" className="group flex items-center w-full text-sm h-9 relative z-10">
+                      {({ isActive }) => (
+                        <div className="pl-[23px] flex items-center w-full h-full">
+                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                          <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Deacons</div>
+                        </div>
+                      )}
+                    </NavLink>
+                  </div>
                 </div>
               )}
 
