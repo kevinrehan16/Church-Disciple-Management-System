@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { FaLaptopHouse, FaLaptop, FaMobileAlt, FaUserShield, FaUsers, FaUserPlus } from "react-icons/fa";
+import { Link } from 'react-router-dom';
+import { FaLaptopHouse, FaLaptop, FaMobileAlt, FaUserShield, FaUsers, FaUserPlus, FaEye } from "react-icons/fa";
 import { Plus, Sprout, CalendarClock, MapPinHouse } from 'lucide-react';
 import GrowthGroupModal from '../../components/modals/growthgroupModals/GrowthGroupModal';
 import ModuleHeader from '../../components/ui/ModuleHeader';
@@ -239,8 +240,9 @@ export default function GrowthGroupsMembers() {
                             const cleanName = member.full_name.replace(',', '');
 
                             return (
-                              <div
+                              <Link
                                 key={member.member_id || idx}
+                                to={`/member/${member.member_id}`} // Palitan ang URL path batay sa route structure mo
                                 className={`relative group/avatar inline-flex h-8 w-8 rounded-full ring-2 ring-white items-center justify-center text-xs font-extrabold text-white transition-transform duration-200 hover:-translate-y-1.5 hover:scale-110 hover:z-30 cursor-pointer shadow-md ${getColor(cleanName)}`}
                               >
                                 <span className="leading-none">
@@ -261,25 +263,32 @@ export default function GrowthGroupsMembers() {
                                   {/* Arrow Pointer */}
                                   <div className={`w-2 h-2 bg-slate-900 rotate-45 -mt-1 ${isFirst ? 'ml-3' : ''}`} />
                                 </div>
-                              </div>
+                              </Link>
                             );
                           })}
                         </div>
 
                         {hiddenCount > 0 && (
-                          <div className="ml-2.5 flex items-center justify-center h-8 px-2.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-bold text-slate-600 shadow-sm">
+                          <div className="ml-1 flex items-center justify-center h-8 px-2.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-bold text-slate-600 shadow-sm">
                             +{hiddenCount}
                           </div>
                         )}
                       </div>
 
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1">
                         <button 
                           onClick={() => handleViewGrowthGroup(gg.id)}
                           className="flex items-center gap-1.5 p-2 rounded-full border border-slate-200 bg-blue-600 text-xs font-semibold text-white hover:bg-blue-800 hover:border-blue-900 transition-all duration-200 active:scale-95"
                           title="Add New Member"
                         >
                           <FaUserPlus size={15} />
+                        </button>
+                        <button 
+                          onClick={() => handleViewGrowthGroup(gg.id)}
+                          className="flex items-center gap-1.5 p-2 rounded-full border border-slate-200 bg-pink-600 text-xs font-semibold text-white hover:bg-pink-800 hover:border-pink-900 transition-all duration-200 active:scale-95"
+                          title="View All Members"
+                        >
+                          <FaEye size={15} />
                         </button>
                       </div>
                     </div>
