@@ -151,7 +151,7 @@ export default function GrowthGroupsMembers() {
 
                         <div>
                             {/* Badge Effect */}
-                            <span className="text-[10px] font-extrabold uppercase tracking-wider text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100 group-hover:bg-sky-100 transition-colors">
+                            <span className="text-[10px] font-extrabold uppercase tracking-wider text-white bg-slate-400 px-2 py-0.5 rounded-md border border-slate-100">
                             {gg.code}
                             </span>
 
