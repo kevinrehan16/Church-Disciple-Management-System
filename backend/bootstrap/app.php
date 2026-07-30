@@ -12,8 +12,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Iwanan lang ito para sa HTTPS proxy detection sa Render
+        // Mahalaga para sa Render HTTPS proxy
         $middleware->trustProxies(at: '*');
+
+        // Ito ang mag-aalis ng CSRF error sa API
+        $middleware->validateCsrfTokens(except: [
+            // 'api/*', //// Pwedeng tanggalin o i-comment out kung gusto mo ng mahigpit na CSRF check
+        ]);
+
+        // Ito ang mag-a-allow ng Sanctum Statefulness (Cookie Auth)
+        $middleware->api(prepend: [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
