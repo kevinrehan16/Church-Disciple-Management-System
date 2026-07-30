@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Para kilalanin ni Laravel ang HTTPS Proxy ng Render (Sobrang mahalaga para sa Cookies!)
+        $middleware->trustProxies(at: '*');
+
         // Ito ang mag-aalis ng CSRF error sa API
         $middleware->validateCsrfTokens(except: [
             'api/*',
