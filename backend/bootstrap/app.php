@@ -12,18 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Para kilalanin ni Laravel ang HTTPS Proxy ng Render (Sobrang mahalaga para sa Cookies!)
+        // Iwanan lang ito para sa HTTPS proxy detection sa Render
         $middleware->trustProxies(at: '*');
-
-        // Ito ang mag-aalis ng CSRF error sa API
-        $middleware->validateCsrfTokens(except: [
-            'api/*',
-        ]);
-
-        // Ito ang mag-a-allow ng Sanctum Statefulness (Cookie Auth)
-        $middleware->api(prepend: [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
