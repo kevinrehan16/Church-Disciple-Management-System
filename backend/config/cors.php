@@ -37,7 +37,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['church-disciple-management-system.vercel.app'],
+    'allowed_origins' => ['https://church-disciple-management-system.vercel.app'],
 
     'allowed_origins_patterns' => [],
 
