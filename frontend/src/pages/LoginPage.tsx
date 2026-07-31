@@ -30,9 +30,8 @@ export default function LoginPage() {
     try {
         // 2. GAMITIN ANG AXIOS (PLAIN), HUWAG apiClient
         // I-target ang ROOT URL (i-remove ang /api/v1)
-        const baseUrl = import.meta.env.VITE_API_URL.replace('/api/v1', '');
         
-        await apiClient.get(`${baseUrl}/sanctum/csrf-cookie`, { 
+        await apiClient.get(`/sanctum/csrf-cookie`, { 
             withCredentials: true 
         });
 
