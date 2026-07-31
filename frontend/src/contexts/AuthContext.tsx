@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from 'react';
+import axios from 'axios';
 import apiClient from '../api/axiosInstance'; 
 
 interface AuthContextType {
@@ -39,15 +40,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (credentials: Record<string, any>) => {
-    // A. Kunin ang CSRF Cookie sa Root Domain (hal. https://domain.onrender.com/sanctum/csrf-cookie)
-    await apiClient.get(`${getBaseDomain()}/sanctum/csrf-cookie`, {
+    const rootDomain = getBaseDomain(); // Halimbawa: https://church-disciple-management-system.onrender.com
+
+    // A. I-diretso ang pagtawag sa sanctum/csrf-cookie gamit ang root domain
+    await axios.get(`${rootDomain}/sanctum/csrf-cookie`, {
       withCredentials: true
     });
+    console.log("wew", getBaseDomain);
 
-    // B. Mag-send ng Login Request sa /api/v1/login
+    // B. Mag-send ng Login Request (gagamit na ito ng apiClient dahil may /api/v1 baseURL na)
     await apiClient.post('/login', credentials);
 
-    // C. Kunin ang User details gamit ang bagong session cookie
+    // C. Kunin ang User details
     await fetchUser();
   };
 
