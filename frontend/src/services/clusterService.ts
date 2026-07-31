@@ -1,6 +1,5 @@
 import apiClient from '../api/axiosInstance';
 import type { GroupedChurch, Cluster, CreateUpdateCluster } from '../types/typeCluster';
-import type { Pagination } from '../types/typePagination';
 
 export interface ChurchFilters {
   search?: string;

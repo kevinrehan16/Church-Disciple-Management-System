@@ -1,6 +1,5 @@
 import apiClient from '../api/axiosInstance';
 import type { GrowthGroup, SaveGrowthGroupPayload } from '../types/typeGrowthGroup';
-import type { Pagination } from '../types/typePagination';
 
 export interface growthgroupFilters {
   search?: string;

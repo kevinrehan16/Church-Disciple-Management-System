@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaFacebook } from 'react-icons/fa';
 import { 
   User, Mail, Phone, MapPin, ShieldCheck, 
-  Users, Edit, Key, Sparkles, Heart, Briefcase, 
+  Edit, Key, Sparkles, Heart, Briefcase, 
   GraduationCap, Cross, CheckCircle2,
   Building, BookOpen, Loader2, AlertCircle
 } from 'lucide-react';
@@ -37,7 +37,7 @@ function MyProfileFetcher() {
   return <ProfileUI data={data} isSelf={true} />;
 }
 
-function MemberProfileFetcher({ id }: { id: string }) {
+function MemberProfileFetcher({ id }: { id: number }) {
   const { data, isLoading, isError } = useMemberProfile(id);
 
   if (isLoading) return <LoadingState />;

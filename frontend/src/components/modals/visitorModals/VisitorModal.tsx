@@ -11,11 +11,13 @@ import { SelectField } from '../../inputs/SelectField';
 interface VisitorModalProps {
   isOpen: boolean;
   onClose: () => void;
+  visitorId: number | null;
 }
 
-export default function VisitorModal({ isOpen, onClose }: VisitorModalProps) {
+export default function VisitorModal({ isOpen, onClose, visitorId }: VisitorModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addVisitor, isPending: pendingAddVisitor } = useRegisterVisitor();
+  console.log(visitorId);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

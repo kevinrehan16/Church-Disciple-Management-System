@@ -13,7 +13,7 @@ export default function Visitors() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [isVisitorModalOpen, setIsVisitorModalOpen] = useState(false);
-  const [selectedVisitorId, setSelectedVisitorId] = useState('');
+  const [selectedVisitorId, setSelectedVisitorId] = useState<number>(0);
 
   // BUG FIX: Tanggalin ang useState dito. Gawin na lang normal object.
   // Tuwing magbabago ang searchTerm o currentPage, magre-re-render ang component 
@@ -29,8 +29,8 @@ export default function Visitors() {
   const meta = visitorData?.meta;
 
 
-  const handleViewVisitor = (id: string) => {
-    setSelectedVisitorId(id);
+  const handleViewVisitor = (id?: number) => {
+    setSelectedVisitorId(id ?? 0);
     setIsVisitorModalOpen(true);
   };
   
