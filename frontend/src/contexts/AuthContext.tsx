@@ -7,6 +7,7 @@ interface AuthContextType {
   isLoading: boolean;
   setIsAuthenticated: (status: boolean) => void;
   fetchUser: () => Promise<void>;
+  login: (credentials: Record<string, any>) => Promise<void>;
   logout: () => void;
 }
 
@@ -17,6 +18,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const getBaseDomain = () => {
+    const apiUrl = import.meta.env.VITE_API_URL || '';
+    return apiUrl.replace(/\/api\/v1\/?$/, '');
+  };
+  
   // 1. Fetch User (Laravel Sanctum standard endpoint: /user)
   const fetchUser = useCallback(async () => {
     try {
@@ -31,6 +37,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(false);
     }
   }, []);
+
+  const login = async (credentials: Record<string, any>) => {
+    // A. Kunin ang CSRF Cookie sa Root Domain (hal. https://domain.onrender.com/sanctum/csrf-cookie)
+    await apiClient.get(`${getBaseDomain()}/sanctum/csrf-cookie`, {
+      withCredentials: true
+    });
+
+    // B. Mag-send ng Login Request sa /api/v1/login
+    await apiClient.post('/login', credentials);
+
+    // C. Kunin ang User details gamit ang bagong session cookie
+    await fetchUser();
+  };
 
   // 2. Logout (Laravel standard endpoint: /logout)
   const logout = useCallback(async () => {
@@ -51,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [fetchUser]);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, setIsAuthenticated, fetchUser, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, setIsAuthenticated, fetchUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

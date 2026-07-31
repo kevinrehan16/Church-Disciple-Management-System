@@ -21,11 +21,14 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // Ito ang mag-a-allow ng Sanctum Statefulness (Cookie Auth)
-        $middleware->api(append: [
-            \Illuminate\Cookie\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \Illuminate\Session\Middleware\StartSession::class,
-        ]);
+        // $middleware->api(prepend: [
+        //     \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        // ]);
+
+        // 🔥 ITO ANG PINAKA-IMPORTANTENG KULANG!
+        // Awtomatiko nitong ikakabit ang EncryptCookies, StartSession, 
+        // at ang Sanctum Stateful Middleware sa lahat ng API routes.
+        $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
