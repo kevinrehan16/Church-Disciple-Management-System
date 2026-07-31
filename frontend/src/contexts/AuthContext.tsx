@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from 'react';
+import axios from 'axios';
 import apiClient from '../api/axiosInstance'; 
 
 interface AuthContextType {
@@ -17,6 +18,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<any | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const getBaseDomain = () => {
+    const apiUrl = import.meta.env.VITE_API_URL || '';
+    return apiUrl.replace(/\/api\/v1\/?$/, '');
+  };
   
   // 1. Fetch User (Laravel Sanctum standard endpoint: /user)
   const fetchUser = useCallback(async () => {
@@ -34,9 +40,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (credentials: Record<string, any>) => {
+    const rootDomain = getBaseDomain(); // Halimbawa: https://church-disciple-management-system.onrender.com
 
     // A. I-diretso ang pagtawag sa sanctum/csrf-cookie gamit ang root domain
-    await apiClient.get(`/sanctum/csrf-cookie`, {
+    await axios.get(`${rootDomain}/sanctum/csrf-cookie`, {
       withCredentials: true
     });
 
