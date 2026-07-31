@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FaFacebookSquare, FaMobile, FaEnvelope, FaUserFriends } from "react-icons/fa";
-import { Plus, Search, Filter, ArrowUpDown, Mars, Venus, Eye, Calendar, Clock } from 'lucide-react';
+import { Plus, Filter, ArrowUpDown, Mars, Venus, Eye, Calendar, Clock } from 'lucide-react';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
 import { TableLoading, TableError, TableEmpty } from '../../components/ui/TableStates';
@@ -29,7 +29,7 @@ export default function Visitors() {
   const meta = visitorData?.meta;
 
 
-  const handleViewVisitor = (id?: number) => {
+  const handleViewVisitor = (id?: any) => {
     setSelectedVisitorId(id ?? 0);
     setIsVisitorModalOpen(true);
   };

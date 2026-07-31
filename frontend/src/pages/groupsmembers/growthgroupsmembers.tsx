@@ -9,7 +9,7 @@ import { useGrowthGroupMembers } from '../../hooks/useGGMembers';
 import { formatTime } from '../../utils/formatters';
 
 // Helper function para sa 2-letter initials
-const getInitials = (firstName, lastName) => {
+const getInitials = (firstName: string, lastName: string) => {
     const first = firstName ? firstName.charAt(0) : '';
     const last = lastName ? lastName.charAt(0) : '';
     return `${first}${last}`.toUpperCase();
@@ -21,7 +21,7 @@ const avatarColors = [
     'bg-amber-500', 'bg-purple-500', 'bg-rose-500', 'bg-teal-500'
 ];
 
-const getColor = (name) => {
+const getColor = (name: any) => {
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
         hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -36,13 +36,13 @@ export default function GrowthGroupsMembers() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const { data: apiResponse, isLoading, isError, refetch } = useGrowthGroupMembers();
+  const { data: apiResponse } = useGrowthGroupMembers();
   const currentGGMembers = apiResponse?.data || [];
 
   const [isGrowthGroupModalOpen, setIsGrowthGroupModalOpen] = useState(false);
   const [selectedGrowthGroupId, setSelectedGrowthGroupId] = useState('');
 
-  const handleViewGrowthGroup = (id) => {
+  const handleViewGrowthGroup = (id: any) => {
     setSelectedGrowthGroupId(id);
     setIsGrowthGroupModalOpen(true);
   };

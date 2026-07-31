@@ -15,7 +15,7 @@ import type { MemberProfile } from '../../types/typeProfile';
 // 1. MAIN SCREEN EXPORT (Router Handler)
 // ==========================================
 export default function ProfileScreen() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: any }>();
 
   // Kung may ID sa URL (e.g. /members/15), i-load ang ibang member.
   // Kung wala (e.g. /profile), i-load ang sariling profile.

@@ -110,7 +110,7 @@ export default function GrowthGroups() {
                   </td>
                 </tr>
               ) : (
-                currentGrowthGroups.map((gg) => (
+                currentGrowthGroups.map((gg : any) => (
                   <tr key={gg.id} className="hover:bg-slate-50/80 transition-colors group">
                     
                     {/* Name & Code */}
@@ -251,7 +251,7 @@ export default function GrowthGroups() {
         <GrowthGroupModal 
           isOpen={isGrowthGroupModalOpen}
           onClose={() => setIsGrowthGroupModalOpen(false)} 
-          GrowthGroupId={selectedGrowthGroupId}
+          // GrowthGroupId={selectedGrowthGroupId}
         />
       )}
     </div>
