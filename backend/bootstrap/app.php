@@ -22,12 +22,12 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Ito ang mag-a-allow ng Sanctum Statefulness (Cookie Auth)
         #### LOCAL SERVER
-        $middleware->api(prepend: [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        ]);
+        // $middleware->api(prepend: [
+        //     \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        // ]);
 
         #### LIVE SERVER
-        // $middleware->statefulApi();
+        $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
