@@ -1,8 +1,6 @@
-import React from 'react';
 import { 
   Users, Activity, DollarSign, Bed, Calendar, ArrowUpRight, ArrowDownRight, 
-  AlertCircle, Clock, CheckCircle2, Hospital, Stethoscope, Syringe,
-  FileText, Droplet, Truck, ShieldCheck, Wallet, UserCheck, Pill, MoreVertical, LayoutDashboard 
+  Clock, CheckCircle2, Hospital, Syringe, FileText, Droplet, Truck, Wallet, UserCheck, Pill, LayoutDashboard 
 } from 'lucide-react';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 

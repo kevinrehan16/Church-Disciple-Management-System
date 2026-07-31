@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
 interface SalusTheme {
   sidebarBg: string;
@@ -7,6 +7,8 @@ interface SalusTheme {
   activeSubmenuTextColor: string;
   topbarBg: string;
   topbarTextColor: string;
+  topbarBorder: string;
+  topbarAccent: string;
 }
 
 const defaultTheme: SalusTheme = {

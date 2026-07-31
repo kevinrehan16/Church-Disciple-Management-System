@@ -15,18 +15,21 @@ export default function GrowthGroups() {
   const [selectedChurch, setSelectedChurch] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
-  const { data: apiResponse, isLoading, isError, refetch } = useGrowthGroup({
+  const { data: apiResponse } = useGrowthGroup({
     search: searchTerm,
     page: currentPage,
     church_id: selectedChurch,
     cluster_id: '',
   });
   
-  const currentGrowthGroups = apiResponse?.data || [];
-  const meta = apiResponse?.meta;
+  // apiResponse may be a paginated response with a `data` property or a plain array.
+  // Use a safe cast/check to avoid TypeScript error when `data` doesn't exist.
+  const currentGrowthGroups = (apiResponse as any)?.data || (Array.isArray(apiResponse) ? apiResponse : []);
+  const meta = (apiResponse as any)?.meta;
 
   const [isGrowthGroupModalOpen, setIsGrowthGroupModalOpen] = useState(false);
   const [selectedGrowthGroupId, setSelectedGrowthGroupId] = useState('');
+  console.log(selectedGrowthGroupId);
 
   const handleViewGrowthGroup = (id: string) => {
     setSelectedGrowthGroupId(id);

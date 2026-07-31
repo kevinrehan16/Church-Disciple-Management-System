@@ -4,13 +4,11 @@ import {
   Church, 
   UserCheck, 
   ShieldCheck, 
-  Layers, 
   Search, 
   Check, 
   ChevronDown, 
   Save, 
   Calendar, 
-  MapPin, 
   Users 
 } from 'lucide-react';
 import { useRegisterGrowthGroup } from '../../../hooks/useGrowthGroup';
@@ -89,7 +87,7 @@ const DEMOGRAPHIC_OPTIONS = [
 
 export default function GrowthGroupModal({ isOpen, onClose, initialData }: GrowthGroupModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
-  const { mutate: addGrowthGroup, isPending: pendingAddGrowthGroup } = useRegisterGrowthGroup();
+  const { mutate: addGrowthGroup } = useRegisterGrowthGroup();
   
   const [formData, setFormData] = useState({
     church_id: initialData?.church_id || 1,

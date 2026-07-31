@@ -6,6 +6,7 @@ interface InputFieldProps {
   name: string;
   error?: string[];
   type?: string;
+  step?: string;
   icon?: React.ReactNode;
   placeholder?: string;
   value?: string;

@@ -16,7 +16,7 @@ interface VisitorModalProps {
 
 export default function VisitorModal({ isOpen, onClose, visitorId }: VisitorModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
-  const { mutate: addVisitor, isPending: pendingAddVisitor } = useRegisterVisitor();
+  const { mutate: addVisitor } = useRegisterVisitor();
   console.log(visitorId);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

@@ -5,7 +5,6 @@ import { useClusters } from '../../hooks/useClusters';
 import ClusterModal from '../../components/modals/clusterModals/ClusterModal';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
-import { TableLoading, TableError, TableEmpty } from '../../components/ui/TableStates';
 
 export default function Clusters() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -13,14 +12,17 @@ export default function Clusters() {
 
   const [isClusterModalOpen, setIsClusterModalOpen] = useState(false);
   const [selectedClusterId, setSelectedClusterId] = useState('');
-
-  const { data: apiResponse, isLoading, isError, refetch } = useClusters({
+  console.log(selectedClusterId);
+  
+  const { data: apiResponse } = useClusters({
     search: searchTerm,
     page: currentPage,
   });
   
-  const currentClusters = apiResponse?.data || [];
-  const meta = apiResponse?.meta;
+  // apiResponse may be a paginated object with a `data` field or an array of clusters.
+  // Use a defensive check to support both shapes and avoid TS errors when `data` is missing.
+  const currentClusters = (apiResponse as any)?.data || (Array.isArray(apiResponse) ? apiResponse : []);
+  const meta = (apiResponse as any)?.meta;
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= (meta?.last_page || 1)) {
@@ -30,8 +32,8 @@ export default function Clusters() {
   
   // Awtomatikong kunin ang ID ng Main Campus para i-open agad
   const mainCampusIds = currentClusters
-    .filter(church => church.is_main_campus)
-    .map(church => church.id);
+    .filter((church: any) => church.is_main_campus)
+    .map((church: any) => church.id);
 
   const [openChurchIds, setOpenChurchIds] = useState<number[]>(mainCampusIds);
 
@@ -43,9 +45,9 @@ export default function Clusters() {
   };
 
   // Filter Logic (Frontend mockup for the search bar)
-  const filteredData = currentClusters.filter(church => {
+  const filteredData = currentClusters.filter((church: any) => {
     const matchChurch = church.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchCluster = church.clusters.some(c => 
+    const matchCluster = church.clusters.some((c: any) => 
       c.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     return matchChurch || matchCluster;
@@ -161,7 +163,7 @@ export default function Clusters() {
                     <div className="p-6 pt-0 border-t border-slate-100 bg-slate-50/30">
                       <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5">
                         
-                        {church.clusters.map((cluster) => (
+                        {church.clusters.map((cluster: any) => (
                           <div 
                             key={cluster.id} 
                             className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-[var(--active-parent,rgb(99,102,241))] hover:shadow-lg hover:shadow-sky-500/5 transition-all group relative overflow-hidden flex flex-col justify-between"

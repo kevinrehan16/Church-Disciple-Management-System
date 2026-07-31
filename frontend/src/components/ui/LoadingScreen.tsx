@@ -73,7 +73,8 @@ export default function LoadingScreen() {
           <motion.div 
             animate={{ scale: [1, 1.1, 1], opacity: [0.8, 1, 0.8] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            className="text-amber-300 filter drop-shadow-[0_0_15px_rgba(251,191,36,0.6)]"
+            className="filter drop-shadow-[0_0_15px_rgba(251,191,36,0.6)]"
+            style={{ color }}
           >
             <svg viewBox="0 0 24 24" fill="currentColor" className="w-20 h-20 sm:w-24 sm:h-24">
               <path d="M11 2h2v7h7v2h-7v11h-2V11H4V9h7V2z" />

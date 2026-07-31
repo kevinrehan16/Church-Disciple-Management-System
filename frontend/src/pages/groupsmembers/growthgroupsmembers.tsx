@@ -41,7 +41,8 @@ export default function GrowthGroupsMembers() {
 
   const [isGrowthGroupModalOpen, setIsGrowthGroupModalOpen] = useState(false);
   const [selectedGrowthGroupId, setSelectedGrowthGroupId] = useState('');
-
+  console.log(selectedGrowthGroupId);
+  
   const handleViewGrowthGroup = (id: any) => {
     setSelectedGrowthGroupId(id);
     setIsGrowthGroupModalOpen(true);
@@ -341,7 +342,7 @@ export default function GrowthGroupsMembers() {
         <GrowthGroupModal 
           isOpen={isGrowthGroupModalOpen}
           onClose={() => setIsGrowthGroupModalOpen(false)} 
-          GrowthGroupId={selectedGrowthGroupId}
+          // GrowthGroupId={selectedGrowthGroupId}
         />
       )}
     </div>

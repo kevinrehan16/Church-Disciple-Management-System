@@ -7,13 +7,12 @@ import {
 import { useChurches } from '../../hooks/useChurches';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
-import ChurchModal from '../../components/modals/churchModals/churchModal';
 
 export default function Churches() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: apiResponse, isLoading, isError, refetch } = useChurches({
+  const { data: apiResponse } = useChurches({
     search: searchTerm,
     page: currentPage,
   });
@@ -27,12 +26,12 @@ export default function Churches() {
     }
   };
 
-  const [selectedChurchId, setSelectedChurchId] = useState<string | null>(null);
-  const [isChurchModalOpen, setIsChurchModalOpen] = useState(false);
+  // const [selectedChurchId, setSelectedChurchId] = useState<string | null>(null);
+  // const [isChurchModalOpen, setIsChurchModalOpen] = useState(false);
 
-  const handleViewChurch = (id: string) => {
-    setSelectedChurchId(id);
-    setIsChurchModalOpen(true);
+  const handleViewChurch = (id: any) => {
+    // setSelectedChurchId(id);
+    // setIsChurchModalOpen(true);
   };
 
   return (
@@ -229,13 +228,13 @@ export default function Churches() {
       )}
 
 
-      {isChurchModalOpen && (
+      {/* {isChurchModalOpen && (
         <ChurchModal 
         isOpen={isChurchModalOpen}
         onClose={() => setIsChurchModalOpen(false)} 
         // churchId={selectedChurchId}
         />
-      )}
+      )} */}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { PanelLeft, PanelLeftClose, PanelLeftOpen, PanelRightOpen, Lock, LogOut } from 'lucide-react';
+import { PanelLeft, PanelLeftClose, PanelLeftOpen, Lock, LogOut } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { getInitials } from '../../utils/formatters';

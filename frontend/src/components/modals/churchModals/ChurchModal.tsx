@@ -14,7 +14,7 @@ interface ChurchModalProps {
 
 export default function ChurchModal({ isOpen, onClose }: ChurchModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
-  const { mutate: addChurch, isPending: pendingAddChurch } = useRegisterChurch();
+  const { mutate: addChurch } = useRegisterChurch();
   
   // I-adjust ang hook na ito base sa actual mutation hook mo para sa Churches
 

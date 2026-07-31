@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Church, Tag, UserCheck, ShieldCheck, Layers, Search, Check, ChevronDown, Save } from 'lucide-react';
+import { X, Church, UserCheck, ShieldCheck, Layers, Search, Check, ChevronDown, Save } from 'lucide-react';
 import { useRegisterCluster } from '../../../hooks/useClusters';
 // I-adjust ang import path base sa kung nasaan ang components mo
 import { modalAnimation } from '../../../utils/ModalAnimation';
@@ -37,7 +37,7 @@ const CHURCH_OPTIONS = [
 
 export default function ClusterModal({ isOpen, onClose, initialData }: ClusterModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
-  const { mutate: addCluster, isPending: pendingAddCluster } = useRegisterCluster();
+  const { mutate: addCluster } = useRegisterCluster();
   
   const [formData, setFormData] = useState({
     church_id: initialData?.church_id || 1,

@@ -19,15 +19,13 @@ interface ModalProps {
 export default function RegisterMemberModal({ isOpen, onClose, memberId }: ModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addMember, isPending: pendingAddMember } = useRegisterMember();
-  const { data: apiResponse, isLoading, isError, refetch } = useSpiritualGift();
+  const { data: apiResponse, isLoading } = useSpiritualGift();
   const [isActive, setIsActive] = useState( true);
 
   // FIX 1: Mas maayos na pag-extract ng array from API
   const giftsList = Array.isArray(apiResponse) 
     ? apiResponse 
-    : Array.isArray(apiResponse?.data) 
-      ? apiResponse.data 
-      : [];
+    : [];
 
   const [selectedGiftIds, setSelectedGiftIds] = useState<number[]>([]);
   
@@ -252,7 +250,8 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                   <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  <InputField label="Interview Conducted By" type='text' placeholder='Not yet working...' />
+                  Interview Conducted By Here...
+                  {/* <InputField label="Interview Conducted By" type='text' placeholder='Not yet working...' />
                   <InputField label="Membership Date" name="membership_date" type="date" />
                   <SelectField 
                     label="Member Position" 
@@ -264,7 +263,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                       {label: 'Elder', value: 'Elder'}, 
                       {label: 'Pastor', value: 'Pastor'}, 
                       {label: 'Senior Pastor', value: 'Senior Pastor'}, 
-                    ]} />
+                    ]} /> */}
                   <div className='hidden'>
                     <SelectField label="Recommendation for Membership" name="rec_for_membership" options={[{label: 'Yes', value: '1'}, {label: 'No', value: '0'}]} />
                   </div>
