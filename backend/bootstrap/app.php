@@ -29,6 +29,14 @@ return Application::configure(basePath: dirname(__DIR__))
         // Awtomatiko nitong ikakabit ang EncryptCookies, StartSession, 
         // at ang Sanctum Stateful Middleware sa lahat ng API routes.
         $middleware->statefulApi();
+
+        // IDAGDAG ITO: I-bypass ang CSRF check para sa Cross-Domain requests
+        $middleware->validateCsrfTokens(except: [
+            'api/*',
+            'login',
+            'logout',
+            'sanctum/csrf-cookie'
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
