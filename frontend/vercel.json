@@ -1,5 +1,23 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { 
+      "source": "/(.*)", "destination": "/index.html" 
+    },
+    {
+      "source": "/api/:match*",
+      "destination": "https://church-disciple-management-system.onrender.com/api/:match*"
+    },
+    {
+      "source": "/sanctum/csrf-cookie",
+      "destination": "https://church-disciple-management-system.onrender.com/sanctum/csrf-cookie"
+    },
+    {
+      "source": "/login",
+      "destination": "https://church-disciple-management-system.onrender.com/login"
+    },
+    {
+      "source": "/logout",
+      "destination": "https://church-disciple-management-system.onrender.com/logout"
+    }
   ]
 }

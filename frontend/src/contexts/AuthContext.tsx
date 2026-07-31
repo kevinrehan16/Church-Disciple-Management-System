@@ -40,10 +40,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (credentials: Record<string, any>) => {
-    const rootDomain = getBaseDomain(); // Halimbawa: https://church-disciple-management-system.onrender.com
 
     // A. I-diretso ang pagtawag sa sanctum/csrf-cookie gamit ang root domain
-    await axios.get(`${rootDomain}/sanctum/csrf-cookie`, {
+    await apiClient.get(`/sanctum/csrf-cookie`, {
       withCredentials: true
     });
 
