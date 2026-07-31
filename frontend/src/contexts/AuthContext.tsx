@@ -46,7 +46,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await axios.get(`${rootDomain}/sanctum/csrf-cookie`, {
       withCredentials: true
     });
-    console.log("wew", getBaseDomain);
 
     // B. Mag-send ng Login Request (gagamit na ito ng apiClient dahil may /api/v1 baseURL na)
     await apiClient.post('/login', credentials);
