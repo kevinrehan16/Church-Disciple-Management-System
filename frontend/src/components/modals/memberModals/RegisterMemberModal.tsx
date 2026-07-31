@@ -196,7 +196,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                   <InputField label="Industry" name="industry" />
                   <InputField label="High School" name="high_school" />
                   <InputField label="College School" name="college_school" />
-                  <InputField label="College Degree" name="college_degree" className="md:col-span-2" />
+                  <InputField label="College Degree" name="college_degree" />
                 </div>
               </div>
 

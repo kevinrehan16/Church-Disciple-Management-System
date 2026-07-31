@@ -18,6 +18,8 @@ const defaultTheme: SalusTheme = {
   activeSubmenuTextColor: '#ffffff',
   topbarBg: '#ffffff',
   topbarTextColor: '#0f172a',
+  topbarBorder: '#e2e8f0',
+  topbarAccent: '#0284c7',
 };
 
 const ThemeContext = createContext<{ 
