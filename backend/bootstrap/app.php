@@ -17,26 +17,17 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Ito ang mag-aalis ng CSRF error sa API
         $middleware->validateCsrfTokens(except: [
-            // 'api/*', //// Pwedeng tanggalin o i-comment out kung gusto mo ng mahigpit na CSRF check
+            'api/*', //// Pwedeng tanggalin o i-comment out kung gusto mo ng mahigpit na CSRF check
         ]);
 
         // Ito ang mag-a-allow ng Sanctum Statefulness (Cookie Auth)
-        // $middleware->api(prepend: [
-        //     \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        // ]);
-
-        // 🔥 ITO ANG PINAKA-IMPORTANTENG KULANG!
-        // Awtomatiko nitong ikakabit ang EncryptCookies, StartSession, 
-        // at ang Sanctum Stateful Middleware sa lahat ng API routes.
-        $middleware->statefulApi();
-
-        // IDAGDAG ITO: I-bypass ang CSRF check para sa Cross-Domain requests
-        $middleware->validateCsrfTokens(except: [
-            'api/*',
-            'login',
-            'logout',
-            'sanctum/csrf-cookie'
+        #### LOCAL SERVER
+        $middleware->api(prepend: [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
+
+        #### LIVE SERVER
+        // $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
