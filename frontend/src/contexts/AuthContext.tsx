@@ -66,7 +66,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    fetchUser();
+    // Huwag munang mag-fetch ng user kung nasa login page naman na
+    if (window.location.pathname !== '/login') {
+      fetchUser();
+    } else {
+      setIsLoading(false);
+    }
   }, [fetchUser]);
 
   return (
