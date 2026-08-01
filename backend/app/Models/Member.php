@@ -12,7 +12,6 @@ class Member extends Model
 {
     use HasCustomId;
 
-    public $idPrefix = 'GCFSM-'; // Pwede mong baguhin bawat Model
     public $idColumn = 'mem_id';
 
     protected $fillable = [

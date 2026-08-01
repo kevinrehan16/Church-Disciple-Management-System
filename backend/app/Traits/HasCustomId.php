@@ -4,17 +4,45 @@ namespace App\Traits;
 
 use App\Services\CustomIdService;
 
+namespace App\Traits;
+
+use App\Services\CustomIdService;
+use App\Models\Church; // I-import ang Church model
+
 trait HasCustomId
 {
     public static function bootHasCustomId()
     {
         static::creating(function ($model) {
-            // I-define ang prefix at column name sa Model mo kung kinakailangan
-            $prefix = property_exists($model, 'idPrefix') ? $model->idPrefix : 'APP-0000001';
-            $column = property_exists($model, 'idColumn') ? $model->idColumn : 'custom_id';
+            $column = property_exists($model, 'idColumn') ? $model->idColumn : 'mem_id';
+
+            // 1. Kunin ang Prefix base sa Church na pinag-rehistruhan
+            $prefix = 'GCF-GEN-'; // Default fallback kung walang church_id
+            $conditions = [];
+
+            if (!empty($model->church_id)) {
+                // Kunin ang Church record gamit ang church_id
+                $church = Church::find($model->church_id);
+
+                if ($church) {
+                    // Assuming na ang Church model ay may column na 'code' (hal. 'SM', 'BCR')
+                    // Magiging output: GCFBCR-
+                    $prefix = 'GCF' . strtoupper($church->code) . '-';
+                }
+
+                // 2. Para mag-start sa 0000001 ang bawat branch independently 
+                // (Optional: Kung gusto mo hiwalay ang numbering per church)
+                $conditions['church_id'] = $model->church_id;
+            }
 
             if (empty($model->$column)) {
-                $model->$column = CustomIdService::generate(get_class($model), $prefix, $column);
+                // Ipasa ang dynamic prefix at conditions sa Service
+                $model->$column = CustomIdService::generate(
+                    get_class($model),
+                    $prefix,
+                    $column,
+                    $conditions
+                );
             }
         });
     }
