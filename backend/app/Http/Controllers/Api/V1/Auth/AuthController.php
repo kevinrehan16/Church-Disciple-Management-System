@@ -24,20 +24,29 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        // 1. I-authenticate ang user gamit ang iyong AuthService
-        // (Assuming binabalik nito ang User model kung tama ang credentials)
+        // 1. I-authenticate ang user gamit ang AuthService
         $user = $this->authService->authenticate($request->validated());
         $user->load('member');
 
-        // 2. I-login ang user sa session ng Laravel
-        Auth::login($user);
+        // 2. Gumawa ng Sanctum API Token para sa user
+        // Pwede kang maglagay ng pangalan ng token tulad ng 'auth_token'
+        $token = $user->createToken('auth_token')->plainTextToken;
 
-        // 3. I-regenerate ang session para iwas Session Fixation attack
-        $request->session()->regenerate();
-
-        // 4. Ibalik ang user details (WALA NANG TOKEN DITO)
+        // 3. Ibalik ang user details kasama ang token
         return response()->json([
-            'user' => new UserResource($user)
+            'user' => new UserResource($user),
+            'token' => $token,
+        ]);
+    }
+
+    public function logout(Request $request)
+    {
+        // 1. I-revoke ang lahat ng tokens ng authenticated user
+        $request->user()->currentAccessToken()->delete();
+
+        // 2. Ibalik ang response
+        return response()->json([
+            'message' => 'Successfully logged out'
         ]);
     }
 

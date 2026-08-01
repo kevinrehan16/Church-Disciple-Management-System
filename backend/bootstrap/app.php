@@ -15,19 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Mahalaga para sa Render HTTPS proxy
         $middleware->trustProxies(at: '*');
 
-        // Ito ang mag-aalis ng CSRF error sa API
-        $middleware->validateCsrfTokens(except: [
-            'api/*', //// Pwedeng tanggalin o i-comment out kung gusto mo ng mahigpit na CSRF check
-        ]);
-
-        // Ito ang mag-a-allow ng Sanctum Statefulness (Cookie Auth)
-        #### LOCAL SERVER
-        // $middleware->api(prepend: [
-        //     \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        // ]);
-
-        #### LIVE SERVER
-        $middleware->statefulApi();
+        // Walang stateful middleware o CSRF exceptions para sa pure Token API.
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
