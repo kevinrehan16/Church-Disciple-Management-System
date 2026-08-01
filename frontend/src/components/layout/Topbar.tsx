@@ -77,7 +77,7 @@ export default function Topbar({ isCollapsed, setIsCollapsed }: any) {
                       hover:ring-2 hover:ring-offset-2 hover:ring-offset-[var(--offset-color)]
                       active:scale-95 cursor-pointer ${isWhiteBg ? 'hover:ring-black' : 'hover:ring-white'}`}
         >
-          {user ? getInitials(user?.data?.member?.firstName + ' ' + user?.data?.member?.lastName) : '??'}
+          {user ? getInitials(user?.member?.firstName + ' ' + user?.member?.lastName) : '??'}
         </button>
 
         {isOpen && (
@@ -94,12 +94,12 @@ export default function Topbar({ isCollapsed, setIsCollapsed }: any) {
                             transition-all duration-300 ease-in-out 
                             ring-2 ring-[var(--ring-color)] ring-offset-2 cursor-pointer"
                 >
-                  {user ? getInitials(user?.data?.member?.firstName + ' ' + user?.data?.member?.lastName) : '??'}
+                  {user ? getInitials(user?.member?.firstName + ' ' + user?.member?.lastName) : '??'}
                 </div>
                 <div>
                   {/* Tinama ko yung firsNname -> firstName dito */}
-                  <p className="text-sm font-semibold text-slate-900">{user?.data?.member?.firstName} {user?.data?.member?.lastName}</p>
-                  <p className="text-xs text-slate-500 capitalize">{user?.data?.role || 'User'}</p>
+                  <p className="text-sm font-semibold text-slate-900">{user?.member?.firstName} {user?.member?.lastName}</p>
+                  <p className="text-xs text-slate-500 capitalize">{user?.role || 'User'}</p>
                 </div>
               </div>
             </div>

@@ -441,11 +441,11 @@ export default function Sidebar({
            {/* Profile Details Container */}
            <div className={`flex items-center overflow-hidden transition-all duration-300 ${isCollapsed ? 'max-w-0 opacity-0 m-0' : 'max-w-[200px] opacity-100'}`}>
              <div className="w-10 h-10 rounded-full bg-[var(--active-parent)] flex items-center justify-center text-white font-semibold shadow-sm shrink-0">
-               {user?.data?.member ? getInitials(`${user.data.member.firstName} ${user.data.member.lastName}`) : '??'}
+               {user?.member ? getInitials(`${user.member.firstName} ${user.member.lastName}`) : '??'}
              </div>
              <div className="ml-3 overflow-hidden whitespace-nowrap">
-                <p className="text-sm font-semibold text-white truncate max-w-[100px]">{user?.data?.member?.firstName} {user?.data?.member?.lastName}</p>
-                <p className="text-xs text-slate-400 capitalize">{user?.data?.role}</p>
+                <p className="text-sm font-semibold text-white truncate max-w-[100px]">{user?.member?.firstName} {user?.member?.lastName}</p>
+                <p className="text-xs text-slate-400 capitalize">{user?.role}</p>
              </div>
            </div>
 

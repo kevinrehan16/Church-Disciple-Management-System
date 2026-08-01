@@ -8,39 +8,30 @@ const apiClient = axios.create({
   },
 });
 
-// === REQUEST INTERCEPTOR (DITO NATIN ILALAGAY ANG BEARER TOKEN) ===
-// Ito ang mag-a-attach ng token sa bawat request na gagawin mo sa backend
+// REQUEST INTERCEPTOR: Kukunin ang token sa localStorage at ikakabit sa Authorization header
 apiClient.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('auth_token'); // Kunin ang token mula sa localStorage
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
+  (config) => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+    return config;
+  },
+  (error) => Promise.reject(error)
 );
 
-// === RESPONSE INTERCEPTOR ===
-// Panatilihin ito para ma-catch kung sakaling mag-expire o mapanis ang token (401 Unauthenticated)
+// RESPONSE INTERCEPTOR: Kapag explicitly 401 (expired/invalid token) lang mag-fo-force logout
 apiClient.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            // 1. Burahin ang token at user data sa localStorage
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('user'); 
-            
-            // 2. I-redirect ang user sa login page kung hindi pa siya doon
-            if (window.location.pathname !== '/login') {
-                window.location.href = '/login';
-            }
-        }
-        
-        return Promise.reject(error);
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('auth_token');
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
+    return Promise.reject(error);
+  }
 );
 
 export default apiClient;

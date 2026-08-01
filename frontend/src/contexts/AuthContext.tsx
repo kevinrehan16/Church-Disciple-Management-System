@@ -13,11 +13,17 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  // User info is kept ONLY in React memory state (not in localStorage)
   const [user, setUser] = useState<any | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState(true);
+  
+  // Set initial authentication status based on token presence
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return !!localStorage.getItem('auth_token');
+  });
+  
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // 1. Fetch User gamit ang Bearer Token
+  // 1. Fetch User Info upon refresh
   const fetchUser = useCallback(async () => {
     const token = localStorage.getItem('auth_token');
     if (!token) {
@@ -29,47 +35,49 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       setIsLoading(true);
-      // Tatakbo ang interceptor para isabit ang Bearer token sa header
       const response = await apiClient.get('/user'); 
-      setUser(response.data.user || response.data);
+      
+      const userData = response.data.data || response.data;
+      setUser(userData);
       setIsAuthenticated(true);
-    } catch (error) {
-      // Kapag invalid o expired ang token
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user');
-      setUser(null);
-      setIsAuthenticated(false);
+    } catch (error: any) {
+      console.error("Fetch user error:", error);
+      
+      // CRITICAL FIX: Burahin LANG ang token kapag 401 Unauthenticated ang nire-return!
+      // Huwag buburahin kapag timeout, network error, o cold start ng Render.
+      if (error.response?.status === 401) {
+        localStorage.removeItem('auth_token');
+        setUser(null);
+        setIsAuthenticated(false);
+      }
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // 2. Login function (Bearer Token approach)
+  // 2. Login Function
   const login = async (credentials: Record<string, any>) => {
-    // Walang nang CSRF cookie endpoint dito! Direct post na sa login.
     const response = await apiClient.post('/login', credentials);
 
-    // Saluhin ang token at user galing sa backend response
-    const { token, user } = response.data;
+    const token = response.data.token || response.data.access_token;
+    const userData = response.data.data || response.data.user;
 
-    // I-save ang token sa localStorage para magamit ng Axios interceptor
+    // TOKEN LANG ANG ISASAVE SA LOCALSTORAGE
     localStorage.setItem('auth_token', token);
-    localStorage.setItem('user', JSON.stringify(user));
 
-    setUser(user);
+    // USER DATA IS SAVED ONLY IN REACT MEMORY
+    setUser(userData);
     setIsAuthenticated(true);
   };
 
-  // 3. Logout function
+  // 3. Logout Function
   const logout = useCallback(async () => {
     try {
       await apiClient.post('/logout'); 
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Logout error:", error);
     } finally {
-      // Burahin ang token at user data sa storage
       localStorage.removeItem('auth_token');
-      localStorage.removeItem('user');
       setUser(null);
       setIsAuthenticated(false);
       window.location.href = '/login';
