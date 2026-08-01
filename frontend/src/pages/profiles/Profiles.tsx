@@ -395,7 +395,7 @@ const MilestoneBox = ({ label, value, subtext, icon }: any) => (
 const InfoData = ({ label, value, fullWidth }: any) => (
   <div className={fullWidth ? 'sm:col-span-2' : ''}>
     <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">{label}</p>
-    <p className="text-sm font-semibold text-slate-800">{value || '—'}</p>
+    <p className="text-sm font-semibold text-slate-800">{value || '---'}</p>
   </div>
 );
 
