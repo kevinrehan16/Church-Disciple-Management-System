@@ -34,8 +34,6 @@ class AuthService
 
             // 2. Create Member Profile (I-save natin sa $member variable)
             $member = $user->member()->create([
-                'mem_id'             => 'MEM-' . time(),
-
                 // Personal Information
                 'first_name'         => $data['first_name'],
                 'last_name'          => $data['last_name'],

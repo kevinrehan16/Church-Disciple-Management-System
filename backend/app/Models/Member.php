@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasCustomId;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -9,6 +10,11 @@ use App\Enums\MemberStatus;
 
 class Member extends Model
 {
+    use HasCustomId;
+
+    public $idPrefix = 'GCFSM-'; // Pwede mong baguhin bawat Model
+    public $idColumn = 'mem_id';
+
     protected $fillable = [
         'user_id',
         'mem_id',
