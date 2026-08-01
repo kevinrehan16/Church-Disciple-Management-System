@@ -133,7 +133,7 @@ export default function Deacons() {
                             <div className="flex items-center gap-2 text-slate-600">
                               <FaFacebookF size={12} className="text-blue-400 shrink-0" />
                               <span className="text-xs font-normal">
-                                {member.facebook_name || <span className="text-slate-300 italic">No number</span>}
+                                {member.facebook_name || <span className="text-slate-300 italic">No Facebook</span>}
                               </span>
                             </div>
                           </div>

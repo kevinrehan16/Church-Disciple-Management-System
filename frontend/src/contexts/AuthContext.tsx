@@ -1,12 +1,10 @@
 import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from 'react';
-import axios from 'axios';
 import apiClient from '../api/axiosInstance'; 
 
 interface AuthContextType {
   user: any | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  setIsAuthenticated: (status: boolean) => void;
   fetchUser: () => Promise<void>;
   login: (credentials: Record<string, any>) => Promise<void>;
   logout: () => void;
@@ -19,19 +17,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getBaseDomain = () => {
-    const apiUrl = import.meta.env.VITE_API_URL || '';
-    return apiUrl.replace(/\/api\/v1\/?$/, '');
-  };
-  
-  // 1. Fetch User (Laravel Sanctum standard endpoint: /user)
+  // 1. Fetch User gamit ang Bearer Token
   const fetchUser = useCallback(async () => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      setUser(null);
+      setIsAuthenticated(false);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
-      const response = await apiClient.get('/user');
-      setUser(response.data);
+      // Tatakbo ang interceptor para isabit ang Bearer token sa header
+      const response = await apiClient.get('/user'); 
+      setUser(response.data.user || response.data);
       setIsAuthenticated(true);
     } catch (error) {
+      // Kapag invalid o expired ang token
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user');
       setUser(null);
       setIsAuthenticated(false);
     } finally {
@@ -39,37 +44,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  // 2. Login function (Bearer Token approach)
   const login = async (credentials: Record<string, any>) => {
-    const rootDomain = getBaseDomain(); // Halimbawa: https://church-disciple-management-system.onrender.com
+    // Walang nang CSRF cookie endpoint dito! Direct post na sa login.
+    const response = await apiClient.post('/login', credentials);
 
-    // A. I-diretso ang pagtawag sa sanctum/csrf-cookie gamit ang root domain
-    await axios.get(`${rootDomain}/sanctum/csrf-cookie`, {
-      withCredentials: true
-    });
+    // Saluhin ang token at user galing sa backend response
+    const { token, user } = response.data;
 
-    // B. Mag-send ng Login Request (gagamit na ito ng apiClient dahil may /api/v1 baseURL na)
-    await apiClient.post('/login', credentials);
+    // I-save ang token sa localStorage para magamit ng Axios interceptor
+    localStorage.setItem('auth_token', token);
+    localStorage.setItem('user', JSON.stringify(user));
 
-    // C. Kunin ang User details
-    await fetchUser();
+    setUser(user);
+    setIsAuthenticated(true);
   };
 
-  // 2. Logout (Laravel standard endpoint: /logout)
+  // 3. Logout function
   const logout = useCallback(async () => {
     try {
       await apiClient.post('/logout'); 
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
+      // Burahin ang token at user data sa storage
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user');
       setUser(null);
       setIsAuthenticated(false);
-      // Optional: I-redirect sa login page kung hindi pa automatic
       window.location.href = '/login';
     }
   }, []);
 
   useEffect(() => {
-    // Huwag munang mag-fetch ng user kung nasa login page naman na
     if (window.location.pathname !== '/login') {
       fetchUser();
     } else {
@@ -78,7 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [fetchUser]);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, setIsAuthenticated, fetchUser, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, fetchUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
