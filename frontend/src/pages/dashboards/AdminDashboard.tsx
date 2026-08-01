@@ -1,5 +1,5 @@
 import { 
-  Users, Activity, Calendar, ArrowUpRight, ArrowDownRight, 
+  Users, Calendar, ArrowUpRight, ArrowDownRight, 
   Clock, CheckCircle2, FileText, Wallet, UserCheck, LayoutDashboard, 
   BookOpen, Heart, Church, HandHeart, Users2, Target, Megaphone
 } from 'lucide-react';
