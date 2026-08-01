@@ -119,7 +119,7 @@ class Member extends Model
 
     public function cluster()
     {
-        return $this->belongsTo(cluster::class);
+        return $this->belongsTo(Cluster::class);
     }
 
     public function spiritualGifts()
