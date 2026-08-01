@@ -27,7 +27,7 @@ trait HasCustomId
                 if ($church) {
                     // Assuming na ang Church model ay may column na 'code' (hal. 'SM', 'BCR')
                     // Magiging output: GCFBCR-
-                    $prefix = 'GCF' . strtoupper($church->code) . '-';
+                    $prefix = strtoupper($church->code) . '-';
                 }
 
                 // 2. Para mag-start sa 0000001 ang bawat branch independently 
