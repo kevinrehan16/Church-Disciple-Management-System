@@ -26,7 +26,7 @@ import Profiles from './pages/profiles/Profiles';
 const ProtectedRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
-  if (!isLoading) {
+  if (isLoading) {
     return <LoadingScreen />;
   }
 
