@@ -60,6 +60,7 @@ export default function LoadingScreen() {
             animate={{ rotate: 360 }}
             transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
             className="absolute inset-0 border-t-2 border-r-2 border-amber-400/50 rounded-full"
+            style={{ borderColor: color }}
           />
           
           {/* Counter-Rotating Ring */}
@@ -112,7 +113,7 @@ export default function LoadingScreen() {
         className="absolute bottom-10 sm:bottom-12 w-full text-center z-10 px-4 pointer-events-none"
       >
         <p className="text-[10px] sm:text-xs font-bold tracking-[0.25em] sm:tracking-[0.35em] text-amber-100/80 uppercase drop-shadow">
-          KNOW <span className="text-amber-400 font-extrabold mx-1.5">•</span> LOVE <span className="text-amber-400 font-extrabold mx-1.5">•</span> ABIDE <span className="text-amber-400 font-extrabold mx-1.5">•</span> SERVE <span className="text-amber-400 font-extrabold mx-1.5">•</span> PROCLAIM
+          KNOW <span className="text-amber-400 font-extrabold mx-1.5" style={{color}}>•</span> LOVE <span className="text-amber-400 font-extrabold mx-1.5" style={{color}}>•</span> ABIDE <span className="text-amber-400 font-extrabold mx-1.5" style={{color}}>•</span> SERVE <span className="text-amber-400 font-extrabold mx-1.5" style={{color}}>•</span> PROCLAIM
         </p>
       </motion.div>
     </motion.div>
