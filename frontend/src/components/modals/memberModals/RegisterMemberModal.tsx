@@ -252,7 +252,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   Interview Conducted By Here...
                   {/* <InputField label="Interview Conducted By" type='text' placeholder='Not yet working...' />
-                  <InputField label="Membership Date" name="membership_date" type="date" />
+                  <InputField label="Membership Date" name="membership_date" type="date" /> */}
                   <SelectField 
                     label="Member Position" 
                     name="member_position" 
@@ -263,7 +263,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                       {label: 'Elder', value: 'Elder'}, 
                       {label: 'Pastor', value: 'Pastor'}, 
                       {label: 'Senior Pastor', value: 'Senior Pastor'}, 
-                    ]} /> */}
+                    ]} />
                   <div className='hidden'>
                     <SelectField label="Recommendation for Membership" name="rec_for_membership" options={[{label: 'Yes', value: '1'}, {label: 'No', value: '0'}]} />
                   </div>
