@@ -6,9 +6,8 @@ import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
 import { TableLoading, TableError, TableEmpty } from '../../components/ui/TableStates';
 import { useMembers } from '../../hooks/useMembers';
-import { calculateAge } from '../../utils/formatters';
+import { calculateAge, getLifestageStyles, formatDate } from '../../utils/formatters';
 import RegisterMemberModal from '../../components/modals/memberModals/RegisterMemberModal';
-import { getLifestageStyles } from '../../utils/formatters';
 
 export default function Members() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -115,7 +114,7 @@ export default function Members() {
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2 text-slate-900 text-sm font-medium">
                               <Cake size={14} className="text-slate-400" />
-                              {member.birthday}
+                              {formatDate(member.birthday)}
                             </div>
                             <div className="flex items-center gap-2 text-slate-500 text-xs">
                               <User size={14} className="text-slate-400" />

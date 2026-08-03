@@ -38,6 +38,26 @@ export const getLifestageStyles = (stage: string) => {
   return styles[stage] || 'bg-slate-50 text-slate-500 border-slate-100';
 };
 
+export function formatDate(dateString: string | null | undefined): string {
+  if (!dateString) return '';
+
+  // Hatiin ang "2002-02-14" sa taon, buwan, at araw
+  const [year, month, day] = dateString.split('-');
+  if (!year || !month || !day) return dateString;
+
+  // Gumawa ng Date object (Month ay 0-indexed sa JS kaya binawasan ng 1)
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
+
+  if (isNaN(date.getTime())) return dateString;
+
+  // I-format gamit ang Intl.DateTimeFormat para maging "Feb 14, 2002"
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',  // Feb
+    day: 'numeric',  // 14
+    year: 'numeric', // 2002
+  }).format(date);
+}
+
 export const formatTime = (timeStr: string) => {
   try {
     const [hours, minutes] = timeStr.split(':');
