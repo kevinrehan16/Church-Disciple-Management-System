@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaFacebookF, FaMobile, FaEnvelope, FaUsers } from "react-icons/fa";
-import { Plus, Filter, ArrowUpDown, Eye, Mars, Venus, Cake, User, MapPin } from 'lucide-react';
+import { Plus, Filter, ArrowUpDown, Eye, Mars, Venus, Cake, User, MapPin, UserPen } from 'lucide-react';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
 import { TableLoading, TableError, TableEmpty } from '../../components/ui/TableStates';
@@ -175,15 +175,25 @@ export default function Members() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-center">
+                        <td className="px-6 py-4 text-center gap-1.5 flex items-center justify-center">
                           <Link 
                             to={`/member/${member.id}`}
                             className="inline-flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium 
-                            text-slate-600 bg-slate-100 hover:bg-cyan-500 hover:text-white 
+                            text-emerald-600 border border-emerald-500 bg-slate-100 hover:bg-emerald-500 hover:text-white 
                             transition-all duration-200 active:scale-95"
+                            title="View Profile"
                           >
                             <Eye size={14} />
                           </Link>
+                          <button 
+                            className="inline-flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium 
+                            text-cyan-600 border border-cyan-500 bg-slate-100 hover:bg-cyan-500 hover:text-white 
+                            transition-all duration-200 active:scale-95"
+                            title="Edit Profile"
+                            onClick={() => handleViewProfile(member.id)}
+                          >
+                            <UserPen size={14} />
+                          </button>
                         </td>
                     </tr>
                     ))

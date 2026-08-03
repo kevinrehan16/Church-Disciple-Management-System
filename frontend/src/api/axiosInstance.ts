@@ -20,12 +20,16 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// RESPONSE INTERCEPTOR: Kapag explicitly 401 (expired/invalid token) lang mag-fo-force logout
+// RESPONSE INTERCEPTOR: Kapag 401 (expired/invalid token), i-clear ang session at i-redirect sa login
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Linisin ang buong session data sa localStorage
       localStorage.removeItem('auth_token');
+      localStorage.removeItem('user'); // I-clear din ang user info kung meron man
+
+      // Iwasan ang redirection loop kung nasa login page na
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
