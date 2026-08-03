@@ -10,6 +10,7 @@ import { modalAnimation } from '../../../utils/ModalAnimation';
 import { InputField } from '../../inputs/InputField';
 import { SelectField } from '../../inputs/SelectField';
 import { MultiSelect } from '../../inputs/MultiSelect';
+import { calculateAge } from '../../../utils/formatters';
 
 interface ModalProps {
   isOpen: boolean;
@@ -65,7 +66,17 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
   // Handle input changes para maging controlled inputs sila
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormDataState(prev => ({ ...prev, [name]: value }));
+    
+    setFormDataState(prev => {
+        const updated = { ...prev, [name]: value };
+
+        // Kung ang binago ay birthday, kusang i-compute ang age
+        if (name === 'birthday') {
+            updated.age = calculateAge(value);
+        }
+
+        return updated;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -166,6 +177,8 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                             value={formDataState.age || ''} 
                             onChange={handleChange}
                             className="w-full px-4 py-2.5 outline-none bg-transparent text-sm text-center" 
+                            readOnly
+                            disabled
                           />
                         </div>
                       </div>

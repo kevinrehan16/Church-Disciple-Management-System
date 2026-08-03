@@ -16,6 +16,7 @@ export const useMemberProfile = (id : number) => {
     queryKey: ['profile', id],
     queryFn: () => profileService.getMemberProfile(id),
     staleTime: 1000 * 60 * 5,
+    enabled: !!id,
     placeholderData: (previousData) => previousData,
   });
 };
