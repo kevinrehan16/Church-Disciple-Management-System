@@ -61,23 +61,26 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
     description: gift.description, 
   }));
 
+  useEffect(() => {
+    if (formDataState.birthday) {
+      const computedAge = calculateAge(formDataState.birthday);
+      
+      setFormDataState(prev => {
+        if (prev.age !== computedAge) {
+          return { ...prev, age: computedAge };
+        }
+        return prev;
+      });
+    }
+  }, [formDataState.birthday]);
+
   if (!isOpen) return null;
 
   // Handle input changes para maging controlled inputs sila
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    
-    setFormDataState(prev => {
-        const updated = { ...prev, [name]: value };
-
-        // Kung ang binago ay birthday, kusang i-compute ang age
-        if (name === 'birthday') {
-            updated.age = calculateAge(value);
-        }
-
-        return updated;
-    });
-  };
+    setFormDataState(prev => ({ ...prev, [name]: value }));
+  }; 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
