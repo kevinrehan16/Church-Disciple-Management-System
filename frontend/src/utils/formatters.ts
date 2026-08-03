@@ -69,3 +69,11 @@ export const formatTime = (timeStr: string) => {
     return timeStr;
   }
 };
+
+export function sanitizeNumber(value: string, maxLength: number = 11): string {
+  // Tanggalin lahat ng hindi numero
+  const numbersOnly = value.replace(/\D/g, '');
+  
+  // Limitahan sa maximum length (default ay 11 para sa PH mobile numbers)
+  return numbersOnly.slice(0, maxLength);
+}

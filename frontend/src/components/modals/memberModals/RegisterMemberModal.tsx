@@ -10,13 +10,19 @@ import { modalAnimation } from '../../../utils/ModalAnimation';
 import { InputField } from '../../inputs/InputField';
 import { SelectField } from '../../inputs/SelectField';
 import { MultiSelect } from '../../inputs/MultiSelect';
-import { calculateAge } from '../../../utils/formatters';
+import { SearchableSelect } from '../../inputs/SearchableSelect';
+import { calculateAge, sanitizeNumber } from '../../../utils/formatters';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   memberId?: string | null; 
 }
+
+const churchList = [
+  { id: '1', name: 'Main Sanctuary - Pasay' },
+  { id: '2', name: 'North Campus - QC' },
+];
 
 export default function RegisterMemberModal({ isOpen, onClose, memberId }: ModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
@@ -79,8 +85,16 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
   // Handle input changes para maging controlled inputs sila
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormDataState(prev => ({ ...prev, [name]: value }));
-  }; 
+    
+    let finalValue = value;
+
+    // Kung mobile number ang binabago, dadaan sa sanitize utility
+    if (name === 'mobile_number') {
+      finalValue = sanitizeNumber(value);
+    }
+
+    setFormDataState(prev => ({ ...prev, [name]: finalValue }));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -196,9 +210,9 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                       options={[
                         {label: 'Single', value: 'Single'}, 
                         {label: 'Married', value: 'Married'},
-                        {label: 'Divorced', value: 'Divorced'},
                         {label: 'Widowed', value: 'Widowed'},
-                        {label: 'Separated', value: 'Separated'}
+                        {label: 'Separated', value: 'Separated'},
+                        {label: 'Divorced', value: 'Divorced'}
                       ]} />
                     <InputField label="Mobile Number" name="mobile_number" value={formDataState.mobile_number || ''} onChange={handleChange} placeholder='0915*******' icon={<Phone size={15}/>} />
                     <InputField label="Facebook Name" name="facebook_name" value={formDataState.facebook_name || ''} onChange={handleChange} placeholder='John Doe'/>
@@ -285,7 +299,16 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                     </div>
                     <InputField label="Previous Church" name="prev_church" value={formDataState.prev_church || ''} onChange={handleChange} />
                     <InputField label="Church Affiliation" name="church_affiliation" value={formDataState.church_affiliation || ''} onChange={handleChange} />
-                    <InputField label="Satellite ID" name="church_id" value={formDataState.church_id || ''} onChange={handleChange} icon={<Church size={15}/>} />
+                    {/* <InputField label="Satellite ID" name="church_id" value={formDataState.church_id || ''} onChange={handleChange} icon={<Church size={15}/>} /> */}
+                    <SearchableSelect
+                      label="Church"
+                      name="church_id"
+                      value={formDataState.church_id || ''}
+                      options={churchList}
+                      placeholder="Select Church"
+                      icon={<Church size={15} />}
+                      onChange={handleChange}
+                    />
                     <InputField label="Picture Path" name="picture" value={formDataState.picture || ''} onChange={handleChange} />
                   </div>
                 </div>
