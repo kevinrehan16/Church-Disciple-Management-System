@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // 1. Siguraduhin na naka-import ang ThemeProvider
 import { ThemeProvider } from './contexts/ThemeContext'; 
 import LoginPage from './pages/LoginPage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
+
 import MainLayout from './components/layout/MainLayout';
 import LoadingScreen from './components/ui/LoadingScreen';
 
@@ -44,7 +46,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
-              
+              <Route path="/change-password" element={<ChangePasswordPage />} />
               {/* Protected Routes */}
               <Route element={<ProtectedRoute />}>
                 <Route element={<MainLayout />}>

@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
-use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\User\RegisterRequest;
+use App\Http\Requests\Password\ChangePasswordRequest;
 use App\Http\Resources\UserResource;
 use App\Services\AuthService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
@@ -67,5 +65,15 @@ class AuthController extends Controller
             'message' => 'User registered successfully',
             'user'    => new UserResource($user)
         ], 201);
+    }
+
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
+    {
+        // I-pasa ang validated data (kasama ang email) sa service
+        $this->authService->changePassword($request->validated());
+
+        return response()->json([
+            'message' => 'Password successfully updated. You can now login.',
+        ], 200);
     }
 }

@@ -40,11 +40,29 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      await login(data); // data = { email: '...', password: '...' }
-      navigate('/', { replace: true });
-    } catch (error) {
+      // 1. Saluhin ang response mula sa login function
+      const response = await login(data) as unknown as {
+        user?: {
+          mustChangePassword?: boolean;
+        };
+        mustChangePassword?: boolean;
+      };
+
+      // 2. Suriin kung true ang mustChangePassword (suportahan din ang snake_case sakali man)
+      if (response?.user?.mustChangePassword) {
+        navigate('/change-password', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
+    } catch (error: any) {
       console.error("Login failed:", error);
-      alert("Invalid credentials.");
+      
+      // Kung sakaling ibato ng backend sa catch block (error response)
+      if (error?.response?.data?.mustChangePassword) {
+        navigate('/change-password', { replace: true });
+      } else {
+        alert("Invalid credentials.");
+      }
     } finally {
       setIsLoading(false);
     }

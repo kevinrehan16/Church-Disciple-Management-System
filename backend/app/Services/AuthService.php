@@ -4,8 +4,8 @@ namespace App\Services;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\NewUserTemporaryPasswordMail;
 use App\Models\User;
+use App\Mail\NewUserTemporaryPasswordMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -103,5 +103,31 @@ class AuthService
 
             return $user;
         });
+    }
+
+    public function changePassword(array $data): bool
+    {
+        // 1. Hanapin ang user base sa email na ibinigay
+        $user = User::where('email', $data['email'])->first();
+
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'email' => ['We cannot find a user with that email address.'],
+            ]);
+        }
+
+        // 2. Suriin kung tama ang current / temporary password
+        if (!Hash::check($data['currentPassword'], $user->password)) {
+            throw ValidationException::withMessages([
+                'currentPassword' => ['The provided current password is incorrect.'],
+            ]);
+        }
+
+        // 3. I-update ang password at i-reset ang flag
+        $user->password = Hash::make($data['newPassword']);
+        $user->must_change_password = false;
+        $user->save();
+
+        return true;
     }
 }

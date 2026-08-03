@@ -6,7 +6,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   fetchUser: () => Promise<void>;
-  login: (credentials: Record<string, any>) => Promise<void>;
+  login: (credentials: Record<string, any>) => Promise<any>; // 👈 Binago mula Promise<void> patungong Promise<any>
   logout: () => void;
 }
 
@@ -44,7 +44,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error("Fetch user error:", error);
       
       // CRITICAL FIX: Burahin LANG ang token kapag 401 Unauthenticated ang nire-return!
-      // Huwag buburahin kapag timeout, network error, o cold start ng Render.
       if (error.response?.status === 401) {
         localStorage.removeItem('auth_token');
         setUser(null);
@@ -68,6 +67,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // USER DATA IS SAVED ONLY IN REACT MEMORY
     setUser(userData);
     setIsAuthenticated(true);
+
+    return response.data;
   };
 
   // 3. Logout Function

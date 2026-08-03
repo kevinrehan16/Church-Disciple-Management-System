@@ -25,7 +25,7 @@ class RegisterRequest extends FormRequest
         return [
             // Auth Credentials
             'email'         => 'required|email|unique:users,email',
-            'password'      => 'required|min:8',
+            // 'password'      => 'required|min:8',
 
             // Personal Info
             'nickname'      => 'nullable|string|max:30',

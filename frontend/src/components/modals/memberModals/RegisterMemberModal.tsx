@@ -157,13 +157,13 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                 {/* SECTION: ID & AUTH */}
                 <div className="space-y-5">
                   <div className="flex items-center gap-4">
-                    <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Account & ID</h3>
+                    <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Account</h3>
                     <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-5">
                     {/* <InputField label="Member ID" name="mem_id" value={formDataState.mem_id || ''} onChange={handleChange} icon={<FileText size={15}/>} /> */}
                     <InputField label="Email Address" name="email" type="email" value={formDataState.email || ''} onChange={handleChange} icon={<Mail size={15}/>} />
-                    <InputField label="Password" name="password" type="password" value={formDataState.password || ''} onChange={handleChange} icon={<Lock size={15}/>} />
+                    {/* <InputField label="Password" name="password" type="password" value={formDataState.password || ''} onChange={handleChange} icon={<Lock size={15}/>} /> */}
                   </div>
                 </div>
 
