@@ -49,18 +49,16 @@ export const useRegisterMember = () => {
   });
 };
 
-// export const useUpdatePatient = () => {
-//   const queryClient = useQueryClient();
-//   return useMutation({
-//     mutationFn: ({ id, data }: { id: string, data: any }) => 
-//       patientService.updatePatient(id, data),
-//     onSuccess: (data, variables) => {
-//       // I-invalidate ang list at ang specific patient detail
-//       queryClient.invalidateQueries({ queryKey: ['patients'] });
-//       queryClient.invalidateQueries({ queryKey: ['patient', variables.id] });
-//     },
-//     onError: (error: any) => {
-//       console.error("Updating failed:", error.response?.data || error.message);
-//     }
-//   });
-// };
+export const useUpdateMember = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, memberData }: { id: string; memberData: any }) => memberService.updateMember(id, memberData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['members'] });
+    },
+    onError: (error: any) => {
+      console.error("Update failed:", error.response?.data || error.message);
+    }
+  });
+};

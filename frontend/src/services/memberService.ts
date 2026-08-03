@@ -32,9 +32,9 @@ export const memberService = {
     return data;
   },
 
-  // updatePatient: async (id: string, data: any): Promise<Patient> => {
-  //   const res = await apiClient.patch(`/patients/${id}/`, data);
-  //   return res.data;
-  // },
+  updateMember: async (id: string, memberData: any): Promise<Member> => {
+    const { data } = await apiClient.put(`/members/${id}/`, memberData);
+    return data;
+  },
   
 };

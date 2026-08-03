@@ -3,11 +3,7 @@
 namespace App\Traits;
 
 use App\Services\CustomIdService;
-
-namespace App\Traits;
-
-use App\Services\CustomIdService;
-use App\Models\Church; // I-import ang Church model
+use App\Models\Church;
 
 trait HasCustomId
 {
@@ -25,13 +21,11 @@ trait HasCustomId
                 $church = Church::find($model->church_id);
 
                 if ($church) {
-                    // Assuming na ang Church model ay may column na 'code' (hal. 'SM', 'BCR')
-                    // Magiging output: GCFBCR-
+                    // Halimbawa: GCFSM-
                     $prefix = strtoupper($church->code) . '-';
                 }
 
                 // 2. Para mag-start sa 0000001 ang bawat branch independently 
-                // (Optional: Kung gusto mo hiwalay ang numbering per church)
                 $conditions['church_id'] = $model->church_id;
             }
 

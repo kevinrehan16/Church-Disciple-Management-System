@@ -3,7 +3,7 @@ import {
   X, Mail, Calendar, Phone, MapPin, Save, ShieldCheck, 
   Briefcase, Church,
 } from 'lucide-react';
-import { useRegisterMember } from '../../../hooks/useMembers';
+import { useRegisterMember, useUpdateMember } from '../../../hooks/useMembers';
 import { useSpiritualGift } from '../../../hooks/useSpiritualGift';
 import { useMemberProfile } from '../../../hooks/useProfiles';
 import { useChurches } from '../../../hooks/useChurches';
@@ -25,6 +25,7 @@ interface ModalProps {
 export default function RegisterMemberModal({ isOpen, onClose, memberId }: ModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addMember, isPending: pendingAddMember } = useRegisterMember();
+  const { mutate: updateMember, isPending: pendingUpdateMember } = useUpdateMember();
   const { data: apiResponse, isLoading } = useSpiritualGift();
   const [isActive, setIsActive] = useState(true);
   
@@ -127,7 +128,11 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
         spiritual_gifts: selectedGiftIds, 
     };
 
-    addMember(formattedData, { onSuccess: () => startClose() });
+    if (memberId) {
+      updateMember({ id: memberId, memberData: formattedData }, { onSuccess: () => startClose() });
+    } else {
+      addMember(formattedData, { onSuccess: () => startClose() });
+    }
   };
 
   return (
