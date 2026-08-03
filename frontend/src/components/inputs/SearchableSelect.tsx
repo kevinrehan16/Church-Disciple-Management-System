@@ -122,12 +122,12 @@ export function SearchableSelect({
                   key={opt.id}
                   onClick={() => handleSelect(opt)}
                   className={`px-4 py-2.5 text-sm cursor-pointer hover:bg-slate-50 flex items-center gap-2 ${
-                    String(value) === String(opt.id) ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-700'
+                    String(value) === String(opt.id) ? 'bg-blue-50 text-indigo-600 font-medium' : 'text-slate-700'
                   }`}
                 >
                   {String(value) === String(opt.id) && (
                     <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg" className='shrink-0'>
-                      <path d="M4 8.6L1.2 5.8L0 7L4 11L12 3L10.8 1.8L4 8.6Z" fill="#2563EB"/>
+                      <path d="M4 8.6L1.2 5.8L0 7L4 11L12 3L10.8 1.8L4 8.6Z" fill="#4f39f6"/>
                     </svg>
                   )}
                   {opt.name}

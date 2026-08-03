@@ -6,6 +6,7 @@ import {
 import { useRegisterMember } from '../../../hooks/useMembers';
 import { useSpiritualGift } from '../../../hooks/useSpiritualGift';
 import { useMemberProfile } from '../../../hooks/useProfiles';
+import { useChurches } from '../../../hooks/useChurches';
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import { InputField } from '../../inputs/InputField';
 import { SelectField } from '../../inputs/SelectField';
@@ -19,16 +20,24 @@ interface ModalProps {
   memberId?: string | null; 
 }
 
-const churchList = [
-  { id: '1', name: 'Main Sanctuary - Pasay' },
-  { id: '2', name: 'North Campus - QC' },
-];
-
 export default function RegisterMemberModal({ isOpen, onClose, memberId }: ModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addMember, isPending: pendingAddMember } = useRegisterMember();
   const { data: apiResponse, isLoading } = useSpiritualGift();
   const [isActive, setIsActive] = useState(true);
+  
+  const { data: apiChurch, isLoading: churchLoading } = useChurches(
+    { 
+      search: '', 
+      page: 1 
+    }
+  );
+
+  const churchList = Array.isArray(apiChurch) 
+  ? apiChurch.map((church: any) => ({ id: church.id, name: church.name }))
+  : Array.isArray(apiChurch?.data) 
+    ? apiChurch.data.map((church: any) => ({ id: church.id, name: church.name }))
+    : [];
 
   // Kunin ang profile data kapag may memberId
   const { data: profileMemberData, isLoading: profileLoading, isError: profileError } = useMemberProfile(memberId);
@@ -103,6 +112,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
 
     const formattedData = {
         ...data,
+        church_id: formDataState.church_id,
         baptized_immersion: data.baptized_immersion === '1',
         rec_for_baptism: data.rec_for_baptism === '1',
         rec_for_membership: data.rec_for_membership === '1',
@@ -151,7 +161,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                     <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <InputField label="Member ID" name="mem_id" value={formDataState.mem_id || ''} onChange={handleChange} icon={<FileText size={15}/>} />
+                    {/* <InputField label="Member ID" name="mem_id" value={formDataState.mem_id || ''} onChange={handleChange} icon={<FileText size={15}/>} /> */}
                     <InputField label="Email Address" name="email" type="email" value={formDataState.email || ''} onChange={handleChange} icon={<Mail size={15}/>} />
                     <InputField label="Password" name="password" type="password" value={formDataState.password || ''} onChange={handleChange} icon={<Lock size={15}/>} />
                   </div>
