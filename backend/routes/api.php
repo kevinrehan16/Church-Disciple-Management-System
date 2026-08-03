@@ -82,6 +82,7 @@ Route::prefix('v1')->group(function () {
 
         // MEMBERS ROUTES
         Route::get('/members', [MemberController::class, 'index']);
+        Route::put('/members/{id}', [MemberController::class, 'update']);
 
         // VISITORS ROUTES
         Route::get('/visitors', [VisitorController::class, 'index']);

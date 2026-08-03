@@ -119,7 +119,7 @@ export default function Members() {
                             </div>
                             <div className="flex items-center gap-2 text-slate-500 text-xs">
                               <User size={14} className="text-slate-400" />
-                              <span>{calculateAge(member.age)} yrs</span>
+                              <span>{calculateAge(member.birthday)} yrs</span>
                               <span>•</span>
                               <div className='flex items-center justify-center gap-1'>
                                 {member.gender === 'Male' ? (
@@ -138,7 +138,9 @@ export default function Members() {
                           <div className="flex flex-col gap-1.5">
                             <div className="flex items-center gap-2 text-slate-600">
                               <FaEnvelope size={12} className="text-rose-400 shrink-0" />
-                              <span className="text-xs truncate max-w-[150px]">{member.email}</span>
+                              <span className="text-xs truncate max-w-[150px]">
+                                {member.email || <span className="text-slate-300 italic">No email</span>}
+                              </span>
                             </div>
                             <div className="flex items-center gap-2 text-slate-600">
                               <FaMobile size={12} className="text-cyan-400 shrink-0" />
@@ -149,7 +151,7 @@ export default function Members() {
                             <div className="flex items-center gap-2 text-slate-600">
                               <FaFacebookF size={12} className="text-blue-400 shrink-0" />
                               <span className="text-xs font-normal">
-                                {member.facebook_name || <span className="text-slate-300 italic">No Facebook</span>}
+                                {member.facebook_name || <span className="text-slate-300 italic">No facebook</span>}
                               </span>
                             </div>
                           </div>

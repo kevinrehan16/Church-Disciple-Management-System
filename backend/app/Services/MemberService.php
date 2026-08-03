@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Member;
+use Illuminate\Support\Facades\DB;
+use Exception;
 
 class MemberService
 {
@@ -28,5 +30,34 @@ class MemberService
                 });
             })
             ->paginate(10);
+    }
+
+    public function updateMember($id, array $data)
+    {
+        DB::beginTransaction();
+
+        try {
+            $member = Member::findOrFail($id);
+
+            // Kunin ang spiritual_gifts array bago i-update ang pangunahing table
+            $spiritualGifts = $data['spiritual_gifts'] ?? null;
+            unset($data['spiritual_gifts']); // Alisin muna para hindi mag-error sa member update
+
+            // I-update ang profile details ng member
+            $member->update($data);
+
+            // Kung may ipinasa na spiritual gifts, i-sync ito sa pivot table
+            if ($spiritualGifts !== null) {
+                $member->spiritualGifts()->sync($spiritualGifts);
+            }
+
+            DB::commit();
+
+            // I-load pabalik ang relasyon para kasama sa response
+            return $member->load('spiritualGifts');
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw new Exception('Error updating member: ' . $e->getMessage());
+        }
     }
 }
