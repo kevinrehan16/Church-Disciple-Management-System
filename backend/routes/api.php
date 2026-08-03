@@ -24,7 +24,7 @@ Route::prefix('v1')->group(function () {
 
     // Dito mo ilalagay ang iba pang protected routes sa hinaharap
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware('auth:sanctum', 'password.changed')->group(function () {
         // AUTH ROUTES
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/logout', [AuthController::class, 'logout']);

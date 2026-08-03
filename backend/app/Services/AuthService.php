@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NewUserTemporaryPasswordMail;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -25,11 +28,14 @@ class AuthService
     public function registerUser(array $data): User
     {
         return DB::transaction(function () use ($data) {
+            $tempPassword = Str::random(10);
+
             // 1. Create User
             $user = User::create([
                 'email'    => $data['email'],
-                'password' => Hash::make($data['password']),
-                'role'     => 'member', // Default role
+                'password' => Hash::make($tempPassword),
+                'role'     => 'member',
+                'must_change_password' => true,
             ]);
 
             // 2. Create Member Profile (I-save natin sa $member variable)
@@ -92,6 +98,8 @@ class AuthService
                 // I-sync ang array of IDs sa member na kakagawa lang
                 $member->spiritualGifts()->sync($data['spiritual_gifts']);
             }
+
+            Mail::to($user->email)->send(new NewUserTemporaryPasswordMail($tempPassword));
 
             return $user;
         });

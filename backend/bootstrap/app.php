@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\EnsurePasswordIsChanged;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Mahalaga para sa Render HTTPS proxy
         $middleware->trustProxies(at: '*');
+
+        // I-register ang custom middleware alias dito
+        $middleware->alias([
+            'password.changed' => EnsurePasswordIsChanged::class,
+        ]);
 
         // Walang stateful middleware o CSRF exceptions para sa pure Token API.
     })
