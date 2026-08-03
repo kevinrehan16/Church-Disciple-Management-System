@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  X, Mail, Calendar, Phone, MapPin, Lock, Save, ShieldCheck, 
-  Briefcase, FileText, Church,
+  X, Mail, Calendar, Phone, MapPin, Save, ShieldCheck, 
+  Briefcase, Church,
 } from 'lucide-react';
 import { useRegisterMember } from '../../../hooks/useMembers';
 import { useSpiritualGift } from '../../../hooks/useSpiritualGift';
@@ -9,10 +9,12 @@ import { useMemberProfile } from '../../../hooks/useProfiles';
 import { useChurches } from '../../../hooks/useChurches';
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import { InputField } from '../../inputs/InputField';
-import { SelectField } from '../../inputs/SelectField';
+import { SelectField as SelectFieldBase } from '../../inputs/SelectField';
 import { MultiSelect } from '../../inputs/MultiSelect';
 import { SearchableSelect } from '../../inputs/SearchableSelect';
 import { calculateAge, sanitizeNumber, getTodayDate } from '../../../utils/formatters';
+
+const SelectField = SelectFieldBase as unknown as React.ComponentType<any>;
 
 interface ModalProps {
   isOpen: boolean;
@@ -26,7 +28,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
   const { data: apiResponse, isLoading } = useSpiritualGift();
   const [isActive, setIsActive] = useState(true);
   
-  const { data: apiChurch, isLoading: churchLoading } = useChurches(
+  const { data: apiChurch } = useChurches(
     { 
       search: '', 
       page: 1 
@@ -40,7 +42,8 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
     : [];
 
   // Kunin ang profile data kapag may memberId
-  const { data: profileMemberData, isLoading: profileLoading, isError: profileError } = useMemberProfile(memberId);
+  const numericMemberId = memberId ? Number(memberId) : 0;
+  const { data: profileMemberData, isLoading: profileLoading } = useMemberProfile(numericMemberId);
 
   const giftsList = Array.isArray(apiResponse) ? apiResponse : [];
   const [selectedGiftIds, setSelectedGiftIds] = useState<number[]>([]);
@@ -53,7 +56,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
     if (profileMemberData) {
       // Depende sa itsura ng API response mo (kung nakabalot sa .data o direkta na), 
       // i-adjust natin dito. Halimbawa: profileMemberData.data o profileMemberData
-      const data = profileMemberData.data || profileMemberData;
+      const data = ((profileMemberData as { data?: Record<string, any> } | undefined)?.data ?? profileMemberData) as Record<string, any>;
 
       setFormDataState(data);
       setIsActive(data.member_status === 'Active');
@@ -92,8 +95,11 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
   if (!isOpen) return null;
 
   // Handle input changes para maging controlled inputs sila
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> | { target: { name: string; value: string } }
+  ) => {
+    const target = e.target as { name: string; value: string };
+    const { name, value } = target;
     
     let finalValue = value;
 
