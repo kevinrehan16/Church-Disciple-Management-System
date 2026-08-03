@@ -11,7 +11,7 @@ import { InputField } from '../../inputs/InputField';
 import { SelectField } from '../../inputs/SelectField';
 import { MultiSelect } from '../../inputs/MultiSelect';
 import { SearchableSelect } from '../../inputs/SearchableSelect';
-import { calculateAge, sanitizeNumber } from '../../../utils/formatters';
+import { calculateAge, sanitizeNumber, getTodayDate } from '../../../utils/formatters';
 
 interface ModalProps {
   isOpen: boolean;
@@ -183,6 +183,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                             name="birthday" 
                             value={formDataState.birthday || ''} 
                             onChange={handleChange}
+                            max={getTodayDate()}
                             className="w-full pl-10 pr-4 py-2.5 outline-none bg-transparent text-sm" 
                           />
                         </div>

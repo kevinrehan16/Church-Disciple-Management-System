@@ -38,7 +38,11 @@ export const getLifestageStyles = (stage: string) => {
   return styles[stage] || 'bg-slate-50 text-slate-500 border-slate-100';
 };
 
-export function formatDate(dateString: string | null | undefined): string {
+export const getTodayDate = (): string => {
+  return new Date().toISOString().split('T')[0];
+}
+
+export const formatDate = (dateString: string | null | undefined): string  => {
   if (!dateString) return '';
 
   // Hatiin ang "2002-02-14" sa taon, buwan, at araw
