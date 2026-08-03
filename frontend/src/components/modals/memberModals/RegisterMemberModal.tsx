@@ -25,7 +25,7 @@ interface ModalProps {
 export default function RegisterMemberModal({ isOpen, onClose, memberId }: ModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addMember, isPending: pendingAddMember } = useRegisterMember();
-  const { mutate: updateMember, isPending: pendingUpdateMember } = useUpdateMember();
+  const { mutate: updateMember } = useUpdateMember();
   const { data: apiResponse, isLoading } = useSpiritualGift();
   const [isActive, setIsActive] = useState(true);
   
