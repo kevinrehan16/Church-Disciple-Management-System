@@ -39,21 +39,25 @@ export interface SingleRoleResponse {
 }
 
 export interface RoleListResponse {
-    current_page: number;
     data: Role[];
-    first_page_url: string;
-    from: number | null;
-    last_page: number;        // <-- Dito mo ilalagay ito para mawala ang error
-    last_page_url: string;
-    links: {
-        url: string | null;
-        label: string;
-        active: boolean;
-    }[];
-    next_page_url: string | null;
-    path: string;
-    per_page: number;
-    prev_page_url: string | null;
-    to: number | null;
-    total: number;
+    meta: {
+        current_page: number;
+        from: number | null;
+        last_page: number;        // <-- Nandito na ngayon ang last_page mo
+        links: {
+            url: string | null;
+            label: string;
+            active: boolean;
+        }[];
+        path: string;
+        per_page: number;
+        to: number | null;
+        total: number;
+    };
+    links?: {
+        first: string | null;
+        last: string | null;
+        prev: string | null;
+        next: string | null;
+    };
 }

@@ -39,10 +39,10 @@ export default function Roles() {
   const roles = rolesResponse?.data || [];
   
   // Sinusuportahan pareho ang standard Laravel pagination (root level) at Resource Collection (meta)
-  const lastPage = rolesResponse?.last_page || rolesResponse?.meta?.last_page || 1;
-  const totalEntries = rolesResponse?.total ?? rolesResponse?.meta?.total ?? roles.length;
-  const fromEntry = rolesResponse?.from ?? rolesResponse?.meta?.from ?? (roles.length > 0 ? 1 : 0);
-  const toEntry = rolesResponse?.to ?? rolesResponse?.meta?.to ?? roles.length;
+  const lastPage = rolesResponse?.meta?.last_page || rolesResponse?.meta?.last_page || 1;
+  const totalEntries = rolesResponse?.meta?.total ?? rolesResponse?.meta?.total ?? roles.length;
+  const fromEntry = rolesResponse?.meta?.from ?? rolesResponse?.meta?.from ?? (roles.length > 0 ? 1 : 0);
+  const toEntry = rolesResponse?.meta?.to ?? rolesResponse?.meta?.to ?? roles.length;
 
   // Toggle Function para sa +X Permission Badges
   const toggleExpandRole = (roleId: number) => {
