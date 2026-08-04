@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             ChurchSeeder::class,
             ClusterSeeder::class,
             GrowthGroupSeeder::class,
+            RoleAndPermissionSeeder::class,
         ]);
     }
 }

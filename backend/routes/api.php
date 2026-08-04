@@ -14,6 +14,9 @@ use App\Http\Controllers\Api\V1\GrowthGroups\GrowthGroupController;
 use App\Http\Controllers\Api\V1\SpiritualGifts\SpiritualGiftController;
 use App\Http\Controllers\Api\V1\Family\FamilyController;
 use App\Http\Controllers\Api\V1\GrowthGroupMember\GrowthGroupMemberController;
+use App\Http\Controllers\Api\V1\Permission\PermissionController;
+use App\Http\Controllers\Api\V1\Role\RoleController;
+use App\Http\Controllers\Api\V1\UserRole\UserRoleController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -27,9 +30,11 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum', 'password.changed')->group(function () {
         // AUTH ROUTES
-        Route::post('/register', [AuthController::class, 'register']);
+        Route::middleware(['role:super_admin|senior_pastor|pastor|admin|staff'])->group(function () {
+            Route::post('/register', [AuthController::class, 'register']);
+            Route::get('/user', [AuthController::class, 'user']);
+        });
         Route::post('/logout', [AuthController::class, 'logout']);
-        Route::get('/user', [AuthController::class, 'user']);
 
         // PROFILE ROUTES
         Route::middleware('auth:sanctum')->group(function () {
@@ -82,8 +87,10 @@ Route::prefix('v1')->group(function () {
         });
 
         // MEMBERS ROUTES
-        Route::get('/members', [MemberController::class, 'index']);
-        Route::put('/members/{id}', [MemberController::class, 'update']);
+        Route::middleware(['role:super_admin|senior_pastor|pastor|admin|staff'])->group(function () {
+            Route::get('/members', [MemberController::class, 'index']);
+            Route::put('/members/{id}', [MemberController::class, 'update']);
+        });
 
         // VISITORS ROUTES
         Route::get('/visitors', [VisitorController::class, 'index']);
@@ -125,6 +132,20 @@ Route::prefix('v1')->group(function () {
             Route::post('members', [FamilyController::class, 'addMember']);
             // Alisin ang member sa pamilya
             Route::delete('members/{memberId}', [FamilyController::class, 'removeMember']);
+        });
+
+        // USER ROLE PERMISSION MANAGEMENT ROUTES
+        Route::middleware(['auth:sanctum', 'role:super_admin'])->group(function () {
+            // Permissions Management
+            Route::apiResource('permissions', PermissionController::class)->only(['index', 'store', 'destroy']);
+
+            // Roles Management & Syncing Permissions
+            Route::apiResource('roles', RoleController::class);
+            Route::post('/roles/{role}/permissions', [RoleController::class, 'syncPermissions']);
+
+            // User Role Assignment
+            Route::post('/users/{user}/roles', [UserRoleController::class, 'assignRole']);
+            Route::delete('/users/{user}/roles', [UserRoleController::class, 'removeRole']);
         });
     });
 });

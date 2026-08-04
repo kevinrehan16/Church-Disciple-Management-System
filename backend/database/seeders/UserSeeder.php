@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
             'id'       => Str::uuid(),
             'email'    => 'superadmin@gcfsouthmetro.org',
             'password' => Hash::make('kevin123'), // palitan mo ito ng secure password
-            'role'     => 'admin',
+            'role'     => 'super_admin',
         ]);
     }
 }

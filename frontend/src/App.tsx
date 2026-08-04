@@ -24,6 +24,9 @@ import Clusters from './pages/groupsetup/clusters';
 import Churches from './pages/groupsetup/churches';
 import Profiles from './pages/profiles/Profiles';
 
+import Permissions from './pages/permissions/permissions';
+import Roles from './pages/roles/roles';
+
 // Protected Route Component
 const ProtectedRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -67,6 +70,9 @@ function App() {
                   <Route path="/group-setup/churches" element={<Churches />} />
                   <Route path="/group-setup/clusters" element={<Clusters />} />
                   <Route path="/group-setup/growth-groups" element={<GrowthGroups />} />
+
+                  <Route path="/roles" element={<Roles />} />
+                  <Route path="/permissions" element={<Permissions />} />
                 </Route>
               </Route>
               

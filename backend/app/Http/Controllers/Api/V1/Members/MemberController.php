@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\MemberService;
 use App\Http\Resources\MemberResource;
 use App\Http\Requests\Member\UpdateMemberRequest;
+use App\Models\Member; // <-- Siguraduhing naka-import ito
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -21,6 +22,7 @@ class MemberController extends Controller
 
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Member::class);
         // 1. Validations (Optional but recommended)
         $request->validate([
             'position' => 'nullable|string',
@@ -38,15 +40,19 @@ class MemberController extends Controller
         return MemberResource::collection($members);
     }
 
-    public function update(UpdateMemberRequest $request, $id): JsonResponse
+    public function update(UpdateMemberRequest $request, Member $member): JsonResponse
     {
+        // Gagamitin na ngayon ang $member dahil sa Route Model Binding
+        $this->authorize('update', $member);
+
         try {
-            $updatedMember = $this->memberService->updateMember($id, $request->validated());
+            // Pwede mong ipasa ang $member->id o ang buong $member object sa service mo
+            $updatedMember = $this->memberService->updateMember($member->id, $request->validated());
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Member profile updated successfully.',
-                'data' => $updatedMember
+                'data' => new MemberResource($updatedMember) // Mas maganda kung i-wrap din sa Resource
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

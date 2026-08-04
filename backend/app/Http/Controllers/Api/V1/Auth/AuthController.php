@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\User\RegisterRequest;
@@ -50,6 +51,8 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
+        $this->authorize('viewAny', User::class);
+
         return new UserResource($request->user()->load('member'));
     }
 

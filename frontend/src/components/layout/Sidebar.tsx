@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaUsers, FaUserFriends, FaNetworkWired, FaLayerGroup, FaChartArea, FaCogs, FaAddressCard, FaHandHoldingHeart } from "react-icons/fa";
+import { FaUsers, FaUserFriends, FaNetworkWired, FaLayerGroup, FaChartArea, FaCogs, FaAddressCard, FaHandHoldingHeart, FaKey, FaUserShield } from "react-icons/fa";
 import { Settings, ChevronDown, ChevronRight } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -429,6 +429,37 @@ export default function Sidebar({
                 </div>
               )}
             </div>
+
+            {/* PERMISSIONS */}
+            <div className="relative group/permissions">
+              <NavLink to="/permissions" className={getNavLinkClass}>
+                <FaKey size={18} className="shrink-0" />
+                <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3'}`}>
+                  Permissions
+                </span>
+              </NavLink>
+              {isCollapsed && (
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-md shadow-lg pointer-events-none opacity-0 group-hover/permissions:opacity-100 transition-opacity duration-150 z-50 whitespace-nowrap border border-slate-700/50">
+                  Permissions
+                </div>
+              )}
+            </div>
+
+            {/* ROLE */}
+            <div className="relative group/roles">
+              <NavLink to="/roles" className={getNavLinkClass}>
+                <FaUserShield size={18} className="shrink-0" />
+                <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3'}`}>
+                  Roles
+                </span>
+              </NavLink>
+              {isCollapsed && (
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-md shadow-lg pointer-events-none opacity-0 group-hover/roles:opacity-100 transition-opacity duration-150 z-50 whitespace-nowrap border border-slate-700/50">
+                  Roles
+                </div>
+              )}
+            </div>
+
             
           </div>
         </div>
