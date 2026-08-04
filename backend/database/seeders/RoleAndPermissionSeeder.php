@@ -123,17 +123,26 @@ class RoleAndPermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+            Permission::firstOrCreate(
+                ['name' => $permission],
+                ['guard_name' => 'sanctum']
+            );
         }
 
         // 2. I-setup ang mga Roles at i-assign ang kaukulang Permissions
 
         // A. Super Admin (May hawak ng lahat ng kapangyarihan sa sistema)
-        $superAdmin = Role::firstOrCreate(['name' => 'super_admin']);
+        $superAdmin = Role::firstOrCreate(
+            ['name' => 'super_admin'],
+            ['guard_name' => 'sanctum']
+        );
         $superAdmin->givePermissionTo(Permission::all());
 
         // B. Senior Pastor (Oversight sa buong simbahan, miyembro, pastors, at ulat)
-        $seniorPastor = Role::firstOrCreate(['name' => 'senior_pastor']);
+        $seniorPastor = Role::firstOrCreate(
+            ['name' => 'senior_pastor'],
+            ['guard_name' => 'sanctum']
+        );
         $seniorPastor->givePermissionTo([
             'view_dashboard',
             'view_profiles',
@@ -160,7 +169,10 @@ class RoleAndPermissionSeeder extends Seeder
         ]);
 
         // C. Admin (Pangangasiwa sa mga user, operasyon, at buong data)
-        $admin = Role::firstOrCreate(['name' => 'admin']);
+        $admin = Role::firstOrCreate(
+            ['name' => 'admin'],
+            ['guard_name' => 'sanctum']
+        );
         $admin->givePermissionTo([
             'manage_dashboard',
             'view_dashboard',
@@ -188,7 +200,10 @@ class RoleAndPermissionSeeder extends Seeder
         ]);
 
         // D. Pastor (Ministry, spiritual oversight sa miyembro, visitors, at cell groups)
-        $pastor = Role::firstOrCreate(['name' => 'pastor']);
+        $pastor = Role::firstOrCreate(
+            ['name' => 'pastor'],
+            ['guard_name' => 'sanctum']
+        );
         $pastor->givePermissionTo([
             'view_dashboard',
             'view_profiles',
@@ -211,7 +226,10 @@ class RoleAndPermissionSeeder extends Seeder
         ]);
 
         // E. Staff (Day-to-day encoding, creation, at updating ng mga records at visitors)
-        $staff = Role::firstOrCreate(['name' => 'staff']);
+        $staff = Role::firstOrCreate(
+            ['name' => 'staff'],
+            ['guard_name' => 'sanctum']
+        );
         $staff->givePermissionTo([
             'view_dashboard',
             'view_profiles',
@@ -228,7 +246,10 @@ class RoleAndPermissionSeeder extends Seeder
         ]);
 
         // F. GG Leader (Pag-handle, pag-create, at pag-monitor ng sariling Growth/Cell Group at members)
-        $ggLeader = Role::firstOrCreate(['name' => 'gg_leader']);
+        $ggLeader = Role::firstOrCreate(
+            ['name' => 'gg_leader'],
+            ['guard_name' => 'sanctum']
+        );
         $ggLeader->givePermissionTo([
             'view_dashboard',
             'view_profiles',
@@ -244,7 +265,10 @@ class RoleAndPermissionSeeder extends Seeder
         ]);
 
         // G. Member (Standard baseline access para sa sariling profile at pagtingin)
-        $member = Role::firstOrCreate(['name' => 'member']);
+        $member = Role::firstOrCreate(
+            ['name' => 'member'],
+            ['guard_name' => 'sanctum']
+        );
         $member->givePermissionTo([
             'view_dashboard',
             'view_profiles',

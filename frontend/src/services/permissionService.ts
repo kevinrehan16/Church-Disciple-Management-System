@@ -4,7 +4,7 @@ import type {
   PermissionQueryParams, 
   CreatePermissionPayload, 
   SinglePermissionResponse 
-} from '../types/permission'; // Palitan ang path kung kinakailangan
+} from '../types/typePermission'; // Palitan ang path kung kinakailangan
 
 export const permissionService = {
   // 1. GET ALL PERMISSIONS (May pagination at search filter)

@@ -6,7 +6,7 @@ import { getPageNumbers } from '../../utils/pagination';
 import SearchInput from '../../components/inputs/SearchInput';
 import PermissionModal from '../../components/modals/permissionModals/PermissionModal';
 import { usePermissions, useDeletePermission } from '../../hooks/usePermissions';
-import type { Permission } from '../../types/permission';
+import type { Permission } from '../../types/typePermission';
 
 export default function Permissions() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -197,59 +197,59 @@ export default function Permissions() {
         {/* DYNAMIC PAGINATION CONTROLS */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-100 bg-slate-100/50">
         
-        {/* 1. KALIWA: SHOWING ENTRIES TEXT */}
-        <p className="text-xs text-slate-500 font-medium">
-            Showing <span className="text-slate-800 font-bold">{meta?.from ?? 0}</span> to{' '}
-            <span className="text-slate-800 font-bold">{meta?.to ?? 0}</span> of{' '}
-            <span className="text-slate-800 font-bold">{meta?.total ?? 0}</span> entries
-        </p>
+          {/* 1. KALIWA: SHOWING ENTRIES TEXT */}
+          <p className="text-xs text-slate-500 font-medium">
+              Showing <span className="text-slate-800 font-bold">{meta?.from ?? 0}</span> to{' '}
+              <span className="text-slate-800 font-bold">{meta?.to ?? 0}</span> of{' '}
+              <span className="text-slate-800 font-bold">{meta?.total ?? 0}</span> entries
+          </p>
 
-        {/* 2. KANAN: PAGINATION BUTTONS */}
-        <div className="flex items-center gap-1">
-            {/* PREV BUTTON */}
-            <button 
-            disabled={currentPage === 1 || isLoading || isFetching}
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            >
-            Prev
-            </button>
-            
-            {/* PAGE NUMBERS (1 ... 4 5 6 7 8) */}
-            {meta && getPageNumbers(currentPage, meta.last_page).map((page, index) => {
-            if (typeof page === 'string') {
-                return (
-                <span key={index} className="px-2 py-1.5 text-xs text-slate-400 font-bold select-none">
-                    {page}
-                </span>
-                );
-            }
+          {/* 2. KANAN: PAGINATION BUTTONS */}
+          <div className="flex items-center gap-1">
+              {/* PREV BUTTON */}
+              <button 
+              disabled={currentPage === 1 || isLoading || isFetching}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              >
+              Prev
+              </button>
+              
+              {/* PAGE NUMBERS (1 ... 4 5 6 7 8) */}
+              {meta && getPageNumbers(currentPage, meta.last_page).map((page, index) => {
+              if (typeof page === 'string') {
+                  return (
+                  <span key={index} className="px-2 py-1.5 text-xs text-slate-400 font-bold select-none">
+                      {page}
+                  </span>
+                  );
+              }
 
-            return (
-                <button
-                key={index}
-                disabled={isLoading || isFetching}
-                onClick={() => setCurrentPage(page)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-                    currentPage === page
-                    ? 'bg-[var(--active-parent,rgb(99,102,241))] text-white shadow-sm'
-                    : 'bg-white text-slate-600 hover:bg-slate-200 border border-slate-200/60'
-                }`}
-                >
-                {page}
-                </button>
-            );
-            })}
+              return (
+                  <button
+                  key={index}
+                  disabled={isLoading || isFetching}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                      currentPage === page
+                      ? 'bg-[var(--active-parent,rgb(99,102,241))] text-white shadow-sm'
+                      : 'bg-white text-slate-600 hover:bg-slate-200 border border-slate-200/60'
+                  }`}
+                  >
+                  {page}
+                  </button>
+              );
+              })}
 
-            {/* NEXT BUTTON */}
-            <button 
-            disabled={!meta || currentPage === meta.last_page || isLoading || isFetching}
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            >
-            Next
-            </button>
-        </div>
+              {/* NEXT BUTTON */}
+              <button 
+              disabled={!meta || currentPage === meta.last_page || isLoading || isFetching}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              >
+              Next
+              </button>
+          </div>
         </div>
       </div>
 

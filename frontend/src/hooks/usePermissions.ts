@@ -5,7 +5,7 @@ import type {
   CreatePermissionPayload, 
   PermissionListResponse, 
   SinglePermissionResponse 
-} from '../types/permission';
+} from '../types/typePermission';
 
 // 1. Hook para sa PAGKUHA ng Permissions (useQuery)
 export const usePermissions = (params?: PermissionQueryParams) => {

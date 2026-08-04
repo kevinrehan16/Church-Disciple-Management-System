@@ -6,7 +6,7 @@ import type {
   UpdateRolePayload,
   RoleListResponse, 
   SingleRoleResponse 
-} from '../types/role';
+} from '../types/typeRole';
 
 // 1. Hook para sa PAGKUHA ng Roles List (useQuery)
 export const useRoles = (params?: RoleQueryParams) => {

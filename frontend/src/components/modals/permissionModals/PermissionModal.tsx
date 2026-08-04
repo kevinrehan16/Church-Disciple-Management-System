@@ -4,8 +4,7 @@ import { useCreatePermission, useUpdatePermission } from '../../../hooks/usePerm
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import SectionHeader from '../../ui/SectionHeader';
 import { InputField } from '../../inputs/InputField';
-import { SelectField } from '../../inputs/SelectField';
-import type { Permission } from '../../../types/permission';
+import type { Permission } from '../../../types/typePermission';
 
 interface PermissionModalProps {
   isOpen: boolean;
@@ -14,7 +13,7 @@ interface PermissionModalProps {
 }
 
 const GUARD_OPTIONS = [
-  { value: 'web', label: 'web (Default Web Guard)' },
+  { value: 'sanctum', label: 'sanctum (Default Sanctum Guard)' },
   { value: 'api', label: 'api (API Token Guard)' },
 ];
 
@@ -25,7 +24,7 @@ export default function PermissionModal({ isOpen, onClose, initialData }: Permis
 
   const [formData, setFormData] = useState({
     name: '',
-    guard_name: 'web',
+    guard_name: 'sanctum',
   });
 
   // Kusa nitong ine-populate ang form kapag may initialData (Edit Mode) o nire-reset kapag Create Mode
@@ -33,12 +32,12 @@ export default function PermissionModal({ isOpen, onClose, initialData }: Permis
     if (initialData) {
       setFormData({
         name: initialData.name || '',
-        guard_name: 'web',
+        guard_name: 'sanctum',
       });
     } else {
       setFormData({
         name: '',
-        guard_name: 'web',
+        guard_name: 'sanctum',
       });
     }
   }, [initialData, isOpen]);

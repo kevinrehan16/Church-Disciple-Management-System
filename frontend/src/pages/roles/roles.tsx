@@ -7,16 +7,15 @@ import {
   Edit3, 
   Trash2, 
   Loader2, 
-  ChevronLeft, 
-  ChevronRight, 
   ShieldAlert,
   LockKeyhole
 } from 'lucide-react';
 import { getPageNumbers } from '../../utils/pagination';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
+import RoleModal from '../../components/modals/roleModals/RoleModal';
 import { useRoles, useDeleteRole } from '../../hooks/useRoles';
-import type { Role } from '../../types/role';
+import type { Role } from '../../types/typeRole';
 
 export default function Roles() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,12 +30,19 @@ export default function Roles() {
   const { data: rolesResponse, isLoading, isError, isFetching } = useRoles({
     page: currentPage,
     search: searchTerm,
+    per_page: 10,
   });
 
   const { mutate: deleteRole, isPending: isDeleting } = useDeleteRole();
 
+  // Pagkuha ng data at pagination properties mula sa root level o meta man yan
   const roles = rolesResponse?.data || [];
-  const meta = rolesResponse?.meta;
+  
+  // Sinusuportahan pareho ang standard Laravel pagination (root level) at Resource Collection (meta)
+  const lastPage = rolesResponse?.last_page || rolesResponse?.meta?.last_page || 1;
+  const totalEntries = rolesResponse?.total ?? rolesResponse?.meta?.total ?? roles.length;
+  const fromEntry = rolesResponse?.from ?? rolesResponse?.meta?.from ?? (roles.length > 0 ? 1 : 0);
+  const toEntry = rolesResponse?.to ?? rolesResponse?.meta?.to ?? roles.length;
 
   // Toggle Function para sa +X Permission Badges
   const toggleExpandRole = (roleId: number) => {
@@ -47,7 +53,7 @@ export default function Roles() {
 
   const handleSearchChange = (val: string) => {
     setSearchTerm(val);
-    setCurrentPage(1);
+    setCurrentPage(1); // Ibalik sa page 1 kapag naghahanap
   };
 
   const handleDelete = (role: Role) => {
@@ -81,6 +87,7 @@ export default function Roles() {
         icon={<FaUserShield size={24} />}
         actions={
           <button 
+            type="button"
             className="group flex items-center gap-2 px-5 py-2.5 bg-[#0284c7] hover:bg-[#026ca1] active:scale-95 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-sky-500/10"
             onClick={handleOpenCreateModal}
           >
@@ -204,7 +211,6 @@ export default function Roles() {
                       <div className="flex flex-wrap gap-1.5 max-w-xl">
                         {role.permissions && role.permissions.length > 0 ? (
                           <>
-                            {/* INDIGO BADGES WITH BORDER */}
                             {displayedPermissions.map((perm) => (
                               <span 
                                 key={perm.id} 
@@ -215,7 +221,6 @@ export default function Roles() {
                               </span>
                             ))}
 
-                            {/* CLICKABLE BLACK TO INDIGO "+X MORE" BADGE */}
                             {!isExpanded && hiddenCount > 0 && (
                               <button
                                 type="button"
@@ -227,7 +232,6 @@ export default function Roles() {
                               </button>
                             )}
 
-                            {/* SHOW LESS BUTTON WHEN EXPANDED */}
                             {isExpanded && hiddenCount > 0 && (
                               <button
                                 type="button"
@@ -244,7 +248,7 @@ export default function Roles() {
                       </div>
                     </td>
 
-                    {/* GUARD NAME - LOWERCASE WITH LOCK ICON */}
+                    {/* GUARD NAME */}
                     <td className="px-6 py-4 text-center">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold font-mono bg-slate-100 text-slate-600 border border-slate-200/80 lowercase">
                         <LockKeyhole size={12} className="text-slate-400 flex-shrink-0" />
@@ -255,7 +259,6 @@ export default function Roles() {
                     {/* ACTIONS */}
                     <td className="px-6 py-4 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        {/* CYAN EDIT BUTTON WITH BORDER */}
                         <button 
                           type="button"
                           className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-cyan-200/80 text-cyan-600 bg-cyan-50 hover:bg-cyan-600 hover:text-white transition-all duration-200 active:scale-95 shadow-sm disabled:opacity-50"
@@ -264,7 +267,6 @@ export default function Roles() {
                           <Edit3 size={14} />
                         </button>
 
-                        {/* ROSE DELETE BUTTON WITH BORDER */}
                         {!isSystemRole && (
                           <button 
                             type="button"
@@ -286,18 +288,17 @@ export default function Roles() {
         
         {/* DYNAMIC PAGINATION CONTROLS */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-100 bg-slate-100/50">
-
-          {/* 1. KALIWA: SHOWING ENTRIES TEXT WITH FALLBACK */}
+        
           <p className="text-xs text-slate-500 font-medium">
-            Showing <span className="text-slate-800 font-bold">{meta?.from ?? (roles.length > 0 ? 1 : 0)}</span> to{' '}
-            <span className="text-slate-800 font-bold">{meta?.to ?? roles.length}</span> of{' '}
-            <span className="text-slate-800 font-bold">{meta?.total ?? roles.length}</span> entries
+            Showing <span className="text-slate-800 font-bold">{fromEntry}</span> to{' '}
+            <span className="text-slate-800 font-bold">{toEntry}</span> of{' '}
+            <span className="text-slate-800 font-bold">{totalEntries}</span> entries
           </p>
 
-          {/* 2. KANAN: PAGINATION BUTTONS */}
           <div className="flex items-center gap-1">
             {/* PREV BUTTON */}
             <button 
+              type="button"
               disabled={currentPage === 1 || isLoading || isFetching}
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
@@ -305,8 +306,8 @@ export default function Roles() {
               Prev
             </button>
             
-            {/* PAGE NUMBERS - GAGANA NA KAHIT WALANG META OBJECT */}
-            {getPageNumbers(currentPage, meta?.last_page || 1).map((page, index) => {
+            {/* PAGE NUMBERS */}
+            {getPageNumbers(currentPage, lastPage).map((page, index) => {
               if (typeof page === 'string') {
                 return (
                   <span key={index} className="px-2 py-1.5 text-xs text-slate-400 font-bold select-none">
@@ -318,6 +319,7 @@ export default function Roles() {
               return (
                 <button
                   key={index}
+                  type="button"
                   disabled={isLoading || isFetching}
                   onClick={() => setCurrentPage(page)}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
@@ -333,8 +335,9 @@ export default function Roles() {
 
             {/* NEXT BUTTON */}
             <button 
-              disabled={currentPage === (meta?.last_page || 1) || isLoading || isFetching}
-              onClick={() => setCurrentPage((prev) => prev + 1)}
+              type="button"
+              disabled={currentPage >= lastPage || isLoading || isFetching}
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, lastPage))}
               className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               Next
@@ -343,6 +346,13 @@ export default function Roles() {
         </div>
 
       </div>
+
+      <RoleModal 
+        key={selectedRole ? `edit-${selectedRole.id}` : 'create'}
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        initialData={selectedRole} 
+      />
     </div>
   );
 }

@@ -18,13 +18,13 @@ export interface Role {
 export interface CreateRolePayload {
   name: string;
   guard_name?: string;
-  permissions?: number[]; // Array ng Permission IDs (e.g. [1, 2, 5])
+  permissions?: string[]; // Array ng Permission IDs (e.g. [1, 2, 5])
 }
 
 export interface UpdateRolePayload {
   name?: string;
   guard_name?: string;
-  permissions?: number[];
+  permissions?: string[];
 }
 
 export interface RoleQueryParams {

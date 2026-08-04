@@ -20,6 +20,7 @@ class User extends Authenticatable
     /**
      * I-set ang data type ng primary key kung ito ay string (UUID).
      */
+    protected string $guard_name = 'sanctum';
     protected $keyType = 'string';
 
     /**
@@ -51,6 +52,10 @@ class User extends Authenticatable
 
     protected $casts = ['password' => 'hashed'];
 
+    protected function getDefaultGuardName(): string
+    {
+        return 'sanctum';
+    }
     /**
      * Get the attributes that should be cast.
      *

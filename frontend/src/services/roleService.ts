@@ -5,7 +5,7 @@ import type {
   CreateRolePayload, 
   UpdateRolePayload,
   SingleRoleResponse 
-} from '../types/role'; // Palitan ang path kung kinakailangan
+} from '../types/typeRole'; // Palitan ang path kung kinakailangan
 
 export const roleService = {
   // 1. GET ALL ROLES (May pagination, search filter, at kasamang permissions array)

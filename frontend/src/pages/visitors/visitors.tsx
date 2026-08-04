@@ -1,232 +1,241 @@
-import { useState } from 'react';
-import { FaFacebookSquare, FaMobile, FaEnvelope, FaUserFriends } from "react-icons/fa";
-import { Plus, Filter, ArrowUpDown, Mars, Venus, Eye, Calendar, Clock } from 'lucide-react';
-import ModuleHeader from '../../components/ui/ModuleHeader';
-import SearchInput from '../../components/inputs/SearchInput';
-import { TableLoading, TableError, TableEmpty } from '../../components/ui/TableStates';
-import { useVisitors } from '../../hooks/useVisitors';
-import { getLifestageStyles } from '../../utils/formatters';
-import VisitorModal from '../../components/modals/visitorModals/VisitorModal';
+import { useState, useEffect } from 'react';
+import { X, Shield, Key, Loader2, Check, LockKeyhole, ShieldAlert } from 'lucide-react';
+import { useCreateRole, useUpdateRole } from '../../hooks/useRoles';
+import { usePermissions } from '../../hooks/usePermissions';
+import type { Role } from '../../types/typeRole';
 
-export default function Visitors() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+interface RoleModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  initialData?: Role | null; // Kung may laman, Edit mode. Kung null/wala, Create mode.
+}
 
-  const [isVisitorModalOpen, setIsVisitorModalOpen] = useState(false);
-  const [selectedVisitorId, setSelectedVisitorId] = useState<number>(0);
+export default function RoleModal({ isOpen, onClose, initialData }: RoleModalProps) {
+  const [name, setName] = useState('');
+  const [guardName, setGuardName] = useState('web');
+  const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
 
-  // BUG FIX: Tanggalin ang useState dito. Gawin na lang normal object.
-  // Tuwing magbabago ang searchTerm o currentPage, magre-re-render ang component 
-  // at kusa itong mag-u-update at ipapasa sa useVisitors.
-  const filters = {
-    page: currentPage,
-    search: searchTerm,
+  // API Mutations
+  const { mutate: createRole, isPending: isCreating } = useCreateRole();
+  const { mutate: updateRole, isPending: isUpdating } = useUpdateRole();
+
+  // Kunin ang listahan ng permissions para sa selection grid
+  const { data: permissionsResponse, isLoading: isLoadingPerms, isError: isErrorPerms } = usePermissions({ per_page: 100 });
+  const permissions = permissionsResponse?.data || [];
+
+  // I-load ang initial data tuwing bubuksan ang modal (para sa Edit o Create)
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name || '');
+      setGuardName(initialData.guard_name || 'web');
+      const permIds = initialData.permissions?.map((p) => p.id) || [];
+      setSelectedPermissions(permIds);
+    } else {
+      setName('');
+      setGuardName('web');
+      setSelectedPermissions([]);
+    }
+  }, [initialData, isOpen]);
+
+  if (!isOpen) return null;
+
+  const isPending = isCreating || isUpdating;
+
+  // Toggle Checkbox para sa individual permissions
+  const togglePermission = (id: number) => {
+    setSelectedPermissions((prev) =>
+      prev.includes(id) ? prev.filter((pId) => pId !== id) : [...prev, id]
+    );
   };
-  
-  const { data: visitorData, isLoading, isError, refetch } = useVisitors(filters);
-  
-  const currentVisitors = visitorData?.data || [];
-  const meta = visitorData?.meta;
 
-
-  const handleViewVisitor = (id?: any) => {
-    setSelectedVisitorId(id ?? 0);
-    setIsVisitorModalOpen(true);
+  // Select All / Deselect All Handler
+  const handleSelectAll = () => {
+    if (selectedPermissions.length === permissions.length) {
+      setSelectedPermissions([]);
+    } else {
+      setSelectedPermissions(permissions.map((p) => p.id));
+    }
   };
-  
-  return (
-    <div className="w-full bg-slate-50 text-slate-800 px-6 py-4 space-y-6">
-      
-      <ModuleHeader
-        title="Visitors"
-        description="Centralized management of visitor profiles, visit history, follow-up activities, and church engagement."
-        icon={<FaUserFriends size={24} />}
-        actions={
-          <button 
-            className="group flex items-center gap-2 px-5 py-2.5 bg-[#0284c7] hover:bg-[#026ca1] active:scale-95 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-rose-500/10"
-            onClick={() => handleViewVisitor('')}
-          >
-            <Plus size={16} className="transition-transform group-hover:rotate-90" />
-            Add New Visitor
-          </button>
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+
+    const payload = {
+      name: name.trim(),
+      guard_name: guardName.trim(),
+      permissions: selectedPermissions,
+    };
+
+    if (initialData) {
+      updateRole(
+        { id: initialData.id, payload },
+        {
+          onSuccess: () => {
+            onClose();
+          },
         }
-      />
+      );
+    } else {
+      createRole(payload, {
+        onSuccess: () => {
+          onClose();
+        },
+      });
+    }
+  };
 
-      <div className="flex flex-col md:flex-row items-center gap-4 justify-between w-full bg-transparent">
-        <SearchInput 
-          value={searchTerm}
-          onChange={(val) => {
-            setSearchTerm(val);
-            setCurrentPage(1); // I-reset sa Page 1 tuwing nag-a-update ang search
-          }}
-          placeholder="Search visitor by information..."
-        />
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-fadeIn">
+      <div className="bg-white rounded-2xl shadow-xl border border-slate-200/80 w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
         
-        <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-600 rounded-xl text-sm font-semibold shadow-sm transition-all">
-            <Filter size={14} /> Advanced Filter
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-600 rounded-xl text-sm font-semibold shadow-sm transition-all">
-            <ArrowUpDown size={14} /> Sort By
+        {/* MODAL HEADER */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-indigo-50 text-[var(--active-parent,rgb(99,102,241))] flex items-center justify-center border border-indigo-100 shadow-sm">
+              <Shield size={18} />
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-800 text-base">
+                {initialData ? 'Edit Role & Permissions' : 'Create New Role'}
+              </h3>
+              <p className="text-xs text-slate-500">
+                {initialData 
+                  ? `Updating configuration for "${initialData.name}"` 
+                  : 'Define a new security role and assign its access scope.'}
+              </p>
+            </div>
+          </div>
+          <button 
+            type="button"
+            onClick={onClose}
+            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 rounded-xl transition-all cursor-pointer"
+          >
+            <X size={18} />
           </button>
         </div>
-      </div>
 
-      <div className="w-full bg-white border border-slate-200/60 rounded-xl shadow-sm overflow-hidden">
-        <div className="overflow-y-auto overflow-x-auto h-[calc(100vh-325px)] border border-slate-200/60 rounded-lg">
-            <table className="w-full text-left text-sm border-separate border-spacing-0">
-                <thead className="sticky top-0 z-10 bg-[var(--active-parent,rgb(99,102,241))]">
-                  <tr className="text-white uppercase tracking-wider text-[10px] font-extrabold border-b border-slate-200/60">
-                    <th className="w-[25%] px-6 py-4">Visitor Details</th>
-                    <th className="w-[14%] px-6 py-4 text-center">Age Group</th>
-                    <th className="w-[8%] px-6 py-4">Gender</th>
-                    <th className="w-[8%] px-6 py-4 text-center">Life-Stage</th>
-                    <th className="w-[15%] px-6 py-4">Contacts</th>
-                    <th className="w-[15%] px-6 py-4">Visited Schedule</th>
-                    <th className="w-[10%] px-6 py-4 text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 bg-white">
-                {isLoading ? (
-                  <TableLoading rows={5} columns={7} />
-                ) : isError ? (
-                  <TableError colSpan={7} onRetry={() => refetch()} />
-                ) : currentVisitors.length > 0 ? (
-                  currentVisitors.map((visitor: any) => (
-                    <tr 
-                      key={visitor.id} 
-                      className="group hover:bg-indigo-50/50 transition-all duration-200 ease-in-out border-b border-slate-50 last:border-0"
-                    >
-                      {/* 1. Visitor Details */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center font-bold text-xs border border-slate-200 group-hover:bg-[var(--active-parent,rgb(99,102,241))]/10 group-hover:text-[var(--active-parent,rgb(99,102,241))] group-hover:border-[var(--active-parent,rgb(99,102,241))] transition-colors">
-                            {visitor.firstName?.[0]}{visitor.lastName?.[0]}
-                          </div>
-                          <div>
-                            <p className="font-semibold text-slate-800 group-hover:text-[var(--active-parent,rgb(99,102,241))] transition-colors">
-                              {visitor.fullName}
-                            </p>
-                            <p className="text-[11px] font-mono text-slate-400">
-                              {visitor.visitorId}
-                            </p>
-                          </div>
+        {/* MODAL FORM BODY */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
+          
+          {/* ROLE NAME INPUT */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
+              Role Name <span className="text-rose-500">*</span>
+            </label>
+            <input 
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. branch_pastor, finance_staff"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[var(--active-parent,rgb(99,102,241))]/25 focus:border-[var(--active-parent,rgb(99,102,241))] transition-all"
+            />
+          </div>
+
+          {/* GUARD NAME INPUT */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
+              Guard Name
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                <LockKeyhole size={15} />
+              </span>
+              <input 
+                type="text"
+                value={guardName}
+                onChange={(e) => setGuardName(e.target.value)}
+                placeholder="web"
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[var(--active-parent,rgb(99,102,241))]/25 focus:border-[var(--active-parent,rgb(99,102,241))] transition-all font-mono lowercase"
+              />
+            </div>
+          </div>
+
+          {/* PERMISSIONS SELECTION GRID */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                Assign Permissions ({selectedPermissions.length} selected)
+              </label>
+              {permissions.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleSelectAll}
+                  className="text-xs font-semibold text-[var(--active-parent,rgb(99,102,241))] hover:underline cursor-pointer"
+                >
+                  {selectedPermissions.length === permissions.length ? 'Deselect All' : 'Select All'}
+                </button>
+              )}
+            </div>
+
+            <div className="border border-slate-200 rounded-xl p-3 bg-slate-50/50 max-h-56 overflow-y-auto space-y-1.5">
+              {isLoadingPerms ? (
+                <div className="flex items-center justify-center py-6 text-slate-400 gap-2">
+                  <Loader2 size={16} className="animate-spin text-[var(--active-parent,rgb(99,102,241))]" />
+                  <span className="text-xs font-medium">Loading permissions...</span>
+                </div>
+              ) : isErrorPerms ? (
+                <div className="flex items-center justify-center py-6 text-rose-500 gap-2">
+                  <ShieldAlert size={16} />
+                  <span className="text-xs font-medium">Failed to load permissions.</span>
+                </div>
+              ) : permissions.length === 0 ? (
+                <p className="text-center text-xs text-slate-400 py-4 font-medium">No permissions found.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {permissions.map((perm) => {
+                    const isChecked = selectedPermissions.includes(perm.id);
+                    return (
+                      <div
+                        key={perm.id}
+                        onClick={() => togglePermission(perm.id)}
+                        className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-medium cursor-pointer transition-all ${
+                          isChecked
+                            ? 'bg-indigo-50/80 border-indigo-200 text-indigo-900 shadow-sm'
+                            : 'bg-white border-slate-200/80 text-slate-700 hover:bg-slate-100/60'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 truncate">
+                          <Key size={13} className={isChecked ? 'text-[var(--active-parent,rgb(99,102,241))]' : 'text-slate-400'} />
+                          <span className="truncate">{perm.name}</span>
                         </div>
-                      </td>
-
-                      {/* 2. Age Group */}
-                      <td className="px-6 py-4 text-center">
-                        <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-200 text-slate-600 w-full">
-                          {visitor.ageGroup}
-                        </span>
-                      </td>
-
-                      {/* 3. Gender */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-slate-600 text-sm">
-                          {visitor.gender === 'Male' ? (
-                            <Mars size={14} className="text-blue-400" />
-                          ) : (
-                            <Venus size={14} className="text-pink-400" />
-                          )}
-                          {visitor.gender}
+                        <div className={`w-4 h-4 rounded-md flex items-center justify-center border transition-all ${
+                          isChecked ? 'bg-[var(--active-parent,rgb(99,102,241))] border-[var(--active-parent,rgb(99,102,241))] text-white' : 'border-slate-300 bg-white'
+                        }`}>
+                          {isChecked && <Check size={11} strokeWidth={3} />}
                         </div>
-                      </td>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
 
-                      {/* 4. Life-Stage */}
-                      <td className="px-6 py-4 text-center">
-                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold border tracking-wider uppercase ${getLifestageStyles(visitor.lifeStage)}`}>
-                          {visitor.lifeStage}
-                        </span>
-                      </td>
-
-                      {/* 5. Contacts */}
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col gap-1.5">
-                          <div className="flex items-center gap-2 text-slate-500">
-                            <FaEnvelope size={11} className="text-rose-400" />
-                            <span className="text-xs truncate max-w-[200px]">{visitor.email || 'N/A'}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-slate-500">
-                            <FaMobile size={11} className="text-cyan-500" />
-                            <span className="text-xs font-mono">{visitor.mobileNumber || 'N/A'}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-slate-500">
-                            <FaFacebookSquare size={11} className="text-blue-500" />
-                            <span className="text-xs font-mono">{visitor.facebookName || 'N/A'}</span>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* 6. Visited Schedule */}
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col gap-1">
-                          <p className="flex items-center gap-1 text-sm font-mono text-slate-800"><Calendar size={10}/> {visitor.dateVisited}</p>
-                          <p className="flex items-center gap-1 text-[10px] text-slate-400 font-medium tracking-wider"><Clock size={10}/> ({visitor.serviceTime}) <span className='capitalize'>Service</span></p>
-                        </div>
-                      </td>
-
-                      {/* 8. Actions */}
-                      <td className="px-6 py-4 text-center">
-                        <button 
-                          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 bg-slate-100 hover:bg-indigo-500 hover:text-white transition-all duration-200 active:scale-95 shadow-sm"
-                          onClick={()=>handleViewVisitor(visitor.id)}
-                        >
-                          <Eye size={14} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <TableEmpty colSpan={7} />
-                )}
-              </tbody>
-            </table>
-        </div>
-        
-        {/* 3. DYNAMIC PAGINATION FOOTER */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-100/50">
-          <p className="text-xs text-slate-500 font-medium">
-            Showing <span className="text-slate-800 font-bold">{meta?.from || 0}</span> to <span className="text-slate-800 font-bold">{meta?.to || 0}</span> of <span className="text-slate-800 font-bold">{meta?.total || 0}</span> entries
-          </p>
-
-          <div className="flex items-center gap-1">
-            <button 
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
-              disabled={!meta || meta.current_page === 1} 
-              className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 transition-colors cursor-pointer disabled:cursor-not-allowed"
+          {/* MODAL FOOTER ACTIONS */}
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isPending}
+              className="px-4 py-2.5 text-xs font-semibold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition-all cursor-pointer"
             >
-              Prev
+              Cancel
             </button>
-            
-            {meta && Array.from({ length: meta.last_page }, (_, i) => i + 1).map((page) => (
-              <button 
-                key={page} 
-                onClick={() => setCurrentPage(page)} 
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${meta.current_page === page ? 'bg-[var(--active-parent,rgb(99,102,241))] text-white' : 'text-slate-600 hover:bg-slate-200'}`}
-              >
-                {page}
-              </button>
-            ))}
-
-            <button 
-              onClick={() => setCurrentPage(prev => (!meta ? prev : Math.min(prev + 1, meta.last_page)))} 
-              disabled={!meta || meta.current_page === meta.last_page || meta.last_page === 0} 
-              className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 transition-colors cursor-pointer disabled:cursor-not-allowed"
+            <button
+              type="submit"
+              disabled={isPending}
+              className="flex items-center gap-2 px-6 py-2.5 text-xs font-bold text-white bg-[var(--active-parent,rgb(99,102,241))] hover:opacity-90 active:scale-95 rounded-xl transition-all shadow-md shadow-indigo-500/10 disabled:opacity-50 cursor-pointer"
             >
-              Next
+              {isPending && <Loader2 size={14} className="animate-spin" />}
+              {initialData ? 'Save Changes' : 'Create Role'}
             </button>
           </div>
-        </div>
+
+        </form>
+
       </div>
-      
-      {isVisitorModalOpen && (
-        <VisitorModal 
-          isOpen={isVisitorModalOpen}
-          onClose={() => setIsVisitorModalOpen(false)} 
-          visitorId={selectedVisitorId}
-        />
-      )}
     </div>
   );
 }
