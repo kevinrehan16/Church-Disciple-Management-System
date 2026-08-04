@@ -99,8 +99,8 @@ export default function Permissions() {
             <thead className="sticky top-0 z-10 bg-[var(--active-parent,rgb(99,102,241))]">
               <tr className="text-white uppercase tracking-wider text-[10px] font-extrabold border-b border-slate-200/60">
                 <th className="w-[25%] px-6 py-4">Permission Name</th>
-                <th className="w-[15%] px-6 py-4 text-center">Guard Name</th>
                 <th className="w-[50%] px-6 py-4">Assigned Roles</th>
+                <th className="w-[15%] px-6 py-4 text-center">Guard Name</th>
                 <th className="w-[10%] px-6 py-4 text-center">Actions</th>
               </tr>
             </thead>
@@ -146,20 +146,13 @@ export default function Permissions() {
                       </div>
                     </td>
 
-                    <td className="px-6 py-4 text-center">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-semibold border border-slate-300 bg-slate-100 text-slate-500 font-mono">
-                        <LockKeyhole size={10} className="text-slate-600" />
-                        {permission.guard_name || 'web'}
-                      </span>
-                    </td>
-
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1.5">
                         {permission.roles && permission.roles.length > 0 ? (
                           permission.roles.map((role, index) => (
                             <span 
                               key={index} 
-                              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/60 uppercase"
+                              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-500 border border-indigo-500 uppercase"
                             >
                               <ShieldCheck size={11} />
                               {role}
@@ -171,17 +164,24 @@ export default function Permissions() {
                       </div>
                     </td>
 
+                    <td className="px-6 py-4 text-center">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-semibold border border-slate-300 bg-slate-100 text-slate-500 font-mono">
+                        <LockKeyhole size={10} className="text-slate-600" />
+                        {permission.guard_name || 'web'}
+                      </span>
+                    </td>
+
                     <td className="flex items-center gap-2 px-6 py-4 text-center">
                       <button 
                         disabled={isDeleting}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-cyan-600 text-cyan-600 bg-cyan-50 hover:bg-cyan-600 hover:text-white transition-all duration-200 active:scale-95 shadow-sm disabled:opacity-50"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-cyan-200/80 text-cyan-600 bg-cyan-50 hover:bg-cyan-600 hover:text-white transition-all duration-200 active:scale-95 shadow-sm disabled:opacity-50"
                         onClick={() => handleOpenEdit(permission)}
                       >
                         <PenLine size={14} />
                       </button>
                       <button 
                         disabled={isDeleting}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-rose-600 text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white transition-all duration-200 active:scale-95 shadow-sm disabled:opacity-50"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-rose-200/80 text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white transition-all duration-200 active:scale-95 shadow-sm disabled:opacity-50"
                         onClick={() => handleDelete(permission.id, permission.name)}
                       >
                         <Trash2 size={14} />

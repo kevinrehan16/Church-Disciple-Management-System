@@ -137,7 +137,7 @@ Route::prefix('v1')->group(function () {
         // USER ROLE PERMISSION MANAGEMENT ROUTES
         Route::middleware(['auth:sanctum', 'role:super_admin'])->group(function () {
             // Permissions Management
-            Route::apiResource('permissions', PermissionController::class)->only(['index', 'store', 'destroy']);
+            Route::apiResource('permissions', PermissionController::class)->only(['index', 'update', 'store', 'destroy']);
 
             // Roles Management & Syncing Permissions
             Route::apiResource('roles', RoleController::class);

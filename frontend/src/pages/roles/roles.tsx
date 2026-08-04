@@ -1,22 +1,78 @@
 import { useState } from 'react';
 import { FaUserShield } from 'react-icons/fa';
-import { ShieldUser, Plus, Filter, ArrowUpDown, Key, Users, Edit3, Trash2 } from 'lucide-react';
+import { 
+  ShieldUser, 
+  Plus, 
+  Key, 
+  Edit3, 
+  Trash2, 
+  Loader2, 
+  ChevronLeft, 
+  ChevronRight, 
+  ShieldAlert,
+  LockKeyhole
+} from 'lucide-react';
+import { getPageNumbers } from '../../utils/pagination';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
-
-// HARDCODED DATA PARA SA DESIGN
-const dummyRoles = [
-  { id: 1, name: 'superadmin', usersCount: 2, permissions: [{ id: 1, name: 'all_access' }] },
-  { id: 2, name: 'senior_pastor', usersCount: 1, permissions: [{ id: 2, name: 'view_dashboard' }, { id: 3, name: 'manage_staff' }] },
-  { id: 3, name: 'pastor', usersCount: 4, permissions: [{ id: 4, name: 'view_members' }, { id: 5, name: 'edit_members' }] },
-  { id: 4, name: 'staff', usersCount: 12, permissions: [{ id: 4, name: 'view_members' }, { id: 6, name: 'add_visitors' }] },
-];
+import { useRoles, useDeleteRole } from '../../hooks/useRoles';
+import type { Role } from '../../types/role';
 
 export default function Roles() {
   const [searchTerm, setSearchTerm] = useState('');
-  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // State para sa pag-expand/show ng natatagong permissions kada role
+  const [expandedRoleIds, setExpandedRoleIds] = useState<number[]>([]);
+
+  // API Hooks
+  const { data: rolesResponse, isLoading, isError, isFetching } = useRoles({
+    page: currentPage,
+    search: searchTerm,
+  });
+
+  const { mutate: deleteRole, isPending: isDeleting } = useDeleteRole();
+
+  const roles = rolesResponse?.data || [];
+  const meta = rolesResponse?.meta;
+
+  // Toggle Function para sa +X Permission Badges
+  const toggleExpandRole = (roleId: number) => {
+    setExpandedRoleIds((prev) =>
+      prev.includes(roleId) ? prev.filter((id) => id !== roleId) : [...prev, roleId]
+    );
+  };
+
+  const handleSearchChange = (val: string) => {
+    setSearchTerm(val);
+    setCurrentPage(1);
+  };
+
+  const handleDelete = (role: Role) => {
+    if (role.name === 'superadmin' || role.name === 'super_admin') {
+      alert('System Protection: You cannot delete the Super Admin role.');
+      return;
+    }
+
+    if (window.confirm(`Are you sure you want to delete the "${role.name}" role?`)) {
+      deleteRole(role.id);
+    }
+  };
+
+  const handleOpenCreateModal = () => {
+    setSelectedRole(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (role: Role) => {
+    setSelectedRole(role);
+    setIsModalOpen(true);
+  };
+
   return (
-    <div className="w-full bg-slate-50 text-slate-800 px-6 py-4 space-y-6 min-h-screen">
+    <div className="w-full bg-slate-50 text-slate-800 px-6 py-4 space-y-6">
       
       {/* MODULE HEADER */}
       <ModuleHeader
@@ -26,7 +82,7 @@ export default function Roles() {
         actions={
           <button 
             className="group flex items-center gap-2 px-5 py-2.5 bg-[#0284c7] hover:bg-[#026ca1] active:scale-95 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-sky-500/10"
-            onClick={() => alert("Open Add Role Modal")}
+            onClick={handleOpenCreateModal}
           >
             <Plus size={16} className="transition-transform group-hover:rotate-90" />
             Add New Role
@@ -39,106 +95,253 @@ export default function Roles() {
         <div className="w-full md:w-96">
           <SearchInput 
             value={searchTerm}
-            onChange={(val) => setSearchTerm(val)}
+            onChange={handleSearchChange}
             placeholder="Search role name..."
           />
         </div>
-        
-        <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-600 rounded-xl text-sm font-semibold shadow-sm transition-all">
-            <Filter size={14} /> Advanced Filter
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-600 rounded-xl text-sm font-semibold shadow-sm transition-all">
-            <ArrowUpDown size={14} /> Sort By
-          </button>
-        </div>
       </div>
 
-      {/* TABLE DATA */}
+      {/* TABLE DATA CONTAINER */}
       <div className="w-full bg-white border border-slate-200/60 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-y-auto overflow-x-auto h-[calc(100vh-325px)] border border-slate-200/60 rounded-lg">
           <table className="w-full text-left text-sm border-separate border-spacing-0">
+            
+            {/* THEME BASED HEADER */}
             <thead className="sticky top-0 z-10 bg-[var(--active-parent,rgb(99,102,241))]">
               <tr className="text-white uppercase tracking-wider text-[10px] font-extrabold border-b border-slate-200/60">
                 <th className="w-[20%] px-6 py-4">Role Name</th>
-                <th className="w-[45%] px-6 py-4">Assigned Permissions</th>
-                <th className="w-[15%] px-6 py-4 text-center">Assigned Users</th>
-                <th className="w-[20%] px-6 py-4 text-center">Actions</th>
+                <th className="w-[55%] px-6 py-4">Assigned Permissions</th>
+                <th className="w-[15%] px-6 py-4 text-center">Guard Name</th>
+                <th className="w-[10%] px-6 py-4 text-center">Actions</th>
               </tr>
             </thead>
+
             <tbody className="divide-y divide-slate-100 bg-white">
-              {dummyRoles.map((role) => (
-                <tr 
-                  key={role.id} 
-                  className="group hover:bg-indigo-50/50 transition-all duration-200 ease-in-out border-b border-slate-50 last:border-0"
-                >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center font-bold text-xs border border-slate-200 group-hover:bg-[var(--active-parent,rgb(99,102,241))]/10 group-hover:text-[var(--active-parent,rgb(99,102,241))] group-hover:border-[var(--active-parent,rgb(99,102,241))] transition-colors">
-                        <ShieldUser size={16} />
+              {/* LOADING SKELETON */}
+              {isLoading && (
+                Array.from({ length: 4 }).map((_, index) => (
+                  <tr key={index} className="animate-pulse">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-slate-200" />
+                        <div className="space-y-1.5">
+                          <div className="w-24 h-3.5 bg-slate-200 rounded" />
+                          <div className="w-12 h-2.5 bg-slate-100 rounded" />
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-semibold text-slate-800 group-hover:text-[var(--active-parent,rgb(99,102,241))] transition-colors capitalize">
-                          {role.name.replace('_', ' ')}
-                        </p>
-                        <p className="text-[11px] font-mono text-slate-400">ID: {role.id}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-1.5">
+                        <div className="w-20 h-6 bg-slate-200 rounded-md" />
+                        <div className="w-24 h-6 bg-slate-200 rounded-md" />
                       </div>
-                    </div>
-                  </td>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="w-16 h-5 bg-slate-200 rounded-full mx-auto" />
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="w-16 h-8 bg-slate-200 rounded-lg mx-auto" />
+                    </td>
+                  </tr>
+                ))
+              )}
 
-                  <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1.5 max-w-xl">
-                      {role.permissions.map((perm) => (
-                        <span 
-                          key={perm.id} 
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200/60"
-                        >
-                          <Key size={10} className="text-indigo-400" />
-                          {perm.name}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-4 text-center">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">
-                      <Users size={12} className="text-slate-400" />
-                      {role.usersCount} Users
-                    </span>
-                  </td>
-
-                  <td className="px-6 py-4 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <button 
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 bg-slate-100 hover:bg-indigo-500 hover:text-white transition-all duration-200 active:scale-95 shadow-sm"
-                        onClick={() => alert(`Edit Role: ${role.name}`)}
-                      >
-                        <Edit3 size={14} /> Edit
-                      </button>
-                      {role.name !== 'superadmin' && (
-                        <button className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white transition-all duration-200 active:scale-95 shadow-sm">
-                          <Trash2 size={14} />
-                        </button>
-                      )}
+              {/* ERROR STATE */}
+              {isError && !isLoading && (
+                <tr>
+                  <td colSpan={4} className="py-12 text-center text-rose-500">
+                    <div className="flex flex-col items-center gap-2">
+                      <ShieldAlert size={28} />
+                      <p className="font-semibold text-xs">Failed to load roles. Please try again.</p>
                     </div>
                   </td>
                 </tr>
-              ))}
+              )}
+
+              {/* EMPTY STATE */}
+              {!isLoading && !isError && roles.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="py-12 text-center text-slate-400">
+                    <p className="font-semibold text-sm text-slate-600">No Roles Found</p>
+                    <p className="text-xs text-slate-400 mt-1">Try searching for another term or create a new role.</p>
+                  </td>
+                </tr>
+              )}
+
+              {/* DATA ROWS */}
+              {!isLoading && !isError && roles.map((role) => {
+                const isSystemRole = role.name === 'superadmin' || role.name === 'super_admin';
+                const isExpanded = expandedRoleIds.includes(role.id);
+                
+                const displayedPermissions = isExpanded 
+                  ? (role.permissions || []) 
+                  : (role.permissions?.slice(0, 4) || []);
+                
+                const hiddenCount = (role.permissions?.length || 0) - 4;
+
+                return (
+                  <tr 
+                    key={role.id} 
+                    className="group hover:bg-indigo-50/50 transition-all duration-200 ease-in-out border-b border-slate-50 last:border-0"
+                  >
+                    {/* ROLE NAME */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center font-bold text-xs border border-slate-200 group-hover:bg-[var(--active-parent,rgb(99,102,241))]/10 group-hover:text-[var(--active-parent,rgb(99,102,241))] group-hover:border-[var(--active-parent,rgb(99,102,241))] transition-colors">
+                          <ShieldUser size={16} />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-slate-800 group-hover:text-[var(--active-parent,rgb(99,102,241))] transition-colors capitalize">
+                            {role.name.replace(/_/g, ' ')}
+                          </p>
+                          <p className="text-[11px] font-mono text-slate-400">ID: {role.id}</p>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* ASSIGNED PERMISSIONS */}
+                    <td className="px-6 py-4">
+                      <div className="flex flex-wrap gap-1.5 max-w-xl">
+                        {role.permissions && role.permissions.length > 0 ? (
+                          <>
+                            {/* INDIGO BADGES WITH BORDER */}
+                            {displayedPermissions.map((perm) => (
+                              <span 
+                                key={perm.id} 
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200"
+                              >
+                                <Key size={10} className="text-indigo-500 flex-shrink-0" />
+                                {perm.name}
+                              </span>
+                            ))}
+
+                            {/* CLICKABLE BLACK TO INDIGO "+X MORE" BADGE */}
+                            {!isExpanded && hiddenCount > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => toggleExpandRole(role.id)}
+                                className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-slate-400 text-white border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 transition-colors shadow-sm cursor-pointer active:scale-95"
+                                title="Click to show all permissions"
+                              >
+                                +{hiddenCount} more
+                              </button>
+                            )}
+
+                            {/* SHOW LESS BUTTON WHEN EXPANDED */}
+                            {isExpanded && hiddenCount > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => toggleExpandRole(role.id)}
+                                className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-slate-800 text-white border border-slate-700 hover:bg-indigo-600 hover:border-indigo-600 transition-colors shadow-sm cursor-pointer active:scale-95"
+                              >
+                                Show less
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-xs text-slate-400 italic">No permissions assigned</span>
+                        )}
+                      </div>
+                    </td>
+
+                    {/* GUARD NAME - LOWERCASE WITH LOCK ICON */}
+                    <td className="px-6 py-4 text-center">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold font-mono bg-slate-100 text-slate-600 border border-slate-200/80 lowercase">
+                        <LockKeyhole size={12} className="text-slate-400 flex-shrink-0" />
+                        {role.guard_name || 'web'}
+                      </span>
+                    </td>
+
+                    {/* ACTIONS */}
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        {/* CYAN EDIT BUTTON WITH BORDER */}
+                        <button 
+                          type="button"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-cyan-200/80 text-cyan-600 bg-cyan-50 hover:bg-cyan-600 hover:text-white transition-all duration-200 active:scale-95 shadow-sm disabled:opacity-50"
+                          onClick={() => handleOpenEditModal(role)}
+                        >
+                          <Edit3 size={14} />
+                        </button>
+
+                        {/* ROSE DELETE BUTTON WITH BORDER */}
+                        {!isSystemRole && (
+                          <button 
+                            type="button"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-rose-200/80 text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white transition-all duration-200 active:scale-95 shadow-sm disabled:opacity-50"
+                            onClick={() => handleDelete(role)}
+                            disabled={isDeleting}
+                          >
+                            {isDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
         
-        {/* HARDCODED PAGINATION */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-100/50">
+        {/* DYNAMIC PAGINATION CONTROLS */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-100 bg-slate-100/50">
+
+          {/* 1. KALIWA: SHOWING ENTRIES TEXT WITH FALLBACK */}
           <p className="text-xs text-slate-500 font-medium">
-            Showing <span className="text-slate-800 font-bold">1</span> to <span className="text-slate-800 font-bold">4</span> of <span className="text-slate-800 font-bold">4</span> entries
+            Showing <span className="text-slate-800 font-bold">{meta?.from ?? (roles.length > 0 ? 1 : 0)}</span> to{' '}
+            <span className="text-slate-800 font-bold">{meta?.to ?? roles.length}</span> of{' '}
+            <span className="text-slate-800 font-bold">{meta?.total ?? roles.length}</span> entries
           </p>
+
+          {/* 2. KANAN: PAGINATION BUTTONS */}
           <div className="flex items-center gap-1">
-            <button className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 cursor-not-allowed" disabled>Prev</button>
-            <button className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--active-parent,rgb(99,102,241))] text-white shadow-sm">1</button>
-            <button className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 cursor-not-allowed" disabled>Next</button>
+            {/* PREV BUTTON */}
+            <button 
+              disabled={currentPage === 1 || isLoading || isFetching}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              Prev
+            </button>
+            
+            {/* PAGE NUMBERS - GAGANA NA KAHIT WALANG META OBJECT */}
+            {getPageNumbers(currentPage, meta?.last_page || 1).map((page, index) => {
+              if (typeof page === 'string') {
+                return (
+                  <span key={index} className="px-2 py-1.5 text-xs text-slate-400 font-bold select-none">
+                    {page}
+                  </span>
+                );
+              }
+
+              return (
+                <button
+                  key={index}
+                  disabled={isLoading || isFetching}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                    currentPage === page
+                      ? 'bg-[var(--active-parent,rgb(99,102,241))] text-white shadow-sm'
+                      : 'bg-white text-slate-600 hover:bg-slate-200 border border-slate-200/60'
+                  }`}
+                >
+                  {page}
+                </button>
+              );
+            })}
+
+            {/* NEXT BUTTON */}
+            <button 
+              disabled={currentPage === (meta?.last_page || 1) || isLoading || isFetching}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              Next
+            </button>
           </div>
         </div>
+
       </div>
     </div>
   );

@@ -18,10 +18,12 @@ class RoleController extends Controller
         $this->roleService = $roleService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $roles = $this->roleService->getAllRoles();
-        return RoleResource::collection($roles);
+        // Ipasa ang $request->all() para makuha ng service ang 'search' at 'page'
+        $roles = $this->roleService->getAllRoles($request->all());
+
+        return response()->json($roles);
     }
 
     public function store(RoleRequest $request)

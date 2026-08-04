@@ -24,6 +24,16 @@ class PermissionService
         ]);
     }
 
+    public function updatePermission(Permission $permission, array $data)
+    {
+        $permission->update([
+            'name'       => $data['name'],
+            'guard_name' => $data['guard_name'] ?? $permission->guard_name ?? 'web',
+        ]);
+
+        return $permission;
+    }
+
     public function deletePermission(Permission $permission)
     {
         return $permission->delete();

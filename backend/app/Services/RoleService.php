@@ -6,14 +6,26 @@ use Spatie\Permission\Models\Role;
 
 class RoleService
 {
-    public function getAllRoles(int $perPage = 10, ?string $search = null)
+    public function getAllRoles(array $params = [])
     {
-        return Role::with('permissions')
-            ->when($search, function ($query, $search) {
-                return $query->where('name', 'like', "%{$search}%");
-            })
-            ->orderBy('id', 'asc')
-            ->paginate($perPage);
+        $query = Role::with('permissions');
+
+        // Suriin kung may 'search' key sa params
+        if (!empty($params['search'])) {
+            $searchTerm = $params['search'];
+
+            $query->where(function ($q) use ($searchTerm) {
+                // I-search ang role name
+                $q->where('name', 'ilike', '%' . $searchTerm . '%')
+                    // O kaya ang pangalan ng permissions na nakakabit sa role
+                    ->orWhereHas('permissions', function ($permQuery) use ($searchTerm) {
+                        $permQuery->where('name', 'ilike', '%' . $searchTerm . '%');
+                    });
+            });
+        }
+
+        // Siguraduhing gamit ang paginate()
+        return $query->paginate($params['per_page'] ?? 10);
     }
 
     public function createRole(array $data)

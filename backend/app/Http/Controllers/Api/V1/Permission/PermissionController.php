@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Permission;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Permission\StorePermissionRequest;
+use App\Http\Requests\Permission\UpdatePermissionRequest;
 use App\Http\Resources\PermissionResource;
 use App\Services\PermissionService;
 use Illuminate\Http\Request;
@@ -36,6 +37,18 @@ class PermissionController extends Controller
             ->additional(['success' => true, 'message' => 'Permission created successfully'])
             ->response()
             ->setStatusCode(201);
+    }
+
+    public function update(UpdatePermissionRequest $request, $id)
+    {
+        $permission = Permission::findOrFail($id);
+
+        $updatedPermission = $this->permissionService->updatePermission($permission, $request->validated());
+
+        return response()->json([
+            'message' => 'Permission updated successfully',
+            'data'    => $updatedPermission,
+        ], 200);
     }
 
     public function destroy(Permission $permission)
