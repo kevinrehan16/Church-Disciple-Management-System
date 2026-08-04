@@ -12,13 +12,16 @@ class PermissionService
             ->when($search, function ($query, $search) {
                 return $query->where('name', 'like', "%{$search}%");
             })
-            ->orderBy('id', 'asc')
+            ->orderBy('id', 'desc')
             ->paginate($perPage);
     }
 
     public function createPermission(array $data)
     {
-        return Permission::create(['name' => $data['name']]);
+        return Permission::create([
+            'name'       => $data['name'],
+            'guard_name' => $data['guard_name'] ?? 'web',
+        ]);
     }
 
     public function deletePermission(Permission $permission)

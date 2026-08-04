@@ -88,9 +88,9 @@ export default function Visitors() {
                 </thead>
                 <tbody className="divide-y divide-slate-100 bg-white">
                 {isLoading ? (
-                  <TableLoading rows={5} columns={8} />
+                  <TableLoading rows={5} columns={7} />
                 ) : isError ? (
-                  <TableError colSpan={8} onRetry={() => refetch()} />
+                  <TableError colSpan={7} onRetry={() => refetch()} />
                 ) : currentVisitors.length > 0 ? (
                   currentVisitors.map((visitor: any) => (
                     <tr 
@@ -178,7 +178,7 @@ export default function Visitors() {
                     </tr>
                   ))
                 ) : (
-                  <TableEmpty colSpan={8} />
+                  <TableEmpty colSpan={7} />
                 )}
               </tbody>
             </table>

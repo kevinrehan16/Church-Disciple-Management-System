@@ -32,6 +32,24 @@ export const useCreatePermission = () => {
   });
 };
 
+export const useUpdatePermission = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    SinglePermissionResponse,
+    Error,
+    { id: number; payload: CreatePermissionPayload }
+  >({
+    mutationFn: ({ id, payload }) => permissionService.updatePermission(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['permissions'] });
+    },
+    onError: (error: any) => {
+      console.error("Update permission failed:", error.response?.data || error.message);
+    },
+  });
+};
+
 // 3. Hook para sa PAG-DELETE ng Permission (useMutation)
 export const useDeletePermission = () => {
   const queryClient = useQueryClient();

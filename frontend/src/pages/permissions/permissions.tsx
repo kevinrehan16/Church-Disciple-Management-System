@@ -1,13 +1,31 @@
 import { useState } from 'react';
 import { FaKey } from 'react-icons/fa';
-import { KeyRound, Plus, Filter, ArrowUpDown, ShieldCheck, Trash2, LockKeyhole, Loader2 } from 'lucide-react';
+import { KeyRound, Plus, Filter, ArrowUpDown, ShieldCheck, Trash2, LockKeyhole, Loader2, PenLine } from 'lucide-react';
 import ModuleHeader from '../../components/ui/ModuleHeader';
+import { getPageNumbers } from '../../utils/pagination';
 import SearchInput from '../../components/inputs/SearchInput';
+import PermissionModal from '../../components/modals/permissionModals/PermissionModal';
 import { usePermissions, useDeletePermission } from '../../hooks/usePermissions';
+import type { Permission } from '../../types/permission';
 
 export default function Permissions() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPermission, setSelectedPermission] = useState<Permission | null>(null);
+
+  // Open Create Modal
+  const handleOpenCreate = () => {
+    setSelectedPermission(null);
+    setIsModalOpen(true);
+  };
+  
+  // Open Edit Modal
+  const handleOpenEdit = (permission: Permission) => {
+    setSelectedPermission(permission);
+    setIsModalOpen(true);
+  };
 
   // 1. React Query Hook para sa Fetching
   const { data, isLoading, isError, isFetching } = usePermissions({
@@ -46,7 +64,7 @@ export default function Permissions() {
         actions={
           <button 
             className="group flex items-center gap-2 px-5 py-2.5 bg-[#0284c7] hover:bg-[#026ca1] active:scale-95 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-sky-500/10"
-            onClick={() => alert("Open Add Permission Modal")}
+            onClick={handleOpenCreate}
           >
             <Plus size={16} className="transition-transform group-hover:rotate-90" />
             Add New Permission
@@ -80,10 +98,10 @@ export default function Permissions() {
           <table className="w-full text-left text-sm border-separate border-spacing-0">
             <thead className="sticky top-0 z-10 bg-[var(--active-parent,rgb(99,102,241))]">
               <tr className="text-white uppercase tracking-wider text-[10px] font-extrabold border-b border-slate-200/60">
-                <th className="w-[30%] px-6 py-4">Permission Name</th>
-                <th className="w-[20%] px-6 py-4 text-center">Guard Name</th>
-                <th className="w-[35%] px-6 py-4">Assigned Roles</th>
-                <th className="w-[15%] px-6 py-4 text-center">Actions</th>
+                <th className="w-[25%] px-6 py-4">Permission Name</th>
+                <th className="w-[15%] px-6 py-4 text-center">Guard Name</th>
+                <th className="w-[50%] px-6 py-4">Assigned Roles</th>
+                <th className="w-[10%] px-6 py-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
@@ -120,7 +138,7 @@ export default function Permissions() {
                           <KeyRound size={16} />
                         </div>
                         <div>
-                          <p className="font-semibold text-slate-800 group-hover:text-[var(--active-parent,rgb(99,102,241))] transition-colors font-mono text-xs">
+                          <p className="font-semibold text-slate-800 group-hover:text-[var(--active-parent,rgb(99,102,241))] transition-colors font-mono text-sm">
                             {permission.name}
                           </p>
                           <p className="text-[11px] font-mono text-slate-400">ID: #{permission.id}</p>
@@ -129,8 +147,8 @@ export default function Permissions() {
                     </td>
 
                     <td className="px-6 py-4 text-center">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 font-mono">
-                        <LockKeyhole size={10} className="text-slate-400" />
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-semibold border border-slate-300 bg-slate-100 text-slate-500 font-mono">
+                        <LockKeyhole size={10} className="text-slate-600" />
                         {permission.guard_name || 'web'}
                       </span>
                     </td>
@@ -141,25 +159,32 @@ export default function Permissions() {
                           permission.roles.map((role, index) => (
                             <span 
                               key={index} 
-                              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/60 uppercase"
+                              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/60 uppercase"
                             >
-                              <ShieldCheck size={10} />
+                              <ShieldCheck size={11} />
                               {role}
                             </span>
                           ))
                         ) : (
-                          <span className="text-xs text-slate-400 italic">Unassigned</span>
+                          <span className="text-sm text-slate-400 italic">Unassigned</span>
                         )}
                       </div>
                     </td>
 
-                    <td className="px-6 py-4 text-center">
+                    <td className="flex items-center gap-2 px-6 py-4 text-center">
                       <button 
                         disabled={isDeleting}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white transition-all duration-200 active:scale-95 shadow-sm disabled:opacity-50"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-cyan-600 text-cyan-600 bg-cyan-50 hover:bg-cyan-600 hover:text-white transition-all duration-200 active:scale-95 shadow-sm disabled:opacity-50"
+                        onClick={() => handleOpenEdit(permission)}
+                      >
+                        <PenLine size={14} />
+                      </button>
+                      <button 
+                        disabled={isDeleting}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-rose-600 text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white transition-all duration-200 active:scale-95 shadow-sm disabled:opacity-50"
                         onClick={() => handleDelete(permission.id, permission.name)}
                       >
-                        <Trash2 size={14} /> Delete
+                        <Trash2 size={14} />
                       </button>
                     </td>
                   </tr>
@@ -170,34 +195,69 @@ export default function Permissions() {
         </div>
         
         {/* DYNAMIC PAGINATION CONTROLS */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-100/50">
-          <p className="text-xs text-slate-500 font-medium">
-            Showing <span className="text-slate-800 font-bold">{meta?.from ?? 0}</span> to <span className="text-slate-800 font-bold">{meta?.to ?? 0}</span> of <span className="text-slate-800 font-bold">{meta?.total ?? 0}</span> entries
-          </p>
-          
-          <div className="flex items-center gap-1">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-100 bg-slate-100/50">
+        
+        {/* 1. KALIWA: SHOWING ENTRIES TEXT */}
+        <p className="text-xs text-slate-500 font-medium">
+            Showing <span className="text-slate-800 font-bold">{meta?.from ?? 0}</span> to{' '}
+            <span className="text-slate-800 font-bold">{meta?.to ?? 0}</span> of{' '}
+            <span className="text-slate-800 font-bold">{meta?.total ?? 0}</span> entries
+        </p>
+
+        {/* 2. KANAN: PAGINATION BUTTONS */}
+        <div className="flex items-center gap-1">
+            {/* PREV BUTTON */}
             <button 
-              disabled={currentPage === 1 || isLoading || isFetching}
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            disabled={currentPage === 1 || isLoading || isFetching}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-              Prev
+            Prev
             </button>
             
-            <button className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--active-parent,rgb(99,102,241))] text-white shadow-sm">
-              {currentPage}
-            </button>
+            {/* PAGE NUMBERS (1 ... 4 5 6 7 8) */}
+            {meta && getPageNumbers(currentPage, meta.last_page).map((page, index) => {
+            if (typeof page === 'string') {
+                return (
+                <span key={index} className="px-2 py-1.5 text-xs text-slate-400 font-bold select-none">
+                    {page}
+                </span>
+                );
+            }
 
+            return (
+                <button
+                key={index}
+                disabled={isLoading || isFetching}
+                onClick={() => setCurrentPage(page)}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                    currentPage === page
+                    ? 'bg-[var(--active-parent,rgb(99,102,241))] text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:bg-slate-200 border border-slate-200/60'
+                }`}
+                >
+                {page}
+                </button>
+            );
+            })}
+
+            {/* NEXT BUTTON */}
             <button 
-              disabled={!meta || currentPage === meta.last_page || isLoading || isFetching}
-              onClick={() => setCurrentPage((prev) => prev + 1)}
-              className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            disabled={!meta || currentPage === meta.last_page || isLoading || isFetching}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-              Next
+            Next
             </button>
-          </div>
+        </div>
         </div>
       </div>
+
+      <PermissionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        initialData={selectedPermission}
+      />
     </div>
   );
 }

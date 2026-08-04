@@ -21,6 +21,11 @@ export const permissionService = {
     return response.data;
   },
 
+  updatePermission: async (id: number, payload: CreatePermissionPayload): Promise<SinglePermissionResponse> => {
+    const response = await apiClient.put<SinglePermissionResponse>(`/permissions/${id}`, payload);
+    return response.data;
+  },
+
   // 3. DELETE PERMISSION (Mag-delete ng permission via ID)
   deletePermission: async (id: number): Promise<{ success: boolean; message: string }> => {
     const response = await apiClient.delete<{ success: boolean; message: string }>(`/permissions/${id}`);
