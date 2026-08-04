@@ -21,7 +21,7 @@ class ProfilePolicy
      */
     public function view(User $user, User $model): bool
     {
-        return $user->id === $model->id || $user->can('manage users');
+        return $user->id === $model->id || $user->can('manage_users');
     }
 
     /**
@@ -30,6 +30,6 @@ class ProfilePolicy
      */
     public function update(User $user, User $model): bool
     {
-        return $user->id === $model->id || $user->can('manage users');
+        return $user->id === $model->id || $user->can('manage_users');
     }
 }

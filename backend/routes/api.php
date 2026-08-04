@@ -89,7 +89,7 @@ Route::prefix('v1')->group(function () {
         // MEMBERS ROUTES
         Route::middleware(['role:super_admin|senior_pastor|pastor|admin|staff'])->group(function () {
             Route::get('/members', [MemberController::class, 'index']);
-            Route::put('/members/{id}', [MemberController::class, 'update']);
+            Route::put('/members/{member}', [MemberController::class, 'update']);
         });
 
         // VISITORS ROUTES

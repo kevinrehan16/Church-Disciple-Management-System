@@ -7,10 +7,11 @@ use App\Models\User;
 
 class MemberPolicy
 {
-    // Awtomatikong pinapayagan ang Super Admin sa lahat ng aksyon
+    // Awtomatikong pinapayagan ang super_admin sa lahat ng aksyon
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->hasRole('Super Admin')) {
+        // ITAMA ITO: Gawing 'super_admin' katulad sa database
+        if ($user->hasRole('super_admin')) {
             return true;
         }
         return null;
@@ -18,22 +19,24 @@ class MemberPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->can('view members');
+        // ITAMA ITO: Palitan ang space ng underscore kung ganyan ang seeder mo (view_members)
+        return $user->can('view_members');
     }
 
     public function view(User $user, Member $member): bool
     {
-        return $user->can('view members') && $user->church_id === $member->church_id;
+        return $user->can('view_members') && $user->church_id === $member->church_id;
     }
 
     public function update(User $user, Member $member): bool
     {
-        // Kailangan may permission at dapat magkatugma ang branch (church_id)
-        return $user->can('edit members') && $user->church_id === $member->church_id;
+        // ITAMA ITO: 'edit_members' sa halip na 'edit members'
+        return $user->can('edit_members') && $user->church_id === $member->church_id;
     }
 
     public function delete(User $user, Member $member): bool
     {
-        return $user->can('delete members') && $user->church_id === $member->church_id;
+        // ITAMA ITO: 'delete_members' sa halip na 'delete members'
+        return $user->can('delete_members') && $user->church_id === $member->church_id;
     }
 }

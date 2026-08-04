@@ -18,13 +18,13 @@ class UserPolicy
     public function viewAny(User $user): bool
     {
         // Halimbawa: Ang mga may 'manage users' permission lang ang pwedeng tumingin ng listahan
-        return $user->can('manage users');
+        return $user->can('manage_users');
     }
 
     public function update(User $user, User $model): bool
     {
         // Halimbawa: Pwedeng i-update kung may permission, o kaya ay sarili niyang account
-        return $user->can('manage users') || $user->id === $model->id;
+        return $user->can('manage_users') || $user->id === $model->id;
     }
 
     public function delete(User $user, User $model): bool
@@ -34,6 +34,6 @@ class UserPolicy
             return false;
         }
 
-        return $user->can('manage users');
+        return $user->can('manage_users');
     }
 }
