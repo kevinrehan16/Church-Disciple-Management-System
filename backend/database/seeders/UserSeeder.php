@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
         // 1. Siguraduhing umiiral ang super_admin role sa database
         $superAdminRole = Role::firstOrCreate([
             'name'       => 'super_admin',
-            'guard_name' => 'web',
+            'guard_name' => 'sanctum',
         ]);
 
         // 2. Isabay na rin ang pag-assign ng lahat ng permissions sa Super Admin role
@@ -32,6 +32,7 @@ class UserSeeder extends Seeder
                 'id'       => Str::uuid(),
                 'password' => Hash::make('kevin123'),
                 'role'     => 'super_admin',
+                'must_change_password' => false,
             ]
         );
 
