@@ -12,11 +12,6 @@ interface PermissionModalProps {
   initialData?: Permission | null;
 }
 
-const GUARD_OPTIONS = [
-  { value: 'sanctum', label: 'sanctum (Default Sanctum Guard)' },
-  { value: 'api', label: 'api (API Token Guard)' },
-];
-
 export default function PermissionModal({ isOpen, onClose, initialData }: PermissionModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: createPermission, isPending: isCreating } = useCreatePermission();

@@ -39,17 +39,21 @@ export interface SingleRoleResponse {
 }
 
 export interface RoleListResponse {
-  data: Role[];
-  meta?: {
     current_page: number;
-    last_page: number;
+    data: Role[];
+    first_page_url: string;
+    from: number | null;
+    last_page: number;        // <-- Dito mo ilalagay ito para mawala ang error
+    last_page_url: string;
+    links: {
+        url: string | null;
+        label: string;
+        active: boolean;
+    }[];
+    next_page_url: string | null;
+    path: string;
     per_page: number;
+    prev_page_url: string | null;
+    to: number | null;
     total: number;
-  };
-  links?: {
-    first: string;
-    last: string;
-    prev: string | null;
-    next: string | null;
-  };
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Shield, Key, Loader2, Check, LockKeyhole, ShieldAlert, Save } from 'lucide-react';
+import { X, Shield, Key, Loader2, Check, ShieldAlert, Save } from 'lucide-react';
 import { useCreateRole, useUpdateRole } from '../../../hooks/useRoles';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { modalAnimation } from '../../../utils/ModalAnimation';
@@ -17,7 +17,6 @@ export default function RoleModal({ isOpen, onClose, initialData }: RoleModalPro
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   
   const [name, setName] = useState('');
-  const [guardName, setGuardName] = useState('web');
   // Binago mula number[] patungong string[] dahil pangalan (string) ang hinahanap ng backend
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
 
@@ -33,13 +32,11 @@ export default function RoleModal({ isOpen, onClose, initialData }: RoleModalPro
   useEffect(() => {
     if (initialData) {
       setName(initialData.name || '');
-      setGuardName(initialData.guard_name || 'web');
       // Kunin ang mga NAMES ng permissions sa halip na IDs
       const permNames = initialData.permissions?.map((p) => p.name) || [];
       setSelectedPermissions(permNames);
     } else {
       setName('');
-      setGuardName('web');
       setSelectedPermissions([]);
     }
   }, [initialData, isOpen]);
@@ -145,15 +142,6 @@ export default function RoleModal({ isOpen, onClose, initialData }: RoleModalPro
                   required
                   icon={<Shield size={15}/>}
                 />
-
-                {/* <InputField
-                  label="Guard Name"
-                  name="guard_name"
-                  placeholder="web"
-                  value={guardName}
-                  onChange={(e) => setGuardName(e.target.value)}
-                  icon={<LockKeyhole size={15}/>}
-                /> */}
               </div>
             </div>
 
