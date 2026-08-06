@@ -115,7 +115,7 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
             className="absolute -top-16 left-1/3 w-96 h-96 rounded-full blur-3xl animate-pulse pointer-events-none opacity-20" 
             style={{ animationDuration: '6s' }} 
           />
-          <div className="absolute -bottom-16 right-1/4 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '4s' }} />
+          <div className="absolute -bottom-16 right-1/4 w-80 h-80 bg-[var(--active-parent,rgb(99,102,241))]-600/20 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDuration: '4s' }} />
 
           <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
             <div className="absolute inset-0 flex items-center justify-center">
