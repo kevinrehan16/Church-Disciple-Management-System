@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaFacebook } from 'react-icons/fa';
 import { 
-  User, Mail, Phone, MapPin, ShieldCheck, 
+  User, Mail, Phone, MapPin, ShieldCheck, Church, 
   Edit, Key, Sparkles, Heart, Briefcase, 
   GraduationCap, Cross, CheckCircle2,
-  Building, BookOpen, Loader2, AlertCircle
+  Building, BookOpen, Loader2, AlertCircle,
+  MapPinned
 } from 'lucide-react';
-
+import RegisterMemberModal from '../../components/modals/memberModals/RegisterMemberModal';
 import { useMyProfile, useMemberProfile } from '../../hooks/useProfiles';
 import type { MemberProfile } from '../../types/typeProfile';
 
@@ -75,7 +76,15 @@ interface ProfileUIProps {
 }
 
 function ProfileUI({ data, isSelf }: ProfileUIProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'personal' | 'career' | 'security'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'personal' | 'church' | 'career' | 'security'>('overview');
+
+  const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+
+  const handleViewProfile = (id: number) => {
+    setSelectedMemberId(id);
+    setIsRegisterModalOpen(true);
+  };
 
   return (
     <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 transition-all">
@@ -85,13 +94,13 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
         {/* Base container for the Banner */}
         <div className="h-48 sm:h-60 bg-slate-950 relative overflow-hidden flex flex-col justify-between p-4 sm:p-6">
           
-          {/* 1. ACTUAL BACKGROUND IMAGE (Worship / Church Theme) - Pinalitaw ang opacity */}
+          {/* 1. ACTUAL BACKGROUND IMAGE (Worship / Church Theme) */}
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
             style={{ backgroundImage: "url('/web_images/bible.avif')" }}
           />
 
-          {/* 2. TRANSPARENT GRADIENT OVERLAY - Para lumusot ang picture sa likod pero royal theme pa rin */}
+          {/* 2. TRANSPARENT GRADIENT OVERLAY */}
           <div className="absolute inset-0 bg-gradient-to-r from-purple-950/80 via-slate-950/70 to-indigo-950/80 pointer-events-none" />
 
           {/* 3. Slow Pulsing Divine Gold & Royal Purple Glow */}
@@ -101,14 +110,12 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
           {/* 4. Watermark Section (JESUS & Cross) */}
           <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
             
-            {/* Strictly Centered "JESUS" Text */}
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="font-black text-8xl sm:text-9xl tracking-[0.25em] text-white/[0.05] uppercase">
                 JESUS
               </span>
             </div>
 
-            {/* Massive, Long & Slanted Cross pointing to 2 o'clock */}
             <div className="absolute -right-12 sm:-right-20 -top-32 sm:-top-44 transform rotate-[42deg] opacity-[0.08] text-white">
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-[18rem] h-[28rem] sm:w-[26rem] sm:h-[40rem]">
                 <path d="M11 2h2v7h7v2h-7v11h-2V11H4V9h7V2z" />
@@ -117,7 +124,7 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
 
           </div>
 
-          {/* 5. Top Row: Discipleship (Left) & Disciplemaking (Right) */}
+          {/* 5. Top Row */}
           <div className="w-full flex items-center justify-between z-10">
             <span className="px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold tracking-widest uppercase bg-white/10 text-amber-200 backdrop-blur-md border border-white/20 shadow-sm flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
@@ -129,7 +136,7 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
             </span>
           </div>
 
-          {/* 6. Bottom Row: Core Tagline / Mission without 'JESUS' */}
+          {/* 6. Bottom Row */}
           <div className="w-full text-center z-10 pb-1 sm:pb-2">
             <p className="text-[9px] sm:text-[11px] font-bold tracking-[0.22em] sm:tracking-[0.3em] text-amber-100/90 uppercase drop-shadow-md">
               KNOW <span className="text-amber-400 font-extrabold mx-1.5">•</span> LOVE <span className="text-amber-400 font-extrabold mx-1.5">•</span> ABIDE <span className="text-amber-400 font-extrabold mx-1.5">•</span> SERVE <span className="text-amber-400 font-extrabold mx-1.5">•</span> PROCLAIM
@@ -141,16 +148,14 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 -mt-16 sm:-mt-20 relative z-10">
             
             <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 sm:gap-6">
-              {/* Profile Picture Box with Centered Initials and Overlaid ID */}
+              {/* Profile Picture Box */}
               <div className="h-28 w-28 sm:h-36 sm:w-36 rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-slate-100 flex-shrink-0">
                 <div className="h-full w-full rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white shadow-inner relative overflow-hidden">
-                  {/* Centered Initials (Strictly fixed in center) */}
                   <span className="text-2xl sm:text-4xl font-extrabold uppercase tracking-tight">
                     {data.first_name?.[0]}{data.last_name?.[0]}
                   </span>
                   
-                  {/* Member ID Floating/Overlaid on top (Bottom-Right) */}
-                  <div className="absolute bottom-2 right-2 z-10">
+                  <div className="absolute bottom-2 z-10">
                     <span className="px-2 py-0.5 rounded-md bg-black/40 text-[9px] sm:text-[10px] font-bold tracking-wider text-amber-200 backdrop-blur-sm border border-white/15 shadow-sm">
                       {data.mem_id}
                     </span>
@@ -176,11 +181,10 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
                   </span>
                 </div>
 
-                {/* Sub-info with Gold Separator Dots */}
                 <p className="text-sm font-medium text-slate-600 flex flex-wrap items-center gap-2">
                   <span className="text-indigo-600 font-semibold">{data.member_position}</span>
                   <span className="text-amber-500 font-bold">•</span>
-                  <span>{data.church_name}</span>
+                  <span>{data.church_name || 'GCF South Metro'}</span>
                   <span className="text-amber-500 font-bold">•</span>
                   <span className="capitalize">{data.role}</span>
                 </p>
@@ -189,7 +193,9 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
 
             <div className="flex items-center gap-2 pt-2 md:pt-0">
               {isSelf ? (
-                <button className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-sm shadow-indigo-200">
+                <button className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-sm shadow-indigo-200"
+                  onClick={() => handleViewProfile(data.id)}
+                >
                   <Edit size={16} /> Edit Profile
                 </button>
               ) : (
@@ -206,6 +212,7 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
       <div className="flex items-center gap-1 sm:gap-2 mb-6 border-b border-slate-200/80 overflow-x-auto no-scrollbar">
         <TabButton active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} icon={<Sparkles size={18} />} label="Overview & Spiritual" />
         <TabButton active={activeTab === 'personal'} onClick={() => setActiveTab('personal')} icon={<User size={18} />} label="Personal & Family" />
+        <TabButton active={activeTab === 'church'} onClick={() => setActiveTab('church')} icon={<Building size={18} />} label="Church Information" />
         <TabButton active={activeTab === 'career'} onClick={() => setActiveTab('career')} icon={<Briefcase size={18} />} label="Education & Work" />
         {isSelf && (
           <TabButton active={activeTab === 'security'} onClick={() => setActiveTab('security')} icon={<Key size={18} />} label="Account & Security" />
@@ -293,6 +300,37 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
             </div>
           )}
 
+          {/* --- CHURCH INFORMATION TAB --- */}
+          {activeTab === 'church' && (
+            <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80 space-y-6">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <Church size={18} className="text-indigo-600" /> Church Details & Assignment
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <InfoData label="Church Name" value={data.church_name || "GCF South Metro"} />
+                  <InfoData label="Church Code" value={data.church_code || "GCFSM"} />
+                  <InfoData label="Church Contact Number" value={data.church_contact_number || "09171234567"} />
+                  <InfoData label="Church Email" value={data.church_email || "gcfsouthmetro@gcfchristian.org"} />
+                  <InfoData label="Church Address" value={data.church_address || "Daang-hari, Las Pinas City"} fullWidth />
+                </div>
+              </div>
+
+              <hr className="border-slate-100" />
+
+              <div>
+                <h3 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <MapPinned size={18} className="text-rose-500" /> Cluster Details
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <InfoData label="Cluster ID" value={data.cluster_id || 1} />
+                  <InfoData label="Cluster Name" value={data.cluster_name || "Muntinlupa-Laguna"} />
+                  <InfoData label="Cluster Code" value={data.cluster_code || "MUN-LAG"} />
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'career' && (
             <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80 space-y-6">
               <div>
@@ -361,6 +399,14 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
         </div>
 
       </div>
+
+      {isRegisterModalOpen && (
+        <RegisterMemberModal 
+          isOpen={isRegisterModalOpen}
+          onClose={() => setIsRegisterModalOpen(false)} 
+          memberId={selectedMemberId}
+        />
+      )}
     </div>
   );
 }
