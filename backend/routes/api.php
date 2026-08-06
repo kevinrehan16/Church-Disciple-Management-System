@@ -18,16 +18,11 @@ use App\Http\Controllers\Api\V1\Permission\PermissionController;
 use App\Http\Controllers\Api\V1\Role\RoleController;
 use App\Http\Controllers\Api\V1\UserRole\UserRoleController;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
-
 Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
     Route::post('/change-password', [AuthController::class, 'changePassword']);
 
     // Dito mo ilalagay ang iba pang protected routes sa hinaharap
-
     Route::middleware('auth:sanctum', 'password.changed')->group(function () {
         // AUTH ROUTES
         Route::middleware(['role:super_admin|senior_pastor|pastor|admin|staff'])->group(function () {

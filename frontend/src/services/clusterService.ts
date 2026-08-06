@@ -1,18 +1,30 @@
 import apiClient from '../api/axiosInstance';
-import type { GroupedChurch, Cluster, CreateUpdateCluster } from '../types/typeCluster';
+import type { GroupedChurch, Cluster, CreateUpdateCluster, PaginatedClustersResponse } from '../types/typeCluster';
 
-export interface ChurchFilters {
+export interface ClusterGroupFilters {
   search?: string;
   page?: number;
 }
 
+export interface ClusterFilters {
+  church_id?: number;
+  search?: string;
+}
+
 export const clusterService = {
-    getGroupedClusters: async (filters: ChurchFilters): Promise<GroupedChurch> => {
+    getGroupedClusters: async (filters: ClusterGroupFilters): Promise<GroupedChurch> => {
         const response = await apiClient.get('clusters/grouped', {
             params: {
                 search: filters.search,
                 page: filters.page || 1,
             }
+        });
+        return response.data;
+    },
+
+    getClustersByChurchId: async (filters: ClusterFilters): Promise<PaginatedClustersResponse> => {
+        const response = await apiClient.get<PaginatedClustersResponse>('clusters', {
+            params: filters, // Dito na papasok ang church_id, search, page, atbp.
         });
         return response.data;
     },

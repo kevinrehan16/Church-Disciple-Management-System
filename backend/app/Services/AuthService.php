@@ -21,9 +21,10 @@ class AuthService
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
             $minutes = ceil($seconds / 60); // Kunin ang katumbas na minuto
+            $minuteText = $minutes == 1 ? 'minute' : 'minutes';
 
             throw ValidationException::withMessages([
-                'email' => ["Too many login attempts. Please try again in {$minutes} minutes."],
+                'email' => ["Too many login attempts. Please try again in {$minutes} {$minuteText}."],
             ]);
         }
 

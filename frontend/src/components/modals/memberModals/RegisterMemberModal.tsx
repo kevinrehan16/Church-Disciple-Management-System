@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { 
   X, Mail, Calendar, Phone, MapPin, Save, ShieldCheck, 
-  Briefcase, Church,
+  Briefcase, Church, MapPinned
 } from 'lucide-react';
 import { useRegisterMember, useUpdateMember } from '../../../hooks/useMembers';
 import { useSpiritualGift } from '../../../hooks/useSpiritualGift';
 import { useMemberProfile } from '../../../hooks/useProfiles';
 import { useChurches } from '../../../hooks/useChurches';
+import { useClustersByChurchId } from '../../../hooks/useClusters';
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import { InputField } from '../../inputs/InputField';
 import { SelectField as SelectFieldBase } from '../../inputs/SelectField';
@@ -29,45 +30,51 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
   const { data: apiResponse, isLoading } = useSpiritualGift();
   const [isActive, setIsActive] = useState(true);
   
-  const { data: apiChurch } = useChurches(
-    { 
-      search: '', 
-      page: 1 
-    }
-  );
+  // 1. Ideklara muna ang formDataState sa unahan para magamit sa mga queries sa ibaba
+  const [formDataState, setFormDataState] = useState<Record<string, any>>({});
+  const [selectedGiftIds, setSelectedGiftIds] = useState<number[]>([]);
 
-  const churchList = Array.isArray(apiChurch) 
-  ? apiChurch.map((church: any) => ({ id: church.id, name: church.name }))
-  : Array.isArray(apiChurch?.data) 
-    ? apiChurch.data.map((church: any) => ({ id: church.id, name: church.name }))
-    : [];
-
-  // Kunin ang profile data kapag may memberId
+  // 2. Kunin ang profile data kapag may memberId
   const numericMemberId = memberId ? Number(memberId) : 0;
   const { data: profileMemberData, isLoading: profileLoading } = useMemberProfile(numericMemberId);
 
+  // 3. Kunin ang listahan ng churches at clusters (nakakonekta na kay formDataState.church_id)
+  const { data: apiChurch } = useChurches({ 
+    search: '', 
+    page: 1 
+  });
+
+  const { data: apiClusters } = useClustersByChurchId({ 
+    church_id: formDataState.church_id || '', 
+    search: '', 
+  });
+
+  const churchList = Array.isArray(apiChurch) 
+    ? apiChurch.map((church: any) => ({ id: church.id, name: church.name }))
+    : Array.isArray(apiChurch?.data) 
+      ? apiChurch.data.map((church: any) => ({ id: church.id, name: church.name }))
+      : [];
+
+  const clusterList = Array.isArray(apiClusters) 
+    ? apiClusters.map((cluster: any) => ({ id: cluster.id, name: cluster.name }))
+    : Array.isArray(apiClusters?.data) 
+      ? apiClusters.data.map((cluster: any) => ({ id: cluster.id, name: cluster.name }))
+      : [];
+
   const giftsList = Array.isArray(apiResponse) ? apiResponse : [];
-  const [selectedGiftIds, setSelectedGiftIds] = useState<number[]>([]);
 
-  // 1. Gumawa tayo ng state para sa form fields para madali nating ma-populate at ma-control
-  const [formDataState, setFormDataState] = useState<Record<string, any>>({});
-
-  // 2. Kapag pumasok ang profileMemberData (Edit Mode), i-set natin sa state
+  // Effect para sa Edit Mode o New Registration Reset
   useEffect(() => {
     if (profileMemberData) {
-      // Depende sa itsura ng API response mo (kung nakabalot sa .data o direkta na), 
-      // i-adjust natin dito. Halimbawa: profileMemberData.data o profileMemberData
       const data = ((profileMemberData as { data?: Record<string, any> } | undefined)?.data ?? profileMemberData) as Record<string, any>;
 
       setFormDataState(data);
       setIsActive(data.member_status === 'Active');
 
-      // Kung may spiritual gifts ang member, kunin ang IDs nila para sa MultiSelect
       if (data.spiritual_gifts && Array.isArray(data.spiritual_gifts)) {
         setSelectedGiftIds(data.spiritual_gifts.map((g: any) => g.id));
       }
     } else {
-      // Reset kung New Registration
       setFormDataState({});
       setSelectedGiftIds([]);
       setIsActive(true);
@@ -75,11 +82,12 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
   }, [profileMemberData]);
 
   const giftOptions = giftsList.map((gift: any) => ({
-    value: gift.id,                           
-    label: gift.name,                          
+    value: gift.id,                         
+    label: gift.name,                           
     description: gift.description, 
   }));
 
+  // Auto compute age kapag nagbago ang birthday
   useEffect(() => {
     if (formDataState.birthday) {
       const computedAge = calculateAge(formDataState.birthday);
@@ -95,7 +103,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
 
   if (!isOpen) return null;
 
-  // Handle input changes para maging controlled inputs sila
+  // Handle input changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> | { target: { name: string; value: string } }
   ) => {
@@ -104,12 +112,17 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
     
     let finalValue = value;
 
-    // Kung mobile number ang binabago, dadaan sa sanitize utility
     if (name === 'mobile_number') {
       finalValue = sanitizeNumber(value);
     }
 
-    setFormDataState(prev => ({ ...prev, [name]: finalValue }));
+    setFormDataState(prev => {
+      // Kung nagbago ang Church, i-reset natin ang Cluster ID para hindi magtira ng lumang selection
+      if (name === 'church_id' && prev.church_id !== value) {
+        return { ...prev, [name]: finalValue, cluster_id: '' };
+      }
+      return { ...prev, [name]: finalValue };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -120,6 +133,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
     const formattedData = {
         ...data,
         church_id: formDataState.church_id,
+        cluster_id: formDataState.cluster_id,
         baptized_immersion: data.baptized_immersion === '1',
         rec_for_baptism: data.rec_for_baptism === '1',
         rec_for_membership: data.rec_for_membership === '1',
@@ -145,10 +159,10 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
           <div className="px-8 py-6 bg-[var(--active-parent)] flex items-center justify-between text-white flex-shrink-0">
             <div>
               <h2 className="text-xl font-extrabold tracking-tight">
-                  {memberId ? 'Edit Member Profile' : 'New Member Registration'}
+                {memberId ? 'Edit Member Profile' : 'New Member Registration'}
               </h2>
               <p className="text-white/80 text-xs mt-0.5 font-medium">
-                  {memberId ? 'Update record details' : 'Complete the member registration form'}
+                {memberId ? 'Update record details' : 'Complete the member registration form'}
               </p>
             </div>
             <button onClick={startClose} className="p-2 hover:bg-white/10 active:scale-95 rounded-full transition-all">
@@ -172,9 +186,8 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                     <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-1 gap-5">
-                    {/* <InputField label="Member ID" name="mem_id" value={formDataState.mem_id || ''} onChange={handleChange} icon={<FileText size={15}/>} /> */}
                     <InputField label="Email Address" name="email" type="email" value={formDataState.email || ''} onChange={handleChange} icon={<Mail size={15}/>} />
-                    {/* <InputField label="Password" name="password" type="password" value={formDataState.password || ''} onChange={handleChange} icon={<Lock size={15}/>} /> */}
+                    <InputField label="Picture Path" name="picture" value={formDataState.picture || ''} onChange={handleChange} />
                   </div>
                 </div>
 
@@ -321,7 +334,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                     </div>
                     <InputField label="Previous Church" name="prev_church" value={formDataState.prev_church || ''} onChange={handleChange} />
                     <InputField label="Church Affiliation" name="church_affiliation" value={formDataState.church_affiliation || ''} onChange={handleChange} />
-                    {/* <InputField label="Satellite ID" name="church_id" value={formDataState.church_id || ''} onChange={handleChange} icon={<Church size={15}/>} /> */}
+                    
                     <SearchableSelect
                       label="Church"
                       name="church_id"
@@ -331,7 +344,16 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                       icon={<Church size={15} />}
                       onChange={handleChange}
                     />
-                    <InputField label="Picture Path" name="picture" value={formDataState.picture || ''} onChange={handleChange} />
+
+                    <SearchableSelect
+                      label="Cluster"
+                      name="cluster_id"
+                      value={formDataState.cluster_id || ''}
+                      options={clusterList}
+                      placeholder="Select Cluster"
+                      icon={<MapPinned size={15} />}
+                      onChange={handleChange}
+                    />
                   </div>
                 </div>
 
