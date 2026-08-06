@@ -91,7 +91,7 @@ export default function Members() {
                     <TableError colSpan={6} onRetry={() => refetch()} />
                 ) : currentMembers.length > 0 ? (
                     currentMembers.map((member: any) => (
-                    <tr key={member.id} className="group hover:bg-[var(--active-parent,rgb(99,102,241))]/5 transition-all duration-200">
+                    <tr key={member.id} className="group odd:bg-slate-50 hover:bg-[var(--active-parent,rgb(99,102,241))]/5 transition-all duration-200">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                               <div className="w-9 h-9 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center font-bold text-xs border border-slate-200 group-hover:bg-[var(--active-parent,rgb(99,102,241))]/10 group-hover:text-[var(--active-parent,rgb(99,102,241))] group-hover:border-[var(--active-parent,rgb(99,102,241))] transition-colors">
@@ -176,7 +176,7 @@ export default function Members() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-center gap-1.5 flex items-center justify-center">
+                        <td className="px-6 py-4 text-center">
                           <Link 
                             to={`/member/${member.id}`}
                             className="inline-flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium 
@@ -187,7 +187,7 @@ export default function Members() {
                             <Eye size={14} />
                           </Link>
                           <button 
-                            className="inline-flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium 
+                            className="inline-flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium ml-1
                             text-cyan-600 border border-cyan-500 bg-slate-100 hover:bg-cyan-500 hover:text-white 
                             transition-all duration-200 active:scale-95"
                             title="Edit Profile"

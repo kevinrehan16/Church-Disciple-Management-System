@@ -126,7 +126,7 @@ export default function ChangePassForm({ emailProp }: { emailProp?: string }) {
             <button 
                 disabled={isLoading}
                 type="submit" 
-                className="w-full text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg disabled:opacity-70 disabled:cursor-not-allowed mt-3"
+                className="w-full flex-1 sm:flex-none inline-flex items-center justify-center gap-2 text-white px-4 py-3 rounded-xl font-semibold text-sm transition-all shadow-sm hover:opacity-90 active:scale-[0.98]"
                 style={{ backgroundColor: theme.activeParentBg, boxShadow: `0 10px 15px -3px ${theme.activeParentBg}40` }}
             >
                 {isLoading ? "Updating Password..." : "Update Password"}
