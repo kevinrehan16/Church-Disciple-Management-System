@@ -61,7 +61,7 @@ export default function LoginPage() {
       if (error?.response?.data?.mustChangePassword) {
         navigate('/change-password', { replace: true });
       } else {
-        alert("Invalid credentials.");
+        alert(error?.response?.data?.message || "Login failed. Please try again.");
       }
     } finally {
       setIsLoading(false);

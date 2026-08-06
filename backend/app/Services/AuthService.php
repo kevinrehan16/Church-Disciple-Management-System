@@ -15,30 +15,31 @@ class AuthService
 {
     public function authenticate(array $credentials, string $ip)
     {
-        // Gumawa ng natatanging throttle key gamit ang email at IP address
         $throttleKey = Str::transliterate(Str::lower($credentials['email']) . '|' . $ip);
 
-        // 1. Suriin kung lumampas na sa 5 beses ang pagsubok sa loob ng 1 minuto
-        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
+        // 1. Suriin kung lumampas na sa 5 beses ang pagsubok
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
+            $minutes = ceil($seconds / 60); // Kunin ang katumbas na minuto
 
             throw ValidationException::withMessages([
-                'email' => ["You have exceeded the allowed attempts. Please try again in {$seconds} seconds."],
+                'email' => ["Too many login attempts. Please try again in {$minutes} minutes."],
             ]);
         }
 
         $user = User::where('email', $credentials['email'])->first();
 
-        // 2. Kung mali ang credentials, dagdagan ang hit count ng rate limiter
+        // 2. Kung mali ang credentials, i-hit ang limiter at i-set sa 900 seconds (15 minutes) ang decay
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
-            RateLimiter::hit($throttleKey);
+            // 900 seconds = 15 minutes
+            RateLimiter::hit($throttleKey, 900);
 
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials.'],
             ]);
         }
 
-        // 3. Kung matagumpay, i-clear ang rate limiter attempts para sa user na ito
+        // 3. Kung matagumpay, i-clear ang attempts
         RateLimiter::clear($throttleKey);
 
         return $user;
