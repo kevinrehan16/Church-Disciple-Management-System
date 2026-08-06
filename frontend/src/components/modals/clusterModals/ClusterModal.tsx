@@ -116,7 +116,7 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
                 <SelectField 
                   label="Church" 
                   name="church_id" 
-                  defaultValue={formData.church_id}
+                  value={formData.church_id}
                   options={CHURCH_OPTIONS}
                   required
                   onChange={(e) => setFormData({ ...formData, church_id: Number(e.target.value) })}

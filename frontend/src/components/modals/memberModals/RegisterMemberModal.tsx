@@ -35,7 +35,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
   // 1. Ideklara muna ang formDataState sa unahan para magamit sa mga queries sa ibaba
   const [formDataState, setFormDataState] = useState<Record<string, any>>({});
   const [selectedGiftIds, setSelectedGiftIds] = useState<number[]>([]);
-
+  
   // 2. Kunin ang profile data kapag may memberId
   const numericMemberId = memberId ? Number(memberId) : 0;
   const { data: profileMemberData, isLoading: profileLoading } = useMemberProfile(numericMemberId);

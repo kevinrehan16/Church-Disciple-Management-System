@@ -47,6 +47,8 @@ class UpdateMemberRequest extends FormRequest
             'prev_church' => 'nullable|string|max:255',
             'church_affiliation' => 'nullable|string|max:255',
             'church_id' => 'nullable|integer|exists:churches,id',
+            'cluster_id' => 'nullable|integer|exists:clusters,id',
+            'interviewby_member_id' => 'nullable|integer|exists:members,id',
             'picture' => 'nullable|string',
             'member_position' => 'nullable|string|max:255',
             'rec_for_membership' => 'nullable|boolean',

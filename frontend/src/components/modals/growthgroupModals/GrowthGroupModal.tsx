@@ -169,7 +169,7 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
                 <SelectField 
                   label="Church" 
                   name="church_id" 
-                  defaultValue={formData.church_id}
+                  value={formData.church_id}
                   options={CHURCH_OPTIONS}
                   required
                   onChange={(e) => setFormData({ ...formData, church_id: Number(e.target.value) })}
@@ -178,7 +178,7 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
                 <SelectField 
                   label="Cluster" 
                   name="cluster_id" 
-                  defaultValue={formData.cluster_id}
+                  value={formData.cluster_id}
                   options={CLUSTER_OPTIONS}
                   required
                   onChange={(e) => setFormData({ ...formData, cluster_id: Number(e.target.value) })}
@@ -217,7 +217,7 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
                 <SelectField 
                   label="Target Demographic" 
                   name="target_demographic" 
-                  defaultValue={formData.target_demographic}
+                  value={formData.target_demographic}
                   options={DEMOGRAPHIC_OPTIONS}
                   required
                   onChange={(e) => setFormData({ ...formData, target_demographic: e.target.value })}
@@ -303,7 +303,7 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
                 <SelectField 
                   label="Meeting Day" 
                   name="meeting_day" 
-                  defaultValue={formData.meeting_day}
+                  value={formData.meeting_day}
                   options={DAY_OPTIONS}
                   required
                   onChange={(e) => setFormData({ ...formData, meeting_day: e.target.value })}
@@ -322,7 +322,7 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
                 <SelectField 
                   label="Location Type" 
                   name="location_type" 
-                  defaultValue={formData.location_type}
+                  value={formData.location_type}
                   options={LOCATION_TYPE_OPTIONS}
                   required
                   onChange={(e) => setFormData({ ...formData, location_type: e.target.value })}

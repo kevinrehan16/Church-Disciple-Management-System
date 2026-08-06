@@ -6,13 +6,13 @@ interface SelectFieldProps {
   error?: string[];
   options: { label: string; value: string | number }[];
   icon?: React.ReactNode;
-  defaultValue?: string | number;
+  value?: string | number;
   readOnly?: boolean;
   required?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
-export const SelectField = ({ label, name, error, options, icon, defaultValue, readOnly = false, required = false, onChange }: SelectFieldProps) => {
+export const SelectField = ({ label, name, error, options, icon, value, readOnly = false, required = false, onChange }: SelectFieldProps) => {
   return (
     <div className="space-y-1.5 w-full">
       <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider ml-1">{label} {required && <span className="text-red-500">*</span>}</label>
@@ -26,9 +26,9 @@ export const SelectField = ({ label, name, error, options, icon, defaultValue, r
         
         {/* Select Input */}
         <select 
-          key={defaultValue}
+          key={value}
           name={name}
-          defaultValue={defaultValue}
+          value={value}
           disabled={readOnly}
           className={`w-full ${icon ? 'pl-10' : 'pl-4'} pr-10 py-2.5 rounded-xl border border-slate-200 
           focus:border-[var(--active-parent,rgb(99,102,241))] 
