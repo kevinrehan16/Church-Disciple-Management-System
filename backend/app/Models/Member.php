@@ -49,6 +49,7 @@ class Member extends Model
         'prev_church',
         'church_affiliation',
         'church_id',
+        'cluster_id',
         'member_position',
         'member_status',
         'Active',
