@@ -14,9 +14,10 @@ interface InputFieldProps {
   defaultValue?: string;
   readOnly?: boolean;
   required?: boolean;
+  max?: string;
 }
 
-export const InputField = ({ label, name, error, type = "text", icon, placeholder, value, onChange, defaultValue, readOnly = false, required }: InputFieldProps) => {
+export const InputField = ({ label, name, error, type = "text", icon, placeholder, value, onChange, defaultValue, readOnly = false, required, max }: InputFieldProps) => {
 
   return (
     <div className="space-y-1.5 w-full">
@@ -37,6 +38,7 @@ export const InputField = ({ label, name, error, type = "text", icon, placeholde
           onChange={onChange}
           placeholder={placeholder}
           readOnly={readOnly}
+          max={max}
           className={`w-full ${icon ? 'pl-10' : 'pl-4'} pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-[var(--active-parent,rgb(99,102,241))] focus:ring-4 focus:ring-[var(--active-parent,rgb(99,102,241))]/10 outline-none transition-all text-sm ${error && '!border-red-500 focus:!border-red-500'}`}
           autoComplete="nope"
         />

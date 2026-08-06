@@ -81,10 +81,15 @@ class MemberResource extends JsonResource
 
             // CHURCH DATA
             'church_name' => $this->church?->name,
+            'church_code' => $this->church?->code,
+            'church_address' => $this->church?->address,
+            'church_contact_number' => $this->church?->contact_number,
+            'church_email' => $this->church?->email,
 
             // CLUSTER DATA
             'cluster_id' => $this->cluster?->id,
             'cluster_name' => $this->cluster?->name,
+            'cluster_code' => $this->cluster?->code,
 
             // SPIRITUAL GIFTS
             'spiritual_gifts' => SpiritualGiftResource::collection($this->whenLoaded('spiritualGifts')),
