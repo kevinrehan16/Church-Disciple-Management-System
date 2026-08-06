@@ -54,6 +54,7 @@ class UpdateMemberRequest extends FormRequest
             'rec_for_membership' => 'nullable|boolean',
             'comment' => 'nullable|string',
             'member_status' => 'sometimes|string|in:Active,Inactive',
+            'membership_date' => 'nullable|date',
         ];
     }
 }
