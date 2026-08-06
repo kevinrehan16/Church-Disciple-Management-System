@@ -11,6 +11,7 @@ import {
 import RegisterMemberModal from '../../components/modals/memberModals/RegisterMemberModal';
 import { useMyProfile, useMemberProfile } from '../../hooks/useProfiles';
 import type { MemberProfile } from '../../types/typeProfile';
+import ChangePassForm from '../../components/ui/ChangePassForm';
 
 // ==========================================
 // 1. MAIN SCREEN EXPORT (Router Handler)
@@ -362,7 +363,8 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
               <p className="text-xs text-slate-500 mb-6">Manage your email and system password security settings.</p>
               
               <div className="space-y-4 max-w-md">
-                <div>
+                <ChangePassForm emailProp={data.email} />
+                {/* <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Current Email</label>
                   <input type="text" value={data.email} readOnly className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 text-sm font-medium" />
                 </div>
@@ -372,7 +374,7 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
                 </div>
                 <button className="bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
                   Update Account
-                </button>
+                </button> */}
               </div>
             </div>
           )}
