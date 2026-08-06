@@ -9,18 +9,37 @@ use App\Mail\NewUserTemporaryPasswordMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\RateLimiter;
 
 class AuthService
 {
-    public function authenticate(array $credentials)
+    public function authenticate(array $credentials, string $ip)
     {
+        // Gumawa ng natatanging throttle key gamit ang email at IP address
+        $throttleKey = Str::transliterate(Str::lower($credentials['email']) . '|' . $ip);
+
+        // 1. Suriin kung lumampas na sa 5 beses ang pagsubok sa loob ng 1 minuto
+        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+
+            throw ValidationException::withMessages([
+                'email' => ["You have exceeded the allowed attempts. Please try again in {$seconds} seconds."],
+            ]);
+        }
+
         $user = User::where('email', $credentials['email'])->first();
 
+        // 2. Kung mali ang credentials, dagdagan ang hit count ng rate limiter
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            RateLimiter::hit($throttleKey);
+
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials.'],
             ]);
         }
+
+        // 3. Kung matagumpay, i-clear ang rate limiter attempts para sa user na ito
+        RateLimiter::clear($throttleKey);
 
         return $user;
     }

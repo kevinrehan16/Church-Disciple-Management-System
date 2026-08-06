@@ -23,7 +23,7 @@ use App\Http\Controllers\Api\V1\UserRole\UserRoleController;
 // })->middleware('auth:sanctum');
 
 Route::prefix('v1')->group(function () {
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
     Route::post('/change-password', [AuthController::class, 'changePassword']);
 
     // Dito mo ilalagay ang iba pang protected routes sa hinaharap

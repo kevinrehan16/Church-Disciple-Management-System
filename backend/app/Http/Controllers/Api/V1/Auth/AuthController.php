@@ -23,15 +23,14 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        // 1. I-authenticate ang user gamit ang AuthService
-        $user = $this->authService->authenticate($request->validated());
+        // Ipasa ang validated data at ang IP address ng client
+        $user = $this->authService->authenticate($request->validated(), $request->ip());
         $user->load('member');
 
-        // 2. Gumawa ng Sanctum API Token para sa user
-        // Pwede kang maglagay ng pangalan ng token tulad ng 'auth_token'
+        // Gumawa ng Sanctum API Token para sa user
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        // 3. Ibalik ang user details kasama ang token
+        // Ibalik ang user details kasama ang token
         return response()->json([
             'user' => new UserResource($user),
             'token' => $token,
