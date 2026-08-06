@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { FaFacebook, FaCross, FaUserTag, FaChurch, FaSuitcase, FaUserShield } from 'react-icons/fa';
 import { 
   User, Mail, Phone, MapPin, ShieldCheck, Church, 
-  Edit, Key, Sparkles, Heart, Briefcase, 
+  Edit, Sparkles, Heart, Briefcase, 
   GraduationCap, Cross, CheckCircle2,
   Building, BookOpen, Loader2, AlertCircle,
   MapPinned
@@ -13,6 +13,7 @@ import { useMyProfile, useMemberProfile } from '../../hooks/useProfiles';
 import type { MemberProfile } from '../../types/typeProfile';
 import ChangePassForm from '../../components/ui/ChangePassForm';
 import { useTheme } from '../../contexts/ThemeContext';
+import LoadingState from '../../components/ui/LoadingState';
 
 // ==========================================
 // 1. MAIN SCREEN EXPORT (Router Handler)
@@ -50,15 +51,7 @@ function MemberProfileFetcher({ id }: { id: number }) {
 // ==========================================
 // 3. UI COMPONENTS (Loading & Error)
 // ==========================================
-const LoadingState = () => {
-  useTheme(); // Initialize theme context hook
-  return (
-    <div className="w-full min-h-[70vh] flex flex-col items-center justify-center gap-3">
-      <Loader2 className="w-10 h-10 animate-spin" style={{ color: 'var(--active-parent, rgb(99,102,241))' }} />
-      <p className="text-sm font-medium text-slate-500">Loading profile...</p>
-    </div>
-  );
-};
+<LoadingState />
 
 const ErrorState = ({ message }: { message: string }) => (
   <div className="w-full min-h-[70vh] flex flex-col items-center justify-center p-4">
