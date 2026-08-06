@@ -56,6 +56,7 @@ export const useUpdateMember = () => {
     mutationFn: ({ id, memberData }: { id: string; memberData: any }) => memberService.updateMember(id, memberData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['members'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
     },
     onError: (error: any) => {
       console.error("Update failed:", error.response?.data || error.message);

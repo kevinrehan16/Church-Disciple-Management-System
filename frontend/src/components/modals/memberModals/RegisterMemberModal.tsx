@@ -78,6 +78,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
       : [];
 
   const giftsList = Array.isArray(apiResponse) ? apiResponse : [];
+  console.log('giftsList:', giftsList);
 
   // Effect para sa Edit Mode o New Registration Reset
   useEffect(() => {
@@ -200,8 +201,10 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                 <div className="space-y-5">
                   <SectionHeader title="Account" icon={ShieldCheck} />
                   <div className="grid grid-cols-1 md:grid-cols-1 gap-5">
-                    <InputField label="Email Address" name="email" type="email" value={formDataState.email || ''} onChange={handleChange} icon={<Mail size={15}/>} />
-                    <InputField label="Picture Path" name="picture" value={formDataState.picture || ''} onChange={handleChange} />
+                    <InputField label="Email Address" placeholder='johndoe@gmail.com' name="email" type="email" value={formDataState.email || ''} onChange={handleChange} icon={<Mail size={15}/>} />
+                    <div className='hidden'>
+                      <InputField label="Picture Path" name="picture" value={formDataState.picture || ''} onChange={handleChange} />
+                    </div>
                   </div>
                 </div>
 
@@ -209,10 +212,10 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                 <div className="space-y-5">
                   <SectionHeader title="Personal Identity" icon={IdCardLanyard} />
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <InputField label="First Name" name="first_name" value={formDataState.first_name || ''} onChange={handleChange} />
-                    <InputField label="Middle Name" name="middle_name" value={formDataState.middle_name || ''} onChange={handleChange} />
-                    <InputField label="Last Name" name="last_name" value={formDataState.last_name || ''} onChange={handleChange} />
-                    <InputField label="Nickname" name="nickname" value={formDataState.nickname || ''} onChange={handleChange} />
+                    <InputField label="First Name" name="first_name" placeholder='Johnny' value={formDataState.first_name || ''} onChange={handleChange} />
+                    <InputField label="Middle Name" name="middle_name" placeholder='Smith' value={formDataState.middle_name || ''} onChange={handleChange} />
+                    <InputField label="Last Name" name="last_name" placeholder='Doe' value={formDataState.last_name || ''} onChange={handleChange} />
+                    <InputField label="Nickname" name="nickname" placeholder='John' value={formDataState.nickname || ''} onChange={handleChange} />
                     
                     <div className="flex flex-col gap-1.5 w-full">
                       <div className="flex">

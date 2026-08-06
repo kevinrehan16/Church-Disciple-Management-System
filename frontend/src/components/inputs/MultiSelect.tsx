@@ -84,7 +84,7 @@ export const MultiSelect = ({
         {/* Placeholder */}
         {selected.length === 0 && (
           <span className="text-slate-400 select-none">
-            {disabled ? 'Loading...' : 'Select gifts...'}
+            {disabled ? 'Loading...' : 'Select your gifts...'}
           </span>
         )}
 
