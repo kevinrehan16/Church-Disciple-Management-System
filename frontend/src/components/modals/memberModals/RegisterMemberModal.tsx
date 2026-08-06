@@ -309,8 +309,26 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                   <SectionHeader title="Christian Experience" icon={Cross} />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <InputField label="Date Received Jesus" name="received_jesus" type="date" value={formDataState.received_jesus || getTodayDate()} onChange={handleChange} />
-                    <SelectField label="Baptized (Immersion)?" name="baptized_immersion" value={String(formDataState.baptized_immersion ? '1' : '0')} onChange={handleChange} options={[{label: 'Yes', value: '1'}, {label: 'Not yet', value: '0'}]} />
-                    <SelectField label="Recommendation for Baptism" name="rec_for_baptism" value={String(formDataState.rec_for_baptism ? '1' : '0')} onChange={handleChange} options={[{label: 'Yes', value: '1'}, {label: 'No', value: '0'}]} />
+                    <SelectField 
+                        label="Baptized (Immersion)?" 
+                        name="baptized_immersion" 
+                        value={formDataState.baptized_immersion == 1 || formDataState.baptized_immersion === true ? '1' : '0'} 
+                        onChange={handleChange} 
+                        options={[
+                            {label: 'Yes', value: '1'}, 
+                            {label: 'Not yet', value: '0'}
+                        ]} 
+                    />
+                    <SelectField 
+                        label="Recommendation for Baptism" 
+                        name="rec_for_baptism" 
+                        value={formDataState.rec_for_baptism == 1 || formDataState.rec_for_baptism === true ? '1' : '0'} 
+                        onChange={handleChange} 
+                        options={[
+                            {label: 'Yes', value: '1'}, 
+                            {label: 'No', value: '0'}
+                        ]} 
+                    />
                     <InputField label="Baptism Date" name="baptized_date" type="date" value={formDataState.baptized_date || getTodayDate()} onChange={handleChange} />
                     <div className="md:col-span-2">
                       <MultiSelect 
