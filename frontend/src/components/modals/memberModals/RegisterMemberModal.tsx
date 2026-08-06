@@ -156,7 +156,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
         member_status: isActive ? 'Active' : 'Inactive',
         age: parseInt(data.age as string) || 0,
         spiritual_gifts: selectedGiftIds, 
-        interviewer_id: formDataState.interviewer_id,
+        interviewby_member_id: formDataState.interviewby_member_id,
     };
 
     if (memberId) {
@@ -370,8 +370,8 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <SearchableSelect
                       label="Interview Conducted By"
-                      name="interviewer_id"
-                      value={formDataState.interviewer_id || ''}
+                      name="interviewby_member_id"
+                      value={formDataState.interviewby_member_id || ''}
                       options={interviewerOptions}
                       placeholder="Select Interviewer"
                       icon={<UserStar size={15} />}

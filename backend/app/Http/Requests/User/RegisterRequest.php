@@ -81,7 +81,7 @@ class RegisterRequest extends FormRequest
 
             'user_added'          => 'nullable|string|max:20',
             'user_updated'        => 'nullable|string|max:20',
-            'interviewer_id'      => 'nullable|integer|exists:users,id',
+            'interviewby_member_id' => 'nullable|integer|exists:members,id',
         ];
     }
 }

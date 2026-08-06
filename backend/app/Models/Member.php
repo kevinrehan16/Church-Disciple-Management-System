@@ -59,7 +59,7 @@ class Member extends Model
         'comment',
         'user_added',
         'user_updated',
-        'interviewer_id'
+        'interviewby_member_id'
     ];
 
     public function user(): BelongsTo
@@ -158,5 +158,10 @@ class Member extends Model
             'id',        // Local key sa members table
             'family_id'  // Local key sa family_members table
         );
+    }
+
+    public function interviewer()
+    {
+        return $this->belongsTo(Member::class, 'interviewby_member_id');
     }
 }

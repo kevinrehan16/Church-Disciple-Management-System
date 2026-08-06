@@ -77,7 +77,7 @@ class MemberResource extends JsonResource
 
             'comment' => $this->comment,
             'created_at' => $this->created_at ? $this->created_at->format('Y-m-d') : null,
-            'interviewer_id' => $this->interviewer_id,
+            'interviewby_member_id' => $this->interviewby_member_id,
 
             // CHURCH DATA
             'church_name' => $this->church?->name,

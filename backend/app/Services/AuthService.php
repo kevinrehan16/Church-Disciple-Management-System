@@ -102,6 +102,7 @@ class AuthService
                 'prev_church'        => $data['prev_church'] ?? null,
                 'church_affiliation' => $data['church_affiliation'] ?? null,
                 'church_id'          => $data['church_id'] ?? null,
+                'cluster_id'          => $data['cluster_id'] ?? null,
                 'member_position'    => $data['member_position'] ?? null,
                 'member_status'      => $data['member_status'] ?? 'Active',
                 'membership_date'    => $data['membership_date'] ?? null,
@@ -112,6 +113,8 @@ class AuthService
                 // Audit Fields
                 'user_added'         => auth()->id(),
                 'user_updated'       => auth()->id(),
+
+                'interviewby_member_id' => $data['interviewby_member_id'] ?? null,
             ]);
 
             // 3. ATTACH SPIRITUAL GIFTS (Heto yung idinagdag natin)
