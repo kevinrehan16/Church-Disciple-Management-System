@@ -38,6 +38,7 @@ export const InputField = ({ label, name, error, type = "text", icon, placeholde
           placeholder={placeholder}
           readOnly={readOnly}
           className={`w-full ${icon ? 'pl-10' : 'pl-4'} pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-[var(--active-parent,rgb(99,102,241))] focus:ring-4 focus:ring-[var(--active-parent,rgb(99,102,241))]/10 outline-none transition-all text-sm ${error && '!border-red-500 focus:!border-red-500'}`}
+          autoComplete="nope"
         />
       </div>
       {error && <p className="flex align-items-center gap-0.5 text-[10px] text-red-500 font-medium ml-1"><CircleAlert size={12} /> {error[0]}</p>}

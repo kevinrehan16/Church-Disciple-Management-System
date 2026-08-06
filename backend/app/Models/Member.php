@@ -58,7 +58,8 @@ class Member extends Model
         'rec_for_membership',
         'comment',
         'user_added',
-        'user_updated'
+        'user_updated',
+        'interviewer_id'
     ];
 
     public function user(): BelongsTo

@@ -79,8 +79,9 @@ class RegisterRequest extends FormRequest
             'spiritual_gifts'     => 'nullable|array',
             'spiritual_gifts.*'   => 'integer|exists:spiritual_gifts,id',
 
-            'user_added'    => 'nullable|string|max:20',
-            'user_updated'  => 'nullable|string|max:20',
+            'user_added'          => 'nullable|string|max:20',
+            'user_updated'        => 'nullable|string|max:20',
+            'interviewer_id'      => 'nullable|integer|exists:users,id',
         ];
     }
 }

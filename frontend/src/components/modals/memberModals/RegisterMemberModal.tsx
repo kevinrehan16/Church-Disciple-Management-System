@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  X, Mail, Calendar, Phone, MapPin, Save, ShieldCheck, 
-  Briefcase, Church, MapPinned
+  X, Mail, Calendar, Phone, MapPin, Save, ShieldCheck, UserStar, IdCardLanyard, Users, House,
+  Briefcase, Church, MapPinned, Building, Cross, NotepadText, ThumbsUp
 } from 'lucide-react';
-import { useRegisterMember, useUpdateMember } from '../../../hooks/useMembers';
+import { useMembers, useRegisterMember, useUpdateMember } from '../../../hooks/useMembers';
 import { useSpiritualGift } from '../../../hooks/useSpiritualGift';
 import { useMemberProfile } from '../../../hooks/useProfiles';
 import { useChurches } from '../../../hooks/useChurches';
@@ -14,6 +14,7 @@ import { SelectField as SelectFieldBase } from '../../inputs/SelectField';
 import { MultiSelect } from '../../inputs/MultiSelect';
 import { SearchableSelect } from '../../inputs/SearchableSelect';
 import { calculateAge, sanitizeNumber, getTodayDate } from '../../../utils/formatters';
+import SectionHeader from '../../ui/SectionHeader';
 
 const SelectField = SelectFieldBase as unknown as React.ComponentType<any>;
 
@@ -24,6 +25,7 @@ interface ModalProps {
 }
 
 export default function RegisterMemberModal({ isOpen, onClose, memberId }: ModalProps) {
+  const [searchTerm, setSearchTerm] = useState('');
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addMember, isPending: pendingAddMember } = useRegisterMember();
   const { mutate: updateMember } = useUpdateMember();
@@ -37,6 +39,20 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
   // 2. Kunin ang profile data kapag may memberId
   const numericMemberId = memberId ? Number(memberId) : 0;
   const { data: profileMemberData, isLoading: profileLoading } = useMemberProfile(numericMemberId);
+
+  const { data: apiInterviewer } = useMembers({
+    search: searchTerm,
+    page: 1,
+    position: 'Elder,Deacon,Pastoral Staff,Senior Pastor,Pastor',
+  });
+  const currentInterviewers = Array.isArray(apiInterviewer) 
+    ? apiInterviewer 
+    : (apiInterviewer?.data || []);
+  
+  const interviewerOptions = currentInterviewers.map((member: any) => ({
+    id: member.id,
+    name: member.full_name, // Ginamit natin ang full_name galing sa data mo
+  }));
 
   // 3. Kunin ang listahan ng churches at clusters (nakakonekta na kay formDataState.church_id)
   const { data: apiChurch } = useChurches({ 
@@ -140,6 +156,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
         member_status: isActive ? 'Active' : 'Inactive',
         age: parseInt(data.age as string) || 0,
         spiritual_gifts: selectedGiftIds, 
+        interviewer_id: formDataState.interviewer_id,
     };
 
     if (memberId) {
@@ -181,10 +198,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                 
                 {/* SECTION: ID & AUTH */}
                 <div className="space-y-5">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Account</h3>
-                    <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
-                  </div>
+                  <SectionHeader title="Account" icon={ShieldCheck} />
                   <div className="grid grid-cols-1 md:grid-cols-1 gap-5">
                     <InputField label="Email Address" name="email" type="email" value={formDataState.email || ''} onChange={handleChange} icon={<Mail size={15}/>} />
                     <InputField label="Picture Path" name="picture" value={formDataState.picture || ''} onChange={handleChange} />
@@ -193,10 +207,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
 
                 {/* SECTION: PERSONAL */}
                 <div className="space-y-5">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Personal Identity</h3>
-                    <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
-                  </div>
+                  <SectionHeader title="Personal Identity" icon={IdCardLanyard} />
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <InputField label="First Name" name="first_name" value={formDataState.first_name || ''} onChange={handleChange} />
                     <InputField label="Middle Name" name="middle_name" value={formDataState.middle_name || ''} onChange={handleChange} />
@@ -256,10 +267,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
 
                 {/* SECTION: FAMILY */}
                 <div className="space-y-5">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Family & Social</h3>
-                    <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
-                  </div>
+                  <SectionHeader title="Family Information" icon={Users} />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <InputField label="Father's Name" name="father_name" value={formDataState.father_name || ''} onChange={handleChange} />
                     <InputField label="Mother's Name" name="mother_name" value={formDataState.mother_name || ''} onChange={handleChange} />
@@ -269,10 +277,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
 
                 {/* SECTION: CONTACT & ADDRESS */}
                 <div className="space-y-5">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Residence</h3>
-                    <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
-                  </div>
+                  <SectionHeader title="Residence Information" icon={House} />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="md:col-span-2">
                       <InputField label="Home Address" name="home_address" value={formDataState.home_address || ''} onChange={handleChange} icon={<MapPin size={15}/>} />
@@ -286,10 +291,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
 
                 {/* SECTION: PROFESSIONAL */}
                 <div className="space-y-5">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Professional & Education</h3>
-                    <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
-                  </div>
+                  <SectionHeader title="Professional & Education" icon={Building} />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <InputField label="Occupation" name="occupation" value={formDataState.occupation || ''} onChange={handleChange} icon={<Briefcase size={15}/>} />
                     <InputField label="Industry" name="industry" value={formDataState.industry || ''} onChange={handleChange} />
@@ -301,10 +303,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
 
                 {/* SECTION: CHRISTIAN EXPERIENCE */}
                 <div className="space-y-5">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Christian Experience</h3>
-                    <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
-                  </div>
+                  <SectionHeader title="Christian Experience" icon={Cross} />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <InputField label="Date Received Jesus" name="received_jesus" type="date" value={formDataState.received_jesus || ''} onChange={handleChange} />
                     <SelectField label="Baptized (Immersion)?" name="baptized_immersion" value={String(formDataState.baptized_immersion ? '1' : '0')} onChange={handleChange} options={[{label: 'Yes', value: '1'}, {label: 'Not yet', value: '0'}]} />
@@ -324,19 +323,13 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
 
                 {/* SECTION: OTHER INFORMATION */}
                 <div className="space-y-5">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Other Information</h3>
-                    <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
-                  </div>
+                  <SectionHeader title="Other Information" icon={NotepadText} />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div className="md:col-span-2">
-                      <InputField label="Purpose of Registration" name="purpose_reg" value={formDataState.purpose_reg || ''} onChange={handleChange} />
-                    </div>
-                    <InputField label="Previous Church" name="prev_church" value={formDataState.prev_church || ''} onChange={handleChange} />
-                    <InputField label="Church Affiliation" name="church_affiliation" value={formDataState.church_affiliation || ''} onChange={handleChange} />
+                    <InputField label="Previous Church Attending" name="prev_church" value={formDataState.prev_church || ''} onChange={handleChange} />
+                    <InputField label="Previous Church Affiliation" name="church_affiliation" value={formDataState.church_affiliation || ''} onChange={handleChange} />
                     
                     <SearchableSelect
-                      label="Church"
+                      label="GCF Church Attending"
                       name="church_id"
                       value={formDataState.church_id || ''}
                       options={churchList}
@@ -346,7 +339,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                     />
 
                     <SearchableSelect
-                      label="Cluster"
+                      label="GCF Cluster Group"
                       name="cluster_id"
                       value={formDataState.cluster_id || ''}
                       options={clusterList}
@@ -354,19 +347,9 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                       icon={<MapPinned size={15} />}
                       onChange={handleChange}
                     />
-                  </div>
-                </div>
-
-                {/* SECTION: ELDER'S RECOMMENDATION */}
-                <div className="space-y-5">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Elder's Recommendation</h3>
-                    <div className="flex-grow h-[1.5px] bg-[var(--active-parent)] transform-gpu scale-y-50" />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    Interview Conducted By Here...
+                    <InputField label="Purpose of Registration" name="purpose_reg" value={formDataState.purpose_reg || ''} onChange={handleChange} />
                     <SelectField 
-                      label="Member Position" 
+                      label="Membership Type" 
                       name="member_position" 
                       value={formDataState.member_position || ''} 
                       onChange={handleChange}
@@ -378,11 +361,25 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                         {label: 'Pastor', value: 'Pastor'}, 
                         {label: 'Senior Pastor', value: 'Senior Pastor'}, 
                       ]} />
+                  </div>
+                </div>
+
+                {/* SECTION: ELDER'S RECOMMENDATION */}
+                <div className="space-y-5">
+                  <SectionHeader title="Elder's Recommendation" icon={ThumbsUp} />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <SearchableSelect
+                      label="Interview Conducted By"
+                      name="interviewer_id"
+                      value={formDataState.interviewer_id || ''}
+                      options={interviewerOptions}
+                      placeholder="Select Interviewer"
+                      icon={<UserStar size={15} />}
+                      onChange={handleChange}
+                    />
+                    <InputField label="Comment" name="comment" value={formDataState.comment || ''} onChange={handleChange} />
                     <div className='hidden'>
                       <SelectField label="Recommendation for Membership" name="rec_for_membership" value={String(formDataState.rec_for_membership ? '1' : '0')} onChange={handleChange} options={[{label: 'Yes', value: '1'}, {label: 'No', value: '0'}]} />
-                    </div>
-                    <div className="md:col-span-3">
-                      <InputField label="Comment" name="comment" value={formDataState.comment || ''} onChange={handleChange} />
                     </div>
                   </div>
                 </div>
