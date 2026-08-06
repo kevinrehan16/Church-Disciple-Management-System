@@ -15,6 +15,7 @@ interface SearchableSelectProps {
   icon?: React.ReactNode;
   error?: string;
   onChange: (e: { target: { name: string; value: string } }) => void;
+  onSearchChange?: (searchText: string) => void; // 👉 Naayos na ang syntax error dito
 }
 
 export function SearchableSelect({
@@ -26,6 +27,7 @@ export function SearchableSelect({
   icon,
   error,
   onChange,
+  onSearchChange
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -56,16 +58,17 @@ export function SearchableSelect({
     });
     setIsOpen(false);
     setSearchQuery('');
+    if (onSearchChange) onSearchChange(''); // Reset search query on parent too kung kailangan
   };
 
   return (
     <div className="relative space-y-1.5 w-full" ref={dropdownRef}>
-      {/* Label sa labas - naka-align nang direkta sa kaliwa ng box */}
+      {/* Label sa labas */}
       <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider ml-1">
         {label}
       </label>
 
-      {/* Main Clickable Box na may active ring at error styles */}
+      {/* Main Clickable Box */}
       <div
         onClick={() => setIsOpen(!isOpen)}
         tabIndex={0}
@@ -75,7 +78,6 @@ export function SearchableSelect({
             : 'border-slate-200 hover:border-slate-300'
         } ${error ? '!border-red-500 ring-4 ring-red-500/10' : ''}`}
       >
-        {/* Icon (Kung meron) */}
         {icon && (
           <span
             className={`absolute left-3.5 pointer-events-none transition-colors ${
@@ -97,7 +99,6 @@ export function SearchableSelect({
         <ChevronDown size={15} className="text-slate-400 shrink-0 ml-2" />
       </div>
 
-      {/* Error Message kung mayroon */}
       {error && <span className="text-xs text-red-500 mt-0.5">{error}</span>}
 
       {/* Dropdown Menu List */}
@@ -109,7 +110,11 @@ export function SearchableSelect({
               type="text"
               placeholder={`Search ${label.toLowerCase()}...`}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                const query = e.target.value;
+                setSearchQuery(query); // Update local search state para sa instant filtering
+                if (onSearchChange) onSearchChange(query); // Update parent search state para sa API request
+              }}
               className="w-full outline-none text-sm bg-transparent"
               autoFocus
             />

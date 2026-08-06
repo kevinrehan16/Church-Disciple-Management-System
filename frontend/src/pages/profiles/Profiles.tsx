@@ -5,7 +5,7 @@ import {
   User, Mail, Phone, MapPin, ShieldCheck, Church, 
   Edit, Sparkles, Heart, Briefcase, 
   GraduationCap, Cross, CheckCircle2,
-  Building, BookOpen, Loader2, AlertCircle,
+  Building, BookOpen, AlertCircle,
   MapPinned
 } from 'lucide-react';
 import RegisterMemberModal from '../../components/modals/memberModals/RegisterMemberModal';
@@ -400,7 +400,7 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
         <RegisterMemberModal 
           isOpen={isRegisterModalOpen}
           onClose={() => setIsRegisterModalOpen(false)} 
-          memberId={selectedMemberId}
+          memberId={selectedMemberId != null ? String(selectedMemberId) : null}
         />
       )}
     </div>

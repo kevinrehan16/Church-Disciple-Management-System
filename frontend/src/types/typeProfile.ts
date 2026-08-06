@@ -81,9 +81,15 @@ export interface MemberProfile {
   rec_for_membership: boolean;
   comment: string | null;
   created_at: string;
-  church_name: string;
+  church_name: string | null;
+  church_code: string | null;
+  church_contact_number: string | null;
+  church_email: string | null;
+  church_address: string | null;
   cluster_id: number | null;
   cluster_name: string | null;
+  cluster_code: string | null;
+  cluster_leader_name: string | null;
   spiritual_gifts: SpiritualGift[];
 }
 

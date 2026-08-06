@@ -397,6 +397,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                       placeholder="Select Interviewer"
                       icon={<UserStar size={15} />}
                       onChange={handleChange}
+                      onSearchChange={(text: string) => setSearchTerm(text)}
                     />
                     <InputField label="Membership Date" name="membership_date" type="date" value={formDataState.membership_date || getTodayDate()} max={getTodayDate()} onChange={handleChange} />
                     <InputField label="Comment" name="comment" value={formDataState.comment || ''} onChange={handleChange} />
