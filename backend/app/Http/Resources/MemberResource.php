@@ -90,6 +90,7 @@ class MemberResource extends JsonResource
             'cluster_id' => $this->cluster?->id,
             'cluster_name' => $this->cluster?->name,
             'cluster_code' => $this->cluster?->code,
+            'cluster_leader_name'       => trim(($this->cluster?->leader?->first_name ?? '') . ' ' . ($this->cluster?->leader?->last_name ?? '')),
 
             // SPIRITUAL GIFTS
             'spiritual_gifts' => SpiritualGiftResource::collection($this->whenLoaded('spiritualGifts')),

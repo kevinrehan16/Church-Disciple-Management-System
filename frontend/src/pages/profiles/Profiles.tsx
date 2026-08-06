@@ -324,9 +324,9 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
                   <MapPinned size={18} className="text-rose-500" /> Cluster Details
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <InfoData label="Cluster ID" value={data.cluster_id || 1} />
                   <InfoData label="Cluster Name" value={data.cluster_name || "Muntinlupa-Laguna"} />
                   <InfoData label="Cluster Code" value={data.cluster_code || "MUN-LAG"} />
+                  <InfoData label="Cluster Mentor" value={data.cluster_leader_name || "Unassigned"} />
                 </div>
               </div>
             </div>
@@ -362,19 +362,8 @@ function ProfileUI({ data, isSelf }: ProfileUIProps) {
               <h3 className="text-base font-bold text-slate-900 mb-1">Account Credentials</h3>
               <p className="text-xs text-slate-500 mb-6">Manage your email and system password security settings.</p>
               
-              <div className="space-y-4 max-w-md">
+              <div className="space-y-4 max-w-sm">
                 <ChangePassForm emailProp={data.email} />
-                {/* <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Current Email</label>
-                  <input type="text" value={data.email} readOnly className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 text-sm font-medium" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">New Password</label>
-                  <input type="password" placeholder="••••••••" className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-600 outline-none" />
-                </div>
-                <button className="bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
-                  Update Account
-                </button> */}
               </div>
             </div>
           )}
