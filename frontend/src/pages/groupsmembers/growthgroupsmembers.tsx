@@ -342,7 +342,7 @@ export default function GrowthGroupsMembers() {
         <GrowthGroupModal 
           isOpen={isGrowthGroupModalOpen}
           onClose={() => setIsGrowthGroupModalOpen(false)} 
-          // GrowthGroupId={selectedGrowthGroupId}
+          GrowthGroupId={selectedGrowthGroupId}
         />
       )}
     </div>
