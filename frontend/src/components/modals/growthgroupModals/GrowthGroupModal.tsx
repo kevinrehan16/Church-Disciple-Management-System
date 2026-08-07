@@ -1,26 +1,28 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   X, 
   Church, 
   UserCheck, 
   ShieldCheck, 
-  Search, 
-  Check, 
-  ChevronDown, 
   Save, 
   Calendar, 
-  Users 
+  Users,
+  MapPinned 
 } from 'lucide-react';
 import { useRegisterGrowthGroup } from '../../../hooks/useGrowthGroup';
-// I-adjust ang import path base sa folder structure mo
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import SectionHeader from '../../ui/SectionHeader';
 import { InputField } from '../../inputs/InputField';
 import { SelectField } from '../../inputs/SelectField';
+import { SearchableSelect } from '../../inputs/SearchableSelect';
+import { useChurches } from '../../../hooks/useChurches';
+import { useClustersByChurchId } from '../../../hooks/useClusters';
+import { useMembers } from '../../../hooks/useMembers';
 
 interface GrowthGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
+  GrowthGroupId: string | number;
   initialData?: {
     church_id: number;
     cluster_id: number;
@@ -35,30 +37,6 @@ interface GrowthGroupModalProps {
     is_active: boolean;
   };
 }
-
-// Mock Data Options
-const MOCK_LEADERS = [
-  { id: 1, name: "Ptr. Juan Dela Cruz" },
-  { id: 2, name: "Ptr. Mark Santos" },
-  { id: 3, name: "Ptr. David Reyes" },
-  { id: 4, name: "Bro. Christian Lim" },
-  { id: 5, name: "Sis. Sarah Jenkins" },
-  { id: 6, name: "Bro. Michael Tan" },
-  { id: 7, name: "Bro. Peter Chan" },
-  { id: 8, name: "Bro. Rimer Regalado" },
-];
-
-const CHURCH_OPTIONS = [
-  { value: '1', label: 'GCF SouthMetro (Main Campus)' },
-  { value: '2', label: 'GCF Bacoor' },
-  { value: '3', label: 'GCF Alfonso' },
-];
-
-const CLUSTER_OPTIONS = [
-  { value: '1', label: 'Cluster 1 - Metro South' },
-  { value: '2', label: 'Cluster 2 - Cavite North' },
-  { value: '3', label: 'Cluster 3 - Upland Cavite' },
-];
 
 const DAY_OPTIONS = [
   { value: 'Sunday', label: 'Sunday' },
@@ -85,14 +63,15 @@ const DEMOGRAPHIC_OPTIONS = [
   { value: 'adults', label: 'General Adults' },
 ];
 
-export default function GrowthGroupModal({ isOpen, onClose, initialData }: GrowthGroupModalProps) {
+export default function GrowthGroupModal({ isOpen, onClose, GrowthGroupId, initialData }: GrowthGroupModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addGrowthGroup } = useRegisterGrowthGroup();
   
+  console.log(GrowthGroupId);
   const [formData, setFormData] = useState({
-    church_id: initialData?.church_id || 1,
-    cluster_id: initialData?.cluster_id || 1,
-    leader_id: initialData?.leader_id || 1,
+    church_id: initialData?.church_id || 0,
+    cluster_id: initialData?.cluster_id || 0,
+    leader_id: initialData?.leader_id || 0,
     name: initialData?.name || '',
     code: initialData?.code || '',
     meeting_day: initialData?.meeting_day || 'Sunday',
@@ -103,32 +82,66 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
     is_active: initialData?.is_active ?? true,
   });
 
-  // States para sa Searchable Leader Dropdown
-  const [isLeaderOpen, setIsLeaderOpen] = useState(false);
-  const [leaderSearchQuery, setLeaderSearchQuery] = useState('');
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  // State para sa Leader search query sa SearchableSelect
+  const [leaderSearchTerm, setLeaderSearchTerm] = useState('');
 
-  const selectedLeaderName = MOCK_LEADERS.find(l => l.id === formData.leader_id)?.name || "Select group leader...";
+  // Universal Handle Change para sa mga inputs at SearchableSelect
+  const handleChange = (e: { target: { name: string; value: any } }) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: ['church_id', 'cluster_id', 'leader_id'].includes(name) ? Number(value) : value,
+      // Automatic na i-reset ang cluster_id kapag pinalitan ang church_id
+      ...(name === 'church_id' ? { cluster_id: 0 } : {})
+    }));
+  };
 
-  const filteredLeaders = MOCK_LEADERS.filter(leader => 
-    leader.name.toLowerCase().includes(leaderSearchQuery.toLowerCase())
-  );
+  // Paggamit ng useChurches hook
+  const { data: apiChurch } = useChurches({ 
+    search: '', 
+    page: 1 
+  });
+  
+  // Paggamit ng useClustersByChurchId hook base sa napiling church_id
+  const { data: apiClusters } = useClustersByChurchId({ 
+    church_id: formData.church_id || 0, 
+    search: '', 
+  });
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsLeaderOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  // Paggamit ng useMembers para sa Group Leader selection na may search
+  const { data: apiLeader } = useMembers({
+    search: leaderSearchTerm,
+    page: 1,
+  });
+
+  // Pag-map ng Church data papuntang { id, name }
+  const churchList = Array.isArray(apiChurch) 
+    ? apiChurch.map((church: any) => ({ id: church.id, name: church.name }))
+    : Array.isArray(apiChurch?.data) 
+      ? apiChurch.data.map((church: any) => ({ id: church.id, name: church.name }))
+      : [];
+
+  // Pag-map ng Cluster data papuntang { id, name }
+  const clusterList = Array.isArray(apiClusters) 
+    ? apiClusters.map((cluster: any) => ({ id: cluster.id, name: cluster.name }))
+    : Array.isArray(apiClusters?.data) 
+      ? apiClusters.data.map((cluster: any) => ({ id: cluster.id, name: cluster.name }))
+      : [];
+
+  // Pag-map ng Leader data papuntang { id, name } galing sa members API
+  const currentLeaders = Array.isArray(apiLeader) 
+    ? apiLeader 
+    : (apiLeader?.data || []);
+
+  const leaderList = currentLeaders.map((member: any) => ({
+    id: member.id,
+    name: member.full_name,
+  }));
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     addGrowthGroup(formData, { onSuccess: () => startClose() });
   };
 
@@ -151,6 +164,7 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
             </p>
           </div>
           <button 
+            type="button"
             onClick={startClose} 
             className="p-2 hover:bg-white/10 active:scale-95 rounded-full transition-all"
           >
@@ -166,22 +180,24 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
             <div>
               <SectionHeader title="Church & Cluster Assignment" icon={Church} />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                <SelectField 
-                  label="Church" 
-                  name="church_id" 
-                  value={formData.church_id}
-                  options={CHURCH_OPTIONS}
-                  required
-                  onChange={(e) => setFormData({ ...formData, church_id: Number(e.target.value) })}
+                <SearchableSelect
+                  label="GCF Church Attending"
+                  name="church_id"
+                  value={formData.church_id || ''}
+                  options={churchList}
+                  placeholder="Select Church"
+                  icon={<Church size={15} />}
+                  onChange={handleChange}
                 />
 
-                <SelectField 
-                  label="Cluster" 
-                  name="cluster_id" 
-                  value={formData.cluster_id}
-                  options={CLUSTER_OPTIONS}
-                  required
-                  onChange={(e) => setFormData({ ...formData, cluster_id: Number(e.target.value) })}
+                <SearchableSelect
+                  label="GCF Cluster Group"
+                  name="cluster_id"
+                  value={formData.cluster_id || ''}
+                  options={clusterList}
+                  placeholder="Select Cluster"
+                  icon={<MapPinned size={15} />}
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -196,7 +212,7 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
                     name="name"
                     placeholder="e.g. Arise"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={handleChange}
                     required
                   />
                 </div>
@@ -207,7 +223,7 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
                     name="code"
                     placeholder="e.g. ARISE"
                     value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                    onChange={handleChange}
                     required
                   />
                 </div>
@@ -220,7 +236,7 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
                   value={formData.target_demographic}
                   options={DEMOGRAPHIC_OPTIONS}
                   required
-                  onChange={(e) => setFormData({ ...formData, target_demographic: e.target.value })}
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -228,70 +244,17 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
             {/* Section 3: Leadership */}
             <div>
               <SectionHeader title="Group Leadership" icon={UserCheck} />
-              <div className="space-y-2 relative mt-2" ref={dropdownRef}>
-                <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider ml-1">
-                  Group Leader <span className="text-red-500">*</span>
-                </label>
-
-                {/* Trigger Button */}
-                <div
-                  onClick={() => setIsLeaderOpen(!isLeaderOpen)}
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 flex items-center justify-between cursor-pointer hover:border-slate-300 transition-all shadow-sm"
-                >
-                  <span className="font-medium">{selectedLeaderName}</span>
-                  <ChevronDown size={16} className={`text-slate-400 transition-transform duration-200 ${isLeaderOpen ? 'rotate-180' : ''}`} />
-                </div>
-
-                {/* Dropdown Menu na may Search */}
-                {isLeaderOpen && (
-                  <div className="absolute left-0 right-0 mt-1 bg-white rounded-xl border border-slate-200 shadow-xl z-50 overflow-hidden animate-fadeIn">
-                    <div className="relative group p-3 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
-                      <Search size={15} className="text-slate-400 group-focus-within:text-[var(--active-parent,rgb(99,102,241))] transition-colors" />
-                      <input
-                        type="text"
-                        placeholder="Search leader name..."
-                        value={leaderSearchQuery}
-                        onChange={(e) => setLeaderSearchQuery(e.target.value)}
-                        className="w-full bg-transparent text-sm text-slate-800 focus:outline-none placeholder:text-slate-400"
-                        autoFocus
-                      />
-                    </div>
-
-                    <div className="max-h-52 overflow-y-auto p-1.5 space-y-1">
-                      {filteredLeaders.length === 0 ? (
-                        <div className="text-center py-4 text-xs text-slate-400 font-medium">
-                          No leader found.
-                        </div>
-                      ) : (
-                        filteredLeaders.map((leader) => {
-                          const isSelected = formData.leader_id === leader.id;
-                          return (
-                            <div
-                              key={leader.id}
-                              onClick={() => {
-                                setFormData({ ...formData, leader_id: leader.id });
-                                setIsLeaderOpen(false);
-                                setLeaderSearchQuery('');
-                              }}
-                              className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm cursor-pointer transition-all ${
-                                isSelected 
-                                  ? 'bg-[var(--active-parent,rgb(99,102,241))]/70 text-white font-medium' 
-                                  : 'text-slate-700 hover:bg-slate-50'
-                              }`}
-                            >
-                              <span>{leader.name}</span>
-                              {isSelected && (
-                                <div className="w-4 h-4 rounded-full bg-emerald-600 border-emerald-300 flex items-center justify-center">
-                                  <Check size={14} className="text-white" />
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })
-                      )}
-                    </div>
-                  </div>
-                )}
+              <div className="mt-2">
+                <SearchableSelect
+                  label="Group Leader"
+                  name="leader_id"
+                  value={formData.leader_id || ''}
+                  options={leaderList}
+                  placeholder="Select Group Leader"
+                  icon={<UserCheck size={15} />}
+                  onChange={handleChange}
+                  onSearchChange={(text: string) => setLeaderSearchTerm(text)}
+                />
               </div>
             </div>
 
@@ -306,7 +269,7 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
                   value={formData.meeting_day}
                   options={DAY_OPTIONS}
                   required
-                  onChange={(e) => setFormData({ ...formData, meeting_day: e.target.value })}
+                  onChange={handleChange}
                 />
 
                 <InputField
@@ -315,7 +278,7 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
                   type="time"
                   step="1"
                   value={formData.meeting_time}
-                  onChange={(e) => setFormData({ ...formData, meeting_time: e.target.value })}
+                  onChange={handleChange}
                   required
                 />
 
@@ -325,7 +288,7 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
                   value={formData.location_type}
                   options={LOCATION_TYPE_OPTIONS}
                   required
-                  onChange={(e) => setFormData({ ...formData, location_type: e.target.value })}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -335,7 +298,7 @@ export default function GrowthGroupModal({ isOpen, onClose, initialData }: Growt
                   name="venue_address"
                   placeholder="e.g. GCFSouthMetro, 2nd Floor, Room 310 or Zoom Link"
                   value={formData.venue_address}
-                  onChange={(e) => setFormData({ ...formData, venue_address: e.target.value })}
+                  onChange={handleChange}
                   required
                 />
               </div>

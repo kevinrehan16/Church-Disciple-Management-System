@@ -29,7 +29,6 @@ export default function GrowthGroups() {
 
   const [isGrowthGroupModalOpen, setIsGrowthGroupModalOpen] = useState(false);
   const [selectedGrowthGroupId, setSelectedGrowthGroupId] = useState('');
-  console.log(selectedGrowthGroupId);
 
   const handleViewGrowthGroup = (id: string) => {
     setSelectedGrowthGroupId(id);
@@ -96,12 +95,12 @@ export default function GrowthGroups() {
             {/* Sticky Table Header */}
             <thead className="sticky top-0 z-10 bg-[var(--active-parent)]">
               <tr className="text-white uppercase tracking-wider text-[10px] font-extrabold border-b border-slate-200/60">
-                <th className="py-4 px-6">Growth Group</th>
-                <th className="py-4 px-6">Church & Cluster</th>
-                <th className="py-4 px-6">Leader</th>
-                <th className="py-4 px-6">Schedule & Venue</th>
-                <th className="py-4 px-6 text-center">Demographic</th>
-                <th className="py-4 px-6 text-center">Actions</th>
+                <th className="w-[24%] py-4 px-6">Growth Group</th>
+                <th className="w-[20%] py-4 px-6">Church & Cluster</th>
+                <th className="w-[18%] py-4 px-6">Leader</th>
+                <th className="w-[20%] py-4 px-6">Schedule & Venue</th>
+                <th className="w-[8%] py-4 px-6 text-center">Demographic</th>
+                <th className="w-[10%] py-4 px-6 text-center">Actions</th>
               </tr>
             </thead>
 
@@ -123,14 +122,14 @@ export default function GrowthGroups() {
                           <Sprout size={16} />
                         </div>
                         <div>
-                          <p className={`text-[12px] font-semibold transition-colors ${
+                          <p className={`text-[14px] font-semibold transition-colors ${
                             gg.is_active 
-                              ? 'text-slate-800 group-hover:text-indigo-600' 
+                              ? 'text-slate-800 group-hover:text-[var(--active-parent,rgb(99,102,241))]' 
                               : 'text-slate-400 line-through'
                           }`}>
                             {gg.name}
                           </p>
-                          <p className={`text-[10px] font-medium ${gg.is_active ? 'text-emerald-600' : 'text-slate-600'}`}>
+                          <p className={`text-[11px] font-medium ${gg.is_active ? 'text-slate-600' : 'text-slate-600'}`}>
                             {gg.code}
                           </p>
                         </div>
@@ -141,11 +140,11 @@ export default function GrowthGroups() {
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-1.5 font-medium text-slate-800">
                         <Church size={13} className="text-indigo-500 flex-shrink-0" />
-                        <span>{gg.church.name}</span>
+                        <span className='text-[13px]'>{gg.church.name}</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-slate-500 text-[11px] mt-0.5">
                         <MapPinned size={12} className="text-slate-400 flex-shrink-0" />
-                        <span>Cluster: <strong className="text-slate-700">{gg.cluster.name}</strong></span>
+                        <span className='text-[11px]'>Cluster: <strong className="text-slate-700">{gg.cluster.name}</strong></span>
                       </div>
                     </td>
 
@@ -153,11 +152,11 @@ export default function GrowthGroups() {
                     <td className="py-4 px-6">
                       <div className="font-semibold text-slate-900 flex items-center gap-1.5">
                         <ShieldUser size={13} className="text-emerald-600 flex-shrink-0" />
-                        <span>{gg.leader.first_name} {gg.leader.last_name}</span>
+                        <span className='text-[13px]'>{gg.leader.first_name} {gg.leader.last_name}</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-slate-500 text-[11px] mt-0.5">
                         <FaMobileAlt size={12} className="text-slate-400 flex-shrink-0" />
-                        <span className="text-slate-400">{gg.leader.mobile_number}</span>
+                        <span className="text-slate-400 text-mono text-[11px]">{gg.leader.mobile_number}</span>
                       </div>
                     </td>
 
@@ -165,7 +164,7 @@ export default function GrowthGroups() {
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-1.5 text-slate-800 font-medium">
                         <CalendarClock  size={13} className="text-amber-500 flex-shrink-0" />
-                        <span>{gg.meeting_day} @ {formatTime(gg.meeting_time)}</span>
+                        <span className='text-[13px]'>{gg.meeting_day} @ {formatTime(gg.meeting_time)}</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-slate-500 text-[11px] mt-0.5">
                         {gg.location_type === 'onsite' ? (
@@ -175,13 +174,13 @@ export default function GrowthGroups() {
                         ) : (
                           <FaLaptop size={12} className="text-blue-500 flex-shrink-0" />
                         )}
-                        <span className="truncate max-w-[200px]" title={gg.venue_address}>{gg.venue_address}</span>
+                        <span className="truncate max-w-[200px] text-[12px]" title={gg.venue_address}>{gg.venue_address}</span>
                       </div>
                     </td>
 
                     {/* Demographic */}
                     <td className="py-4 px-6 text-center">
-                      <span className="capitalize px-2.5 py-1 bg-indigo-50 text-[var(--active-parent)] font-semibold rounded-lg text-[10px]">
+                      <span className="capitalize px-2.5 py-1 bg-indigo-50 text-[var(--active-parent)] font-semibold rounded-lg text-[11px]">
                         {gg.target_demographic.replace('_', ' ')}
                       </span>
                     </td>
@@ -254,7 +253,7 @@ export default function GrowthGroups() {
         <GrowthGroupModal 
           isOpen={isGrowthGroupModalOpen}
           onClose={() => setIsGrowthGroupModalOpen(false)} 
-          // GrowthGroupId={selectedGrowthGroupId}
+          GrowthGroupId={selectedGrowthGroupId}
         />
       )}
     </div>

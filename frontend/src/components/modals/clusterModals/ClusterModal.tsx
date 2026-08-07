@@ -11,6 +11,7 @@ import { SearchableSelect } from '../../inputs/SearchableSelect';
 interface ClusterModalProps {
   isOpen: boolean;
   onClose: () => void;
+  clusterId: string | number;
   initialData?: {
     church_id: number;
     name: string;
@@ -20,7 +21,7 @@ interface ClusterModalProps {
   };
 }
 
-export default function ClusterModal({ isOpen, onClose, initialData }: ClusterModalProps) {
+export default function ClusterModal({ isOpen, onClose, clusterId, initialData }: ClusterModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addCluster } = useRegisterCluster();
@@ -45,6 +46,7 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
     member_id: initialData?.member_id || 0,
     is_active: initialData?.is_active ?? true,
   });
+  console.log(clusterId);
 
   // Fetch Members/Leaders data
   const { data: apiInterviewer } = useMembers({

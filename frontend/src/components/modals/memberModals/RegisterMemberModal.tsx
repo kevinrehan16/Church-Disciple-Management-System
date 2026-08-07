@@ -399,7 +399,9 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                       onSearchChange={(text: string) => setSearchTerm(text)}
                     />
                     <InputField label="Membership Date" name="membership_date" type="date" value={formDataState.membership_date || getTodayDate()} max={getTodayDate()} onChange={handleChange} />
-                    <InputField label="Comment" name="comment" value={formDataState.comment || ''} onChange={handleChange} />
+                    <div className="md:col-span-2">
+                      <InputField label="Comment" name="comment" value={formDataState.comment || ''} onChange={handleChange} />
+                    </div>
                     <div className='hidden'>
                       <SelectField label="Recommendation for Membership" name="rec_for_membership" value={String(formDataState.rec_for_membership ? '1' : '0')} onChange={handleChange} options={[{label: 'Yes', value: '1'}, {label: 'No', value: '0'}]} />
                     </div>
