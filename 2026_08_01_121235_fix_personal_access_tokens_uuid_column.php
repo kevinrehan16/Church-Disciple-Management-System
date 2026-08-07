@@ -12,26 +12,26 @@ return new class extends Migration
         // 1. Linisin muna ang lumang tokens para walang maiwang conflict
         DB::table('personal_access_tokens')->delete();
 
-        // 2. Baguhin ang tokenable_id mula bigint patungong UUID
+        // 2. I-drop ang lumang tokenable_id
         Schema::table('personal_access_tokens', function (Blueprint $table) {
             $table->dropColumn('tokenable_id');
         });
 
+        // 3. Idagdag ulit na ginawang UUID at hinayaang nullable para maiwasan ang not null violation
         Schema::table('personal_access_tokens', function (Blueprint $table) {
-            $table->uuid('tokenable_id');
+            $table->uuid('tokenable_id')->nullable();
             $table->index(['tokenable_type', 'tokenable_id']);
         });
     }
 
     public function down(): void
     {
-        // Baliktad kung sakaling i-rollback
         Schema::table('personal_access_tokens', function (Blueprint $table) {
             $table->dropColumn('tokenable_id');
         });
 
         Schema::table('personal_access_tokens', function (Blueprint $table) {
-            $table->bigInteger('tokenable_id');
+            $table->uuid('tokenable_id')->nullable();
             $table->index(['tokenable_type', 'tokenable_id']);
         });
     }
