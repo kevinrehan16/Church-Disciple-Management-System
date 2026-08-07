@@ -22,18 +22,9 @@ class AuthControllerTest extends TestCase
 
     protected function prepareTestDatabase(): void
     {
-        Schema::disableForeignKeyConstraints();
-
-        Schema::dropIfExists('model_has_roles');
-        Schema::dropIfExists('role_has_permissions');
-        Schema::dropIfExists('model_has_permissions');
-        Schema::dropIfExists('roles');
-        Schema::dropIfExists('permissions');
-        Schema::dropIfExists('personal_access_tokens');
-        Schema::dropIfExists('sessions');
-        Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('members');
-        Schema::dropIfExists('users');
+        // I-wipe ang buong Postgres schema kasama ang lahat ng dependent tables (growth_groups, families, etc.)
+        DB::statement('DROP SCHEMA public CASCADE;');
+        DB::statement('CREATE SCHEMA public;');
 
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary();
@@ -156,8 +147,6 @@ class AuthControllerTest extends TestCase
             $table->unsignedBigInteger('role_id');
             $table->primary(['permission_id', 'role_id']);
         });
-
-        Schema::enableForeignKeyConstraints();
     }
 
     protected function createMemberUser(array $overrides = []): User
