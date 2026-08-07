@@ -22,6 +22,8 @@ class AuthControllerTest extends TestCase
 
     protected function prepareTestDatabase(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         Schema::dropIfExists('model_has_roles');
         Schema::dropIfExists('role_has_permissions');
         Schema::dropIfExists('model_has_permissions');
@@ -154,6 +156,8 @@ class AuthControllerTest extends TestCase
             $table->unsignedBigInteger('role_id');
             $table->primary(['permission_id', 'role_id']);
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     protected function createMemberUser(array $overrides = []): User
