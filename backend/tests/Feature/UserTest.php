@@ -6,6 +6,7 @@ use App\Mail\NewUserTemporaryPasswordMail;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Role;
@@ -22,16 +23,9 @@ class UserTest extends TestCase
 
     protected function createSchema(): void
     {
-        Schema::dropIfExists('model_has_roles');
-        Schema::dropIfExists('role_has_permissions');
-        Schema::dropIfExists('model_has_permissions');
-        Schema::dropIfExists('roles');
-        Schema::dropIfExists('permissions');
-        Schema::dropIfExists('personal_access_tokens');
-        Schema::dropIfExists('sessions');
-        Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('members');
-        Schema::dropIfExists('users');
+        // I-wipe ang buong Postgres schema kasama ang lahat ng dependent tables (growth_groups, families, etc.)
+        DB::statement('DROP SCHEMA public CASCADE;');
+        DB::statement('CREATE SCHEMA public;');
 
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary();
