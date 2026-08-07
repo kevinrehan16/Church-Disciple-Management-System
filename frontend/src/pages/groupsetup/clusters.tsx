@@ -256,7 +256,7 @@ export default function Clusters() {
         <ClusterModal 
           isOpen={isClusterModalOpen}
           onClose={() => setIsClusterModalOpen(false)} 
-          // clusterId={selectedClusterId}
+          clusterId={selectedClusterId}
         />
       )}
     </div>

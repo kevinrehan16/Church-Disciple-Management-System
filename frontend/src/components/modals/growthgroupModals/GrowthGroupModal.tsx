@@ -22,6 +22,7 @@ import { useMembers } from '../../../hooks/useMembers';
 interface GrowthGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
+  GrowthGroupId: string | number;
   initialData?: {
     church_id: number;
     cluster_id: number;
@@ -62,10 +63,11 @@ const DEMOGRAPHIC_OPTIONS = [
   { value: 'adults', label: 'General Adults' },
 ];
 
-export default function GrowthGroupModal({ isOpen, onClose, initialData }: GrowthGroupModalProps) {
+export default function GrowthGroupModal({ isOpen, onClose, GrowthGroupId, initialData }: GrowthGroupModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addGrowthGroup } = useRegisterGrowthGroup();
   
+  console.log(GrowthGroupId);
   const [formData, setFormData] = useState({
     church_id: initialData?.church_id || 0,
     cluster_id: initialData?.cluster_id || 0,
