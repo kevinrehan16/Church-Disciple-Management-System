@@ -12,7 +12,6 @@ export default function Clusters() {
 
   const [isClusterModalOpen, setIsClusterModalOpen] = useState(false);
   const [selectedClusterId, setSelectedClusterId] = useState('');
-  console.log(selectedClusterId);
   
   const { data: apiResponse } = useClusters({
     search: searchTerm,
