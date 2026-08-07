@@ -97,7 +97,7 @@ export default function LoginPage() {
 
             <div className="flex flex-col justify-center select-none">
               <span className="text-2xl font-black tracking-tight leading-none text-white drop-shadow-sm">
-                Disciple<span className="text-white/60 font-medium">Network</span>
+                Church<span className="text-white/60 font-medium">Disciple</span>
               </span>
               <span className="text-[10px] font-bold leading-none tracking-[0.25em] text-amber-400/90 uppercase mt-1.5 drop-shadow">
                 Management System
