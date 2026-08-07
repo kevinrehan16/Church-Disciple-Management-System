@@ -24,8 +24,10 @@ class UserTest extends TestCase
     protected function createSchema(): void
     {
         // I-wipe ang buong Postgres schema kasama ang lahat ng dependent tables (growth_groups, families, etc.)
-        DB::statement('DROP SCHEMA public CASCADE;');
-        DB::statement('CREATE SCHEMA public;');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('DROP SCHEMA public CASCADE;');
+            DB::statement('CREATE SCHEMA public;');
+        }
 
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary();
