@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X, Church, UserCheck, ShieldCheck, Layers, Save, UserStar } from 'lucide-react';
 import { useRegisterCluster } from '../../../hooks/useClusters';
 import { useMembers } from '../../../hooks/useMembers';
