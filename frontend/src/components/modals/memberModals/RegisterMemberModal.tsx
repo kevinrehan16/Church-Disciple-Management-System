@@ -78,7 +78,6 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
       : [];
 
   const giftsList = Array.isArray(apiResponse) ? apiResponse : [];
-  console.log('giftsList:', giftsList);
 
   // Effect para sa Edit Mode o New Registration Reset
   useEffect(() => {

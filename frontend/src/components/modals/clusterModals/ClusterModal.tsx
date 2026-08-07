@@ -1,11 +1,12 @@
-import { useState, useRef, useEffect } from 'react';
-import { X, Church, UserCheck, ShieldCheck, Layers, Search, Check, ChevronDown, Save } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Church, UserCheck, ShieldCheck, Layers, Save, UserStar } from 'lucide-react';
 import { useRegisterCluster } from '../../../hooks/useClusters';
-// I-adjust ang import path base sa kung nasaan ang components mo
+import { useMembers } from '../../../hooks/useMembers';
 import { modalAnimation } from '../../../utils/ModalAnimation';
+import { useChurches } from '../../../hooks/useChurches';
 import SectionHeader from '../../ui/SectionHeader';
 import { InputField } from '../../inputs/InputField';
-import { SelectField } from '../../inputs/SelectField';
+import { SearchableSelect } from '../../inputs/SearchableSelect';
 
 interface ClusterModalProps {
   isOpen: boolean;
@@ -19,63 +20,66 @@ interface ClusterModalProps {
   };
 }
 
-// Mock data para sa mga pwedeng maging Cluster Head
-const MOCK_HEADS = [
-  { id: 1, name: "Ptr. Juan Dela Cruz" },
-  { id: 2, name: "Ptr. Mark Santos" },
-  { id: 3, name: "Ptr. David Reyes" },
-  { id: 4, name: "Ptr. Michael Tan" },
-  { id: 5, name: "Ptra. Sarah Jenkins" },
-  { id: 6, name: "Ptr. Alexander Lim" },
-];
-
-const CHURCH_OPTIONS = [
-  { value: '1', label: 'GCF SouthMetro (Main Campus)' },
-  { value: '2', label: 'GCF Bacoor' },
-  { value: '3', label: 'GCF Alfonso' },
-];
-
 export default function ClusterModal({ isOpen, onClose, initialData }: ClusterModalProps) {
+  const [searchTerm, setSearchTerm] = useState('');
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addCluster } = useRegisterCluster();
+
+  // Fetch Churches data
+  const { data: apiChurch } = useChurches({ 
+    search: '', 
+    page: 1 
+  });
+
+  const churchList = Array.isArray(apiChurch) 
+    ? apiChurch.map((church: any) => ({ value: church.id, label: church.name, id: church.id, name: church.name }))
+    : Array.isArray(apiChurch?.data) 
+      ? apiChurch.data.map((church: any) => ({ value: church.id, label: church.name, id: church.id, name: church.name }))
+      : [];
   
+  // Form State
   const [formData, setFormData] = useState({
     church_id: initialData?.church_id || 1,
     name: initialData?.name || '',
     code: initialData?.code || '',
-    member_id: initialData?.member_id || 2,
+    member_id: initialData?.member_id || 0,
     is_active: initialData?.is_active ?? true,
   });
 
-  // States para sa Searchable Dropdown ng Cluster Head
-  const [isHeadOpen, setIsHeadOpen] = useState(false);
-  const [headSearchQuery, setHeadSearchQuery] = useState('');
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  // Fetch Members/Leaders data
+  const { data: apiInterviewer } = useMembers({
+    search: searchTerm,
+    page: 1,
+    position: 'Elder,Deacon,Pastoral Staff,Senior Pastor,Pastor',
+  });
 
-  // Hanapin ang pangkasalukuyang napiling head para ma-display sa trigger button
-  const selectedHeadName = MOCK_HEADS.find(h => h.id === formData.member_id)?.name || "Select cluster head...";
-
-  // Filtered heads base sa tina-type sa search box
-  const filteredHeads = MOCK_HEADS.filter(head => 
-    head.name.toLowerCase().includes(headSearchQuery.toLowerCase())
-  );
-
-  // Close dropdown kapag nag-click sa labas
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsHeadOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const currentInterviewers = Array.isArray(apiInterviewer) 
+    ? apiInterviewer 
+    : (apiInterviewer?.data || []);
+  
+  const headOptions = currentInterviewers.map((member: any) => ({
+    value: member.id,
+    label: member.full_name,
+    id: member.id,
+    name: member.full_name,
+  }));
 
   if (!isOpen) return null;
 
+  // Handler para sa pagbabago ng Church selection
+  const handleChurchChange = (val: any) => {
+    const selectedValue = val?.target ? val.target.value : val;
+    setFormData((prev) => ({ ...prev, church_id: Number(selectedValue) }));
+  };
+
+  // Handler para sa pagbabago ng Cluster Head selection
+  const handleHeadChange = (val: any) => {
+    const selectedValue = val?.target ? val.target.value : val;
+    setFormData((prev) => ({ ...prev, member_id: Number(selectedValue) }));
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
     addCluster(formData, { onSuccess: () => startClose() });
   };
 
@@ -87,7 +91,7 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
       {/* Modal Container */}
       <div className={`bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden border border-slate-200/80 flex flex-col max-h-[92vh] ${isClosing ? 'modal-content closing' : 'modal-content'}`}>
         
-        {/* Header - Dynamic background consistent sa theme */}
+        {/* Header */}
         <div className="px-8 py-6 bg-[var(--active-parent)] flex items-center justify-between text-white flex-shrink-0">
           <div>
             <h2 className="text-xl font-extrabold tracking-tight">
@@ -113,13 +117,14 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
             <div>
               <SectionHeader title="Associated Church" icon={Church} />
               <div className="mt-2">
-                <SelectField 
-                  label="Church" 
-                  name="church_id" 
-                  value={formData.church_id}
-                  options={CHURCH_OPTIONS}
-                  required
-                  onChange={(e) => setFormData({ ...formData, church_id: Number(e.target.value) })}
+                <SearchableSelect
+                  label="Church"
+                  name="church_id"
+                  value={formData.church_id || ''}
+                  options={churchList}
+                  placeholder="Select Church"
+                  icon={<Church size={15} />}
+                  onChange={handleChurchChange}
                 />
               </div>
             </div>
@@ -154,75 +159,20 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
               </div>
             </div>
 
-            {/* Section 3: Cluster Leadership (Searchable Dropdown) */}
+            {/* Section 3: Cluster Leadership */}
             <div>
               <SectionHeader title="Cluster Leadership" icon={UserCheck} />
-              <div className="space-y-2 relative mt-2" ref={dropdownRef}>
-                <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider ml-1">Cluster Head (Leader) <span className="text-red-500">*</span></label>
-
-                {/* Trigger Button */}
-                <div
-                  onClick={() => setIsHeadOpen(!isHeadOpen)}
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 flex items-center justify-between cursor-pointer hover:border-slate-300 transition-all shadow-sm"
-                >
-                  <span className="font-medium">{selectedHeadName}</span>
-                  <ChevronDown size={16} className={`text-slate-400 transition-transform duration-200 ${isHeadOpen ? 'rotate-180' : ''}`} />
-                </div>
-
-                {/* Dropdown Menu na may Search Feature */}
-                {isHeadOpen && (
-                  <div className="absolute left-0 right-0 mt-0 bg-white rounded-xl border border-slate-200 shadow-xl z-50 overflow-hidden animate-fadeIn">
-                    
-                    {/* Search Input sa loob ng dropdown */}
-                    <div className="relative group p-3 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
-                      <Search size={15} className="text-slate-400 group-focus-within:text-[var(--active-parent,rgb(99,102,241))] transition-colors" />
-                      <input
-                        type="text"
-                        placeholder="Search leader name..."
-                        value={headSearchQuery}
-                        onChange={(e) => setHeadSearchQuery(e.target.value)}
-                        className="w-full bg-transparent text-sm text-slate-800 focus:outline-none placeholder:text-slate-400"
-                        autoFocus
-                      />
-                      <input type="hidden" name="member_id" value={formData.member_id} />
-                    </div>
-
-                    {/* List ng Results */}
-                    <div className="max-h-52 overflow-y-auto p-1.5 space-y-1">
-                      {filteredHeads.length === 0 ? (
-                        <div className="text-center py-4 text-xs text-slate-400 font-medium">
-                          No leader found.
-                        </div>
-                      ) : (
-                        filteredHeads.map((head) => {
-                          const isSelected = formData.member_id === head.id;
-                          return (
-                            <div
-                              key={head.id}
-                              onClick={() => {
-                                setFormData({ ...formData, member_id: head.id });
-                                setIsHeadOpen(false);
-                                setHeadSearchQuery('');
-                              }}
-                              className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm cursor-pointer transition-all ${
-                                isSelected 
-                                  ? 'bg-[var(--active-parent,rgb(99,102,241))]/70 text-white font-medium' 
-                                  : 'text-slate-700 hover:bg-slate-50'
-                              }`}
-                            >
-                              <span>{head.name}</span>
-                              {isSelected && (
-                                <div className="w-4 h-4 rounded-full bg-emerald-600 border-emerald-300 flex items-center justify-center">
-                                  <Check size={14} className="text-white" />
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })
-                      )}
-                    </div>
-                  </div>
-                )}
+              <div className="mt-2">
+                <SearchableSelect
+                  label="Cluster Head (Leader)"
+                  name="member_id"
+                  value={formData.member_id || ''}
+                  options={headOptions}
+                  placeholder="Select Cluster Head"
+                  icon={<UserStar size={15} />}
+                  onChange={handleHeadChange}
+                  onSearchChange={(text: string) => setSearchTerm(text)}
+                />
               </div>
             </div>
 
@@ -238,7 +188,6 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
                 </div>
               </div>
 
-              {/* Custom Toggle Switch */}
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
@@ -257,7 +206,7 @@ export default function ClusterModal({ isOpen, onClose, initialData }: ClusterMo
           </form>
         </div>
 
-        {/* Footer Actions - Sticky (Consistent with VisitorModal) */}
+        {/* Footer Actions */}
         <div className="px-8 py-4 bg-slate-50 border-t border-slate-200/60 flex gap-3 justify-end flex-shrink-0">
           <button 
             type="button" 
