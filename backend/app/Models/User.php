@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,15 +17,13 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasUuids, HasApiTokens, HasRoles;
 
     /**
-     * I-set ang data type ng primary key kung ito ay string (UUID).
+     * I-set ang primary key properties para sa UUID.
      */
-    protected string $guard_name = 'sanctum';
+    protected $primaryKey = 'id';
     protected $keyType = 'string';
-
-    /**
-     * Kung UUID ang primary key, i-off ang auto-increment.
-     */
     public $incrementing = false;
+
+    protected string $guard_name = 'sanctum';
 
     /**
      * The attributes that are mass assignable.
@@ -50,12 +47,6 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected $casts = ['password' => 'hashed'];
-
-    protected function getDefaultGuardName(): string
-    {
-        return 'sanctum';
-    }
     /**
      * Get the attributes that should be cast.
      *
@@ -67,6 +58,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    protected function getDefaultGuardName(): string
+    {
+        return 'sanctum';
     }
 
     public function member(): HasOne
