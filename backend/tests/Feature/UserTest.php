@@ -6,6 +6,7 @@ use App\Mail\NewUserTemporaryPasswordMail;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Role;
