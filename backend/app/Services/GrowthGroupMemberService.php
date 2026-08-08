@@ -24,13 +24,36 @@ class GrowthGroupMemberService
         // I-check kung miyembro na para iwas duplicate
         if ($growthGroup->members()->where('member_id', $data['member_id'])->exists()) {
             throw ValidationException::withMessages([
-                'member_id' => ['Ang miyembrong ito ay nakasali na sa Growth Group na ito.'],
+                'member_id' => ['This member is already part of this Growth Group.'],
             ]);
         }
 
         $growthGroup->members()->attach($data['member_id'], [
-            'role' => $data['role'] ?? 'member',
-            'joined_at' => $data['joined_at'] ?? now(),
+            'role'            => $data['role'] ?? 'member',
+            'status'          => $data['status'] ?? 'active',
+            'joined_at'       => $data['joined_at'] ?? now(),
+            'ended_at'        => $data['ended_at'] ?? null,
+            'inactive_reason' => $data['inactive_reason'] ?? null,
+        ]);
+
+        return true;
+    }
+
+    public function deactivateGgMember($growthGroupId, array $data)
+    {
+        $growthGroup = GrowthGroup::findOrFail($growthGroupId);
+
+        // Check if member exists in this Growth Group
+        if (!$growthGroup->members()->where('member_id', $data['member_id'])->exists()) {
+            throw ValidationException::withMessages([
+                'member_id' => ['This member is not part of this Growth Group.'],
+            ]);
+        }
+
+        $growthGroup->members()->updateExistingPivot($data['member_id'], [
+            'status'          => 'inactive',
+            'ended_at'        => now(),
+            'inactive_reason' => $data['inactive_reason'],
         ]);
 
         return true;
