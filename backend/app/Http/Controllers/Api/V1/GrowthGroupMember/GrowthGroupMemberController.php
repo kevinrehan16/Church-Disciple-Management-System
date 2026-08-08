@@ -35,18 +35,7 @@ class GrowthGroupMemberController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'growth_group' => $growthGroup->name,
-                'code' => $growthGroup->code,
-                'leader' => $growthGroup->leader ? $growthGroup->leader->first_name . ', ' . $growthGroup->leader->last_name : null,
-                'meeting_day' => $growthGroup->meeting_day,
-                'meeting_time' => $growthGroup->meeting_time,
-                'location_type' => $growthGroup->location_type,
-                'venue_address' => $growthGroup->venue_address,
-                'target_demographic' => $growthGroup->target_demographic,
-                'is_active' => $growthGroup->is_active,
-                'members' => GrowthGroupMemberResource::collection($growthGroup->members),
-            ]
+            'data' => new GrowthGroupsMembersResource($growthGroup),
         ]);
     }
 
@@ -57,7 +46,7 @@ class GrowthGroupMemberController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Matagumpay na naidagdag ang miyembro sa Growth Group.',
+            'message' => 'The member has been successfully added to the Growth Group.',
         ], 201);
     }
 

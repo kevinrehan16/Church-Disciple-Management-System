@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaLaptopHouse, FaLaptop, FaMobileAlt, FaUserShield, FaUsers, FaUserPlus, FaEye } from "react-icons/fa";
 import { Plus, Sprout, CalendarClock, MapPinHouse } from 'lucide-react';
-import GrowthGroupModal from '../../components/modals/growthgroupModals/GrowthGroupModal';
+import GrowthGroupMemberModal from '../../components/modals/growthgroupmemberModals/GrowthGroupMemberModal';
+import ViewGrowthGroupMembersModal from '../../components/modals/growthgroupmemberModals/ViewGrowthGroupMembersModal';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
-import { useGrowthGroupMembers } from '../../hooks/useGGMembers';
+import { useAllGrowthGroupsMembers } from '../../hooks/useGGMembers';
 import { formatTime } from '../../utils/formatters';
 
 // Helper function para sa 2-letter initials
@@ -36,23 +37,32 @@ export default function GrowthGroupsMembers() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const { data: apiResponse } = useGrowthGroupMembers();
+  const { data: apiResponse } = useAllGrowthGroupsMembers();
   const currentGGMembers = apiResponse?.data || [];
 
-  const [isGrowthGroupModalOpen, setIsGrowthGroupModalOpen] = useState(false);
-  const [selectedGrowthGroupId, setSelectedGrowthGroupId] = useState('');
-  console.log(selectedGrowthGroupId);
+  const [isGrowthGroupMemberModalOpen, setIsGrowthGroupMemberModalOpen] = useState(false);
+  // 👉 Itinama natin ito sa number | null para tugma sa id ng growth group
+  const [selectedGrowthGroupId, setSelectedGrowthGroupId] = useState<number | null>(null);
+
+  const [isViewMembersModalOpen, setIsViewMembersModalOpen] = useState(false);
+  const [selectedGroupForView, setSelectedGroupForView] = useState<number | null>(null);
   
-  const handleViewGrowthGroup = (id: any) => {
+  const handleViewGrowthGroup = (id: number | null) => {
     setSelectedGrowthGroupId(id);
-    setIsGrowthGroupModalOpen(true);
+    setIsGrowthGroupMemberModalOpen(true);
+  };
+
+  const handleOpenViewModal = (id: number) => {
+    setSelectedGroupForView(id);
+    setIsViewMembersModalOpen(true);
   };
 
   // Filtering
   const filteredGroups = currentGGMembers.filter((group) => {
-    const matchesSearch = group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          group.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          `${group.leader.first_name} ${group.leader.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = 
+          (group.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (group.code || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+          `${group.leader?.first_name || ''} ${group.leader?.last_name || ''}`.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = selectedStatus === 'all' 
       ? true 
@@ -79,7 +89,7 @@ export default function GrowthGroupsMembers() {
           actions={
             <button 
               className="group flex items-center gap-2 px-4 py-2.5 bg-[#0284c7] hover:bg-[#026ca1] active:scale-95 text-white rounded-xl text-xs font-semibold transition-all shadow-sm cursor-pointer"
-              onClick={() => handleViewGrowthGroup('')}
+              onClick={() => handleViewGrowthGroup(null)}
             >
               <Plus size={15} className="transition-transform group-hover:rotate-90" />
               Add New Growth Group
@@ -146,23 +156,20 @@ export default function GrowthGroupsMembers() {
                     {/* Header ng Card */}
                     <div className="flex justify-between items-start mb-3 pt-1">
                       <div className="flex items-center gap-2.5">
-                        {/* Icon Box Effect */}
-                        <div className="w-10 h-10 rounded-xl bg-[var(--active-parent,rgb(99,102,241))]/60 text-white flex items-center justify-center font-bold text-xs border border-[var(--active-parent,rgb(99,102,241))] shadow-inner group-hover:bg-[var(--active-parent,rgb(99,102,241))] group-hover:text-white group-hover:scale-105 group-hover:border-[var(--active-parent,rgb(99,102,241))] transition-all duration-300">
+                        <div className="w-10 h-10 rounded-xl bg-[var(--active-parent,rgb(99,102,241))]/60 text-white flex items-center justify-center font-bold text-xs border border-[var(--active-parent,rgb(99,102,241))]/30 shadow-inner group-hover:bg-[var(--active-parent,rgb(99,102,241))] group-hover:text-white group-hover:scale-105 group-hover:border-[var(--active-parent,rgb(99,102,241))] transition-all duration-300">
                             <Sprout size={18} />
                         </div>
 
                         <div>
-                            {/* Badge Effect */}
                             <span className="text-[10px] font-extrabold uppercase tracking-wider text-white bg-slate-400 px-2 py-0.5 rounded-md border border-slate-100">
                             {gg.code}
                             </span>
 
-                            {/* Title Effect */}
                             <h3 className="text-base font-bold text-slate-900 mt-1 group-hover:text-[var(--active-parent,rgb(99,102,241))] transition-colors">
                             {gg.name}
                             </h3>
                         </div>
-                    </div>
+                      </div>
                       
                       <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wide ${gg.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-slate-100 text-slate-500'}`}>
                         {gg.is_active ? 'Active' : 'Inactive'}
@@ -203,7 +210,6 @@ export default function GrowthGroupsMembers() {
                         <div className="flex-1 h-px bg-slate-200 ml-0.5 mr-1" />
                       </div>
                       <div className="flex items-center justify-between bg-slate-50/50 p-2 rounded-xl border border-slate-100">
-                        {/* Kanan: Avatar at Pangalan */}
                         <div className="flex items-center gap-2.5">
                             <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold shadow-sm shrink-0 group-hover:bg-[var(--active-parent,rgb(99,102,241))]">
                             {getInitials(gg.leader.first_name, gg.leader.last_name)}
@@ -213,7 +219,6 @@ export default function GrowthGroupsMembers() {
                             </p>
                         </div>
 
-                        {/* Kaliwa: Mobile Number */}
                         <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1 shrink-0 bg-white px-2 py-1 rounded-lg border border-slate-100 shadow-2xs">
                             <FaMobileAlt size={10} className="text-slate-400" /> {gg.leader.mobile_number}
                         </p>
@@ -237,20 +242,18 @@ export default function GrowthGroupsMembers() {
                         <div className="flex -space-x-2.5 overflow-visible py-1.5">
                           {visibleMembers.map((member, idx) => {
                             const isFirst = idx === 0;
-                            // Inaalis ang comma kung mayroon man sa name (e.g., "Mark, Magangat" -> "Mark Magangat")
                             const cleanName = member.full_name.replace(',', '');
 
                             return (
                               <Link
                                 key={member.member_id || idx}
-                                to={`/member/${member.member_id}`} // Palitan ang URL path batay sa route structure mo
+                                to={`/member/${member.member_id}`}
                                 className={`relative group/avatar inline-flex h-8 w-8 rounded-full ring-2 ring-white items-center justify-center text-xs font-extrabold text-white transition-transform duration-200 hover:-translate-y-1.5 hover:scale-110 hover:z-30 cursor-pointer shadow-md ${getColor(cleanName)}`}
                               >
                                 <span className="leading-none">
                                   {getInitials(cleanName.split(' ')[0], cleanName.split(' ').slice(1).join(' '))}
                                 </span>
                                 
-                                {/* Tooltip Container */}
                                 <div 
                                   className={`absolute bottom-full mb-2 hidden group-hover/avatar:flex flex-col z-40 pointer-events-none ${
                                     isFirst 
@@ -261,7 +264,6 @@ export default function GrowthGroupsMembers() {
                                   <span className="bg-slate-900 text-white text-[11px] font-medium px-2.5 py-1 rounded-lg shadow-xl whitespace-nowrap">
                                     {cleanName}
                                   </span>
-                                  {/* Arrow Pointer */}
                                   <div className={`w-2 h-2 bg-slate-900 rotate-45 -mt-1 ${isFirst ? 'ml-3' : ''}`} />
                                 </div>
                               </Link>
@@ -279,14 +281,14 @@ export default function GrowthGroupsMembers() {
                       <div className="flex items-center gap-1">
                         <button 
                           onClick={() => handleViewGrowthGroup(gg.id)}
-                          className="flex items-center gap-1.5 p-2 rounded-full border border-slate-200 bg-blue-600 text-xs font-semibold text-white hover:bg-blue-800 hover:border-blue-900 transition-all duration-200 active:scale-95"
+                          className="flex items-center gap-1.5 p-2 rounded-full border border-slate-200 bg-blue-600 text-xs font-semibold text-white hover:bg-blue-800 hover:border-blue-900 transition-all duration-200 active:scale-95 cursor-pointer"
                           title="Add New Member"
                         >
                           <FaUserPlus size={15} />
                         </button>
                         <button 
-                          onClick={() => handleViewGrowthGroup(gg.id)}
-                          className="flex items-center gap-1.5 p-2 rounded-full border border-slate-200 bg-pink-600 text-xs font-semibold text-white hover:bg-pink-800 hover:border-pink-900 transition-all duration-200 active:scale-95"
+                          onClick={() => handleOpenViewModal(gg.id)}
+                          className="flex items-center gap-1.5 p-2 rounded-full border border-slate-200 bg-pink-600 text-xs font-semibold text-white hover:bg-pink-800 hover:border-pink-900 transition-all duration-200 active:scale-95 cursor-pointer"
                           title="View All Members"
                         >
                           <FaEye size={15} />
@@ -302,7 +304,7 @@ export default function GrowthGroupsMembers() {
         )}
       </div>
       
-      {/* -- PAGINATION FOOTER (ZERO MARGIN & FULL EDGE-TO-EDGE) -- */}
+      {/* -- PAGINATION FOOTER -- */}
       <div className="shrink-0 w-full m-0 px-6 py-4 border-t border-slate-200 bg-white flex items-center justify-between rounded-none shadow-sm">
         <p className="text-xs text-slate-500 font-medium">
           Showing <span className="text-slate-800 font-bold">{filteredGroups.length > 0 ? startIndex + 1 : 0}</span> to <span className="text-slate-800 font-bold">{endIndex}</span> of <span className="text-slate-800 font-bold">{filteredGroups.length}</span> entries
@@ -337,12 +339,21 @@ export default function GrowthGroupsMembers() {
         </div>
       </div>
 
-      {/* Modal */}
-      {isGrowthGroupModalOpen && (
-        <GrowthGroupModal 
-          isOpen={isGrowthGroupModalOpen}
-          onClose={() => setIsGrowthGroupModalOpen(false)} 
-          GrowthGroupId={selectedGrowthGroupId}
+      {/* 👉 Growth Group Member Modal Integration */}
+      {isGrowthGroupMemberModalOpen &&      
+        <GrowthGroupMemberModal 
+          isOpen={isGrowthGroupMemberModalOpen}
+          onClose={() => setIsGrowthGroupMemberModalOpen(false)} 
+          defaultGrowthGroupId={selectedGrowthGroupId ?? undefined}
+        />
+      }
+
+      {isViewMembersModalOpen && (
+        <ViewGrowthGroupMembersModal 
+          isOpen={isViewMembersModalOpen}
+          onClose={() => setIsViewMembersModalOpen(false)}
+          growthGroupId={selectedGroupForView}
+          growthGroupName="Dasma Central Growth Group" // Pwede mong dinamihin based sa napiling group item
         />
       )}
     </div>
