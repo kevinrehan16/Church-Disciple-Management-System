@@ -25,6 +25,8 @@ class UserResource extends JsonResource
                 'firstName' => $this->member?->first_name ?? 'N/A',
                 'lastName'  => $this->member?->last_name ?? 'N/A',
                 'mobile'    => $this->member?->mobile_number ?? 'N/A',
+                'church_id'    => $this->member?->church_id ?? 'N/A',
+                'cluster_id'    => $this->member?->cluster_id ?? 'N/A',
             ],
         ];
     }

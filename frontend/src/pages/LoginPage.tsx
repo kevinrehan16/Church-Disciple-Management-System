@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
+import { RotateCw } from 'lucide-react';
 import { Lock, Mail, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -164,7 +165,7 @@ export default function LoginPage() {
         >
           <div className="mb-8">
             <h2 className="font-heading text-3xl font-bold text-slate-900">Welcome Back</h2>
-            <p className="text-slate-500 mt-2">Sign in to the Disciple Network System.</p>
+            <p className="text-slate-500 mt-2">Please, sign in to your account below...</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -203,10 +204,10 @@ export default function LoginPage() {
             <button 
               disabled={isLoading}
               type="submit" 
-              className="w-full text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98] shadow-lg disabled:opacity-70 disabled:hover:opacity-70 disabled:cursor-not-allowed"
               style={{ backgroundColor: theme.activeParentBg, boxShadow: `0 10px 15px -3px ${theme.activeParentBg}40` }}
             >
-              {isLoading ? "Authenticating..." : "Sign in to Portal"}
+              {isLoading ? <> <RotateCw size={25} className="animate-spin" /> Authenticating... </> : "Sign in to Portal"}
               {!isLoading && <ArrowRight className="w-5 h-5" />}
             </button>
           </form>

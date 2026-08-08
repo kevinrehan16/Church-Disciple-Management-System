@@ -47,24 +47,27 @@ class ClusterService
 
     public function getGroupedClusters(array $filters = [], int $perPage = 5): LengthAwarePaginator
     {
-        // Kukunin ang Church at ire-relate ang Clusters
         $query = Church::query()
-            ->with(['clusters' => function ($q) use ($filters) {
-                // Pag may search filter, i-fifilter din ang clusters
-                if (!empty($filters['search'])) {
-                    $search = $filters['search'];
-                    $q->where(function ($sub) use ($search) {
-                        $sub->where('name', 'ILIKE', "%{$search}%")
-                            ->orWhere('code', 'ILIKE', "%{$search}%");
-                    });
-                }
+            ->with([
+                'clusters' => function ($q) use ($filters) {
+                    // 👉 Dito natin ilalagay ang withCount para mabilang ang growth groups sa bawat cluster
+                    $q->withCount(['growthGroups', 'members']);
 
-                if (isset($filters['is_active'])) {
-                    $q->where('is_active', filter_var($filters['is_active'], FILTER_VALIDATE_BOOLEAN));
-                }
-            }]);
+                    if (!empty($filters['search'])) {
+                        $search = $filters['search'];
+                        $q->where(function ($sub) use ($search) {
+                            $sub->where('name', 'ILIKE', "%{$search}%")
+                                ->orWhere('code', 'ILIKE', "%{$search}%");
+                        });
+                    }
 
-        // Search filter: puwedeng pangalan ng Church O pangalan ng Cluster
+                    if (isset($filters['is_active'])) {
+                        $q->where('is_active', filter_var($filters['is_active'], FILTER_VALIDATE_BOOLEAN));
+                    }
+                },
+                'clusters.leader'
+            ]);
+
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {

@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Church, UserCheck, ShieldCheck, Layers, Save, UserStar } from 'lucide-react';
-import { useRegisterCluster } from '../../../hooks/useClusters';
+import { useRegisterCluster, useUpdateCluster, useClusters } from '../../../hooks/useClusters';
 import { useMembers } from '../../../hooks/useMembers';
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import { useChurches } from '../../../hooks/useChurches';
@@ -11,7 +11,8 @@ import { SearchableSelect } from '../../inputs/SearchableSelect';
 interface ClusterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  clusterId: string | number;
+  clusterId: string | number | null;
+  defaultChurchId?: number;
   initialData?: {
     church_id: number;
     name: string;
@@ -21,32 +22,77 @@ interface ClusterModalProps {
   };
 }
 
-export default function ClusterModal({ isOpen, onClose, clusterId, initialData }: ClusterModalProps) {
+export default function ClusterModal({ isOpen, onClose, clusterId, defaultChurchId, initialData }: ClusterModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
-  const { mutate: addCluster } = useRegisterCluster();
-
-  // Fetch Churches data
-  const { data: apiChurch } = useChurches({ 
-    search: '', 
-    page: 1 
-  });
-
-  const churchList = Array.isArray(apiChurch) 
-    ? apiChurch.map((church: any) => ({ value: church.id, label: church.name, id: church.id, name: church.name }))
-    : Array.isArray(apiChurch?.data) 
-      ? apiChurch.data.map((church: any) => ({ value: church.id, label: church.name, id: church.id, name: church.name }))
-      : [];
   
+  const { mutate: addCluster, isPending: isCreating } = useRegisterCluster();
+  const { mutate: updateCluster, isPending: isUpdating } = useUpdateCluster();
+
+  // Fetch Clusters data para makuha ang data kung edit mode at walang initialData
+  const { data: apiResponse } = useClusters({ search: '', page: 1 });
+  const allClusters = (apiResponse as any)?.data || (Array.isArray(apiResponse) ? apiResponse : []);
+
   // Form State
   const [formData, setFormData] = useState({
-    church_id: initialData?.church_id || 1,
+    church_id: initialData?.church_id || defaultChurchId || 1,
     name: initialData?.name || '',
     code: initialData?.code || '',
     member_id: initialData?.member_id || 0,
     is_active: initialData?.is_active ?? true,
   });
-  console.log(clusterId);
+
+  // Ginagamit ito para hindi ma-reset ang form habang nagta-type ang user
+  const loadedClusterIdRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      loadedClusterIdRef.current = null; // I-reset kapag sinarado ang modal
+      return;
+    }
+
+    // Kung na-load na ang data para sa clusterId na ito, huwag na ulit galawin
+    if (loadedClusterIdRef.current === clusterId) return;
+
+    if (initialData) {
+      setFormData({
+        church_id: initialData.church_id || defaultChurchId || 1,
+        name: initialData.name || '',
+        code: initialData.code || '',
+        member_id: initialData.member_id || 0,
+        is_active: initialData.is_active ?? true,
+      });
+      loadedClusterIdRef.current = clusterId;
+      return;
+    }
+
+    if (clusterId) {
+      // Hanapin ang cluster sa loob ng allClusters
+      const foundCluster = allClusters.flatMap((c: any) => 
+        (c.clusters || []).map((cl: any) => ({ ...cl, church_id: c.id }))
+      ).find((c: any) => String(c.id) === String(clusterId));
+
+      if (foundCluster) {
+        setFormData({
+          church_id: foundCluster.church_id || 1,
+          name: foundCluster.name || '',
+          code: foundCluster.code || '',
+          member_id: foundCluster.cluster_mentor?.id || foundCluster.member_id || 0,
+          is_active: foundCluster.is_active ?? true,
+        });
+        loadedClusterIdRef.current = clusterId;
+      }
+    } else {
+      setFormData({
+        church_id: defaultChurchId || 1,
+        name: '',
+        code: '',
+        member_id: 0,
+        is_active: true,
+      });
+      loadedClusterIdRef.current = clusterId;
+    }
+  }, [isOpen, clusterId, defaultChurchId, initialData, allClusters]);
 
   // Fetch Members/Leaders data
   const { data: apiInterviewer } = useMembers({
@@ -66,6 +112,18 @@ export default function ClusterModal({ isOpen, onClose, clusterId, initialData }
     name: member.full_name,
   }));
 
+  // Fetch Churches data
+  const { data: apiChurch } = useChurches({ 
+    search: '', 
+    page: 1 
+  });
+
+  const churchList = Array.isArray(apiChurch) 
+    ? apiChurch.map((church: any) => ({ value: church.id, label: church.name, id: church.id, name: church.name }))
+    : Array.isArray(apiChurch?.data) 
+      ? apiChurch.data.map((church: any) => ({ value: church.id, label: church.name, id: church.id, name: church.name }))
+      : [];
+
   if (!isOpen) return null;
 
   // Handler para sa pagbabago ng Church selection
@@ -82,8 +140,23 @@ export default function ClusterModal({ isOpen, onClose, clusterId, initialData }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    addCluster(formData, { onSuccess: () => startClose() });
+    
+    if (clusterId) {
+      // Edit Mode
+      updateCluster(
+        { id: clusterId, formData }, 
+        { onSuccess: () => startClose() }
+      );
+    } else {
+      // Create Mode
+      addCluster(
+        formData, 
+        { onSuccess: () => startClose() }
+      );
+    }
   };
+
+  const isChurchLocked = Boolean(defaultChurchId && !clusterId && !initialData);
 
   return (
     <div 
@@ -97,13 +170,14 @@ export default function ClusterModal({ isOpen, onClose, clusterId, initialData }
         <div className="px-8 py-6 bg-[var(--active-parent)] flex items-center justify-between text-white flex-shrink-0">
           <div>
             <h2 className="text-xl font-extrabold tracking-tight">
-              {initialData ? 'Edit Cluster' : 'Create New Cluster'}
+              {clusterId ? 'Edit Cluster' : 'Create New Cluster'}
             </h2>
             <p className="text-white/80 text-xs mt-0.5 font-medium">
               Fill in the details to configure church cluster structure.
             </p>
           </div>
           <button 
+            type="button"
             onClick={startClose} 
             className="p-2 hover:bg-white/10 active:scale-95 rounded-full transition-all"
           >
@@ -119,15 +193,30 @@ export default function ClusterModal({ isOpen, onClose, clusterId, initialData }
             <div>
               <SectionHeader title="Associated Church" icon={Church} />
               <div className="mt-2">
-                <SearchableSelect
-                  label="Church"
-                  name="church_id"
-                  value={formData.church_id || ''}
-                  options={churchList}
-                  placeholder="Select Church"
-                  icon={<Church size={15} />}
-                  onChange={handleChurchChange}
-                />
+                {isChurchLocked ? (
+                  <div>
+                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider ml-1">
+                      Church <span className="text-red-500">*</span>
+                    </label>
+                    <div className="mt-1 w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 flex items-center justify-between cursor-not-allowed">
+                      <span className="font-medium flex items-center gap-2">
+                        <Church size={15} className="text-slate-400" />
+                        {churchList.find((c: any) => c.id === formData.church_id)?.name || 'Selected Church'}
+                      </span>
+                      <span className="text-[10px] font-bold uppercase bg-slate-200 text-slate-500 px-2 py-0.5 rounded">Locked</span>
+                    </div>
+                  </div>
+                ) : (
+                  <SearchableSelect
+                    label="Church"
+                    name="church_id"
+                    value={formData.church_id || ''}
+                    options={churchList}
+                    placeholder="Select Church"
+                    icon={<Church size={15} />}
+                    onChange={handleChurchChange}
+                  />
+                )}
               </div>
             </div>
 
@@ -220,9 +309,10 @@ export default function ClusterModal({ isOpen, onClose, clusterId, initialData }
           <button 
             type="submit" 
             form="cluster-form" 
-            className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2"
+            disabled={isCreating || isUpdating}
+            className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2"
           >
-            <Save size={15} /> Save Cluster
+            <Save size={15} /> {clusterId ? 'Update Cluster' : 'Save Cluster'}
           </button>
         </div>
 

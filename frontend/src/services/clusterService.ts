@@ -34,10 +34,10 @@ export const clusterService = {
         return response.data.data;
     },
 
-    // async updateCluster(id: number, payload: UpdateClusterPayload): Promise<Cluster> {
-    //     const response = await api.put(`/clusters/${id}`, payload);
-    //     return response.data.data || response.data;
-    // },
+    updateCluster: async (id: string, payload: CreateUpdateCluster): Promise<Cluster> => {
+        const response = await apiClient.put(`/clusters/${id}`, payload);
+        return response.data.data || response.data;
+    },
 
     // // Mag-delete ng cluster
     // async deleteCluster(id: number): Promise<void> {
