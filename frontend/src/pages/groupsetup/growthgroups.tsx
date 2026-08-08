@@ -113,7 +113,7 @@ export default function GrowthGroups() {
                 </tr>
               ) : (
                 currentGrowthGroups.map((gg : any) => (
-                  <tr key={gg.id} className="hover:bg-slate-50/80 transition-colors group">
+                  <tr key={gg.id} className="group odd:bg-slate-50 hover:bg-[var(--active-parent,rgb(99,102,241))]/5 transition-colors">
                     
                     {/* Name & Code */}
                     <td className="px-6 py-4">

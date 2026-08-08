@@ -34,7 +34,7 @@ class Cluster extends Model
         return $this->belongsTo(Member::class);
     }
 
-    public function leader()
+    public function leader(): BelongsTo
     {
         // Kung ang member_id sa clusters table ay tumutukoy sa members table:
         return $this->belongsTo(Member::class, 'member_id');
@@ -43,5 +43,10 @@ class Cluster extends Model
     public function growthGroups(): HasMany
     {
         return $this->hasMany(GrowthGroup::class);
+    }
+
+    public function members(): HasMany
+    {
+        return $this->hasMany(Member::class);
     }
 }

@@ -44,3 +44,20 @@ export const useRegisterCluster = () => {
     }
   });
 };
+
+export const useUpdateCluster = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    // Dito ay sinasabi natin na kukunin niya ang 'id' at ang 'formData' object
+    mutationFn: ({ id, formData }: { id: string | number; formData: any }) => 
+      clusterService.updateCluster(id, formData),
+      
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['grouped-clusters'] });
+    },
+    onError: (error: any) => {
+      console.error("Update Cluster failed:", error.response?.data || error.message);
+    }
+  });
+};
