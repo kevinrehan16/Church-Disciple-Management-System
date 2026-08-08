@@ -47,7 +47,8 @@ export default function ViewGrowthGroupMembersModal({
   const safeGrowthGroupId: string | number = growthGroupId ?? '';
   const { data: apiResponse } = useGrowthGroupMembers(safeGrowthGroupId);
   
-  const groupData = apiResponse?.data || apiResponse;
+  const responseObj = apiResponse as any;
+  const groupData = responseObj?.data || responseObj;
   const leader = groupData?.leader || null;
   const rawMembers = groupData?.members || [];
 
@@ -98,7 +99,7 @@ export default function ViewGrowthGroupMembersModal({
               </span>
             </div>
             <h2 className="text-xl font-extrabold tracking-tight mt-1">
-              {groupData?.name || growthGroupName} — Members Roster
+              {groupData?.name || growthGroupName} - Growth Group Members
             </h2>
             <p className="text-white/80 text-xs mt-0.5 font-medium">
               Meeting every {groupData?.meeting_day || 'Schedule'} at {groupData?.venue_address || 'Venue'}
