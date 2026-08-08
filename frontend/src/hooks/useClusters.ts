@@ -51,7 +51,7 @@ export const useUpdateCluster = () => {
   return useMutation({
     // Dito ay sinasabi natin na kukunin niya ang 'id' at ang 'formData' object
     mutationFn: ({ id, formData }: { id: string | number; formData: any }) => 
-      clusterService.updateCluster(id, formData),
+      clusterService.updateCluster(String(id), formData),
       
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['grouped-clusters'] });
