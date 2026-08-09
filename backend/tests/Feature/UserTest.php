@@ -182,7 +182,7 @@ class UserTest extends TestCase
             'birthday' => '1995-01-15',
             'city' => 'Parañaque City',
             'barangay' => 'BF Homes',
-            'church_id' => 1,
+            'church_id' => '1',
         ];
 
         $response = $this->actingAs($admin, 'sanctum')
@@ -247,7 +247,7 @@ class UserTest extends TestCase
             'birthday' => '1995-01-15',
             'city' => 'Parañaque City',
             'barangay' => 'BF Homes',
-            'church_id' => 1,
+            'church_id' => '1',
         ];
 
         $response = $this->actingAs($admin, 'sanctum')
