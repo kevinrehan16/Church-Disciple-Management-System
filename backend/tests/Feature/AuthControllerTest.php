@@ -158,6 +158,7 @@ class AuthControllerTest extends TestCase
             'password' => Hash::make('Password123!'),
             'role' => 'member',
             'must_change_password' => true,
+            'is_active' => true,
         ], $overrides));
 
         $user->member()->create([
@@ -177,6 +178,7 @@ class AuthControllerTest extends TestCase
             'email' => 'admin@example.com',
             'password' => Hash::make('Password123!'),
             'role' => 'admin',
+            'is_active' => true,
         ]);
 
         $role = Role::findOrCreate('admin', 'sanctum');
