@@ -23,7 +23,7 @@ class UserTest extends TestCase
 
     protected function createSchema(): void
     {
-        // I-wipe ang buong Postgres schema kasama ang lahat ng dependent tables (growth_groups, families, etc.)
+        // I-wipe ang buong Postgres schema kasama ang lahat ng dependent tables
         if (DB::getDriverName() === 'pgsql') {
             DB::statement('DROP SCHEMA public CASCADE;');
             DB::statement('CREATE SCHEMA public;');
@@ -39,6 +39,13 @@ class UserTest extends TestCase
             $table->boolean('must_change_password')->default(true);
             $table->boolean('is_active')->default(true);
             $table->rememberToken();
+            $table->timestamps();
+        });
+
+        // IDAGDAG ITO: Churches table para pumasa ang exists:churches,id validation
+        Schema::create('churches', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
             $table->timestamps();
         });
 
@@ -172,6 +179,9 @@ class UserTest extends TestCase
         Mail::fake();
         $admin = $this->actingAsAdminUser();
 
+        // Mag-insert ng dummy church para sa exists validation
+        DB::table('churches')->insert(['id' => 1, 'name' => 'Main Church', 'created_at' => now(), 'updated_at' => now()]);
+
         $payload = [
             'email' => 'member@example.com',
             'first_name' => 'Juan',
@@ -228,13 +238,16 @@ class UserTest extends TestCase
             ->assertJsonValidationErrors(['email', 'first_name', 'last_name', 'gender', 'mobile_number']);
 
         $this->assertDatabaseCount('users', 1);
-        Mail::assertNothingSent();
+        $this->assertNothingSent(); // Fixed alias if needed, or Mail::assertNothingSent();
     }
 
     public function test_registration_persists_user_and_member_records_with_expected_data(): void
     {
         Mail::fake();
         $admin = $this->actingAsAdminUser();
+
+        // Mag-insert ng dummy church para sa exists validation
+        DB::table('churches')->insert(['id' => 1, 'name' => 'Main Church', 'created_at' => now(), 'updated_at' => now()]);
 
         $payload = [
             'email' => 'integrity@example.com',
