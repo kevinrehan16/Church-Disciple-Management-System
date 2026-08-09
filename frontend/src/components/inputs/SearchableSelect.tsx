@@ -14,6 +14,7 @@ interface SearchableSelectProps {
   placeholder?: string;
   icon?: React.ReactNode;
   error?: string;
+  required?: boolean;
   onChange: (e: { target: { name: string; value: string } }) => void;
   onSearchChange?: (searchText: string) => void; // 👉 Naayos na ang syntax error dito
 }
@@ -26,6 +27,7 @@ export function SearchableSelect({
   placeholder = 'Select...',
   icon,
   error,
+  required,
   onChange,
   onSearchChange
 }: SearchableSelectProps) {
@@ -65,7 +67,7 @@ export function SearchableSelect({
     <div className="relative space-y-1.5 w-full" ref={dropdownRef}>
       {/* Label sa labas */}
       <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider ml-1">
-        {label}
+        {label} {required && <span className="text-red-500">*</span>}
       </label>
 
       {/* Main Clickable Box */}

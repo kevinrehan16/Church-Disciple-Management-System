@@ -11,7 +11,6 @@ import {
   Filter
 } from 'lucide-react';
 import { useUsers } from '../../hooks/useUsers';
-import { getPageNumbers } from '../../utils/pagination';
 import UserModal from '../../components/modals/userModals/UserModal';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
@@ -33,11 +32,6 @@ export default function Users() {
 
   const users = paginatedResponse?.data || [];
   const meta = paginatedResponse?.meta;
-  
-  const lastPage = meta?.last_page || 1;
-  const totalEntries = meta?.total || 0;
-  const fromEntry = meta?.from || 0;
-  const toEntry = meta?.to || 0;
 
   const handleSearchChange = (val: string) => {
     setSearchTerm(val);
@@ -266,55 +260,65 @@ export default function Users() {
           </table>
         </div>
         
-        {/* DYNAMIC PAGINATION CONTROLS */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-slate-100 bg-slate-100/50">
+        {/* 3. DYNAMIC PAGINATION FOOTER (Optimized) */}
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-100/50">
           <p className="text-xs text-slate-500 font-medium">
-            Showing <span className="text-slate-800 font-bold">{fromEntry}</span> to{' '}
-            <span className="text-slate-800 font-bold">{toEntry}</span> of{' '}
-            <span className="text-slate-800 font-bold">{totalEntries}</span> entries
+            Showing <span className="text-slate-800 font-bold">{meta?.from || 0}</span> to <span className="text-slate-800 font-bold">{meta?.to || 0}</span> of <span className="text-slate-800 font-bold">{meta?.total || 0}</span> entries
           </p>
 
           <div className="flex items-center gap-1">
             <button 
-              type="button"
-              disabled={currentPage === 1 || isLoading}
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+              disabled={!meta || meta.current_page === 1} 
+              className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30"
             >
               Prev
             </button>
             
-            {getPageNumbers(currentPage, lastPage).map((page, index) => {
-              if (typeof page === 'string') {
-                return (
-                  <span key={index} className="px-2 py-1.5 text-xs text-slate-400 font-bold select-none">
-                    {page}
-                  </span>
-                );
+            {/* Dynamic Page Numbers with Ellipsis (...) para hindi sumabog ang UI */}
+            {meta && (() => {
+              const current = meta.current_page;
+              const last = meta.last_page;
+              const delta = 2; // Ilang pahina ang gusto mong makita sa tabi ng current page
+              const range = [];
+
+              for (let i = Math.max(2, current - delta); i <= Math.min(last - 1, current + delta); i++) {
+                range.push(i);
               }
 
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  disabled={isLoading}
-                  onClick={() => setCurrentPage(page)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-                    currentPage === page
-                      ? 'bg-[var(--active-parent,rgb(99,102,241))] text-white shadow-sm'
-                      : 'bg-white text-slate-600 hover:bg-slate-200 border border-slate-200/60'
-                  }`}
-                >
-                  {page}
-                </button>
-              );
-            })}
+              if (current - delta > 2) {
+                range.unshift("...");
+              }
+              if (current + delta < last - 1) {
+                range.push("...");
+              }
+
+              range.unshift(1);
+              if (last > 1) {
+                range.push(last);
+              }
+
+              return range.map((page, index) => {
+                if (page === "...") {
+                  return <span key={`ellipsis-${index}`} className="px-2 text-xs text-slate-400">...</span>;
+                }
+
+                return (
+                  <button 
+                    key={page} 
+                    onClick={() => setCurrentPage(Number(page))} 
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg ${current === page ? 'bg-[var(--active-parent,rgb(99,102,241))] text-white' : 'text-slate-600 hover:bg-slate-200'}`}
+                  >
+                    {page}
+                  </button>
+                );
+              });
+            })()}
 
             <button 
-              type="button"
-              disabled={currentPage >= lastPage || isLoading}
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, lastPage))}
-              className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              onClick={() => setCurrentPage(prev => (!meta ? prev : Math.min(prev + 1, meta.last_page)))} 
+              disabled={!meta || meta.current_page === meta.last_page || meta.last_page === 0} 
+              className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-30"
             >
               Next
             </button>

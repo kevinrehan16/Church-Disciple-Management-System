@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Traits\HasCustomId;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Enums\MemberStatus;
 
 class Member extends Model
 {
-    use HasCustomId;
+    use HasCustomId, HasFactory;
 
     public $idColumn = 'mem_id';
 
@@ -89,6 +91,7 @@ class Member extends Model
     // Define mo dito ang rules para madaling i-update sa future
     const RANK_MAP = [
         'Senior Pastor'         => 1,
+        'Pastoral'              => 2,
         'Pastoral Staff'        => 2,
         'Elder'                 => 2,
         'Deacon'                => 2,
@@ -119,6 +122,11 @@ class Member extends Model
             ->withTimestamps();
     }
 
+    public function ledGrowthGroups()
+    {
+        return $this->hasMany(GrowthGroup::class, 'leader_id');
+    }
+
     public function church()
     {
         return $this->belongsTo(Church::class);
@@ -142,7 +150,7 @@ class Member extends Model
             ->withTimestamps();
     }
 
-    public function familyMembership(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function familyMembership(): HasOne
     {
         return $this->hasOne(FamilyMember::class);
     }

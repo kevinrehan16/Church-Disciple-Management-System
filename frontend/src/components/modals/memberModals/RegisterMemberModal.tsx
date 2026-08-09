@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   X, Mail, Calendar, Phone, MapPin, Save, ShieldCheck, UserStar, IdCardLanyard, Users, House,
-  Briefcase, Church, MapPinned, Building, Cross, NotepadText, ThumbsUp
+  Briefcase, Church, MapPinned, Building, Cross, NotepadText, ThumbsUp, Loader2
 } from 'lucide-react';
 import { useMembers, useRegisterMember, useUpdateMember } from '../../../hooks/useMembers';
 import { useSpiritualGift } from '../../../hooks/useSpiritualGift';
@@ -28,7 +28,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
   const [searchTerm, setSearchTerm] = useState('');
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addMember, isPending: pendingAddMember } = useRegisterMember();
-  const { mutate: updateMember } = useUpdateMember();
+  const { mutate: updateMember, isPending: pendingUpdateMember } = useUpdateMember();
   const { data: apiResponse, isLoading } = useSpiritualGift();
   const [isActive, setIsActive] = useState(true);
   
@@ -182,7 +182,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                 {memberId ? 'Update record details' : 'Complete the member registration form'}
               </p>
             </div>
-            <button onClick={startClose} className="p-2 hover:bg-white/10 active:scale-95 rounded-full transition-all">
+            <button onClick={startClose} disabled={pendingAddMember} className="p-2 hover:bg-white/10 active:scale-95 rounded-full transition-all">
               <X size={20} />
             </button>
           </div>
@@ -200,7 +200,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                 <div className="space-y-5">
                   <SectionHeader title="Account" icon={ShieldCheck} />
                   <div className="grid grid-cols-1 md:grid-cols-1 gap-5">
-                    <InputField label="Email Address" placeholder='johndoe@gmail.com' name="email" type="email" value={formDataState.email || ''} onChange={handleChange} icon={<Mail size={15}/>} />
+                    <InputField label="Email Address" required placeholder='johndoe@gmail.com' name="email" type="email" value={formDataState.email || ''} onChange={handleChange} icon={<Mail size={15}/>} />
                     <div className='hidden'>
                       <InputField label="Picture Path" name="picture" value={formDataState.picture || ''} onChange={handleChange} />
                     </div>
@@ -211,9 +211,9 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                 <div className="space-y-5">
                   <SectionHeader title="Personal Identity" icon={IdCardLanyard} />
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <InputField label="First Name" name="first_name" placeholder='Johnny' value={formDataState.first_name || ''} onChange={handleChange} />
+                    <InputField label="First Name" required name="first_name" placeholder='Johnny' value={formDataState.first_name || ''} onChange={handleChange} />
                     <InputField label="Middle Name" name="middle_name" placeholder='Smith' value={formDataState.middle_name || ''} onChange={handleChange} />
-                    <InputField label="Last Name" name="last_name" placeholder='Doe' value={formDataState.last_name || ''} onChange={handleChange} />
+                    <InputField label="Last Name" required name="last_name" placeholder='Doe' value={formDataState.last_name || ''} onChange={handleChange} />
                     <InputField label="Nickname" name="nickname" placeholder='John' value={formDataState.nickname || ''} onChange={handleChange} />
                     
                     <div className="flex flex-col gap-1.5 w-full">
@@ -230,6 +230,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                             name="birthday" 
                             value={formDataState.birthday || getTodayDate()} 
                             onChange={handleChange}
+                            required
                             max={getTodayDate()}
                             className="w-full pl-10 pr-4 py-2.5 outline-none bg-transparent text-sm" 
                           />
@@ -262,7 +263,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                         {label: 'Separated', value: 'Separated'},
                         {label: 'Divorced', value: 'Divorced'}
                       ]} />
-                    <InputField label="Mobile Number" name="mobile_number" value={formDataState.mobile_number || ''} onChange={handleChange} placeholder='0915*******' icon={<Phone size={15}/>} />
+                    <InputField label="Mobile Number" required name="mobile_number" value={formDataState.mobile_number || ''} onChange={handleChange} placeholder='0915*******' icon={<Phone size={15}/>} />
                     <InputField label="Facebook Name" name="facebook_name" value={formDataState.facebook_name || ''} onChange={handleChange} placeholder='John Doe'/>
                   </div>
                 </div>
@@ -284,8 +285,8 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                     <div className="md:col-span-2">
                       <InputField label="Home Address" name="home_address" value={formDataState.home_address || ''} onChange={handleChange} icon={<MapPin size={15}/>} />
                     </div>
-                    <InputField label="Barangay" name="barangay" value={formDataState.barangay || ''} onChange={handleChange} />
-                    <InputField label="City" name="city" value={formDataState.city || ''} onChange={handleChange} />
+                    <InputField label="Barangay" required name="barangay" value={formDataState.barangay || ''} onChange={handleChange} />
+                    <InputField label="City" required name="city" value={formDataState.city || ''} onChange={handleChange} />
                     <InputField label="Region" name="region" value={formDataState.region || ''} onChange={handleChange} />
                     <InputField label="Country" name="country" value={formDataState.country || ''} onChange={handleChange} />
                   </div>
@@ -356,6 +357,7 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                       placeholder="Select Church"
                       icon={<Church size={15} />}
                       onChange={handleChange}
+                      required
                     />
 
                     <SearchableSelect
@@ -367,20 +369,25 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                       icon={<MapPinned size={15} />}
                       onChange={handleChange}
                     />
-                    <InputField label="Purpose of Registration" name="purpose_reg" value={formDataState.purpose_reg || ''} onChange={handleChange} />
-                    <SelectField 
-                      label="Membership Type" 
-                      name="member_position" 
-                      value={formDataState.member_position || ''} 
-                      onChange={handleChange}
-                      options={[ 
-                        {label: 'Member', value: 'Growth Group Member'}, 
-                        {label: 'Pastoral Staff', value: 'Pastoral Staff'}, 
-                        {label: 'Deacon', value: 'Deacon'}, 
-                        {label: 'Elder', value: 'Elder'}, 
-                        {label: 'Pastor', value: 'Pastor'}, 
-                        {label: 'Senior Pastor', value: 'Senior Pastor'}, 
-                      ]} />
+                    <div className="md:col-span-2">
+                      <InputField label="Purpose of Registration" name="purpose_reg" value={formDataState.purpose_reg || ''} onChange={handleChange} />
+                    </div>
+                    <div className='hidden'>
+                      <SelectField 
+                        label="Membership Type" 
+                        name="member_position" 
+                        value={formDataState.member_position || ''} 
+                        onChange={handleChange}
+                        options={[ 
+                          {label: 'No Growth Group', value: 'No Growth Group'}, 
+                          {label: 'Growth Group Member', value: 'Growth Group Member'}, 
+                          {label: 'Pastoral Staff', value: 'Pastoral Staff'}, 
+                          {label: 'Deacon', value: 'Deacon'}, 
+                          {label: 'Elder', value: 'Elder'}, 
+                          {label: 'Pastor', value: 'Pastor'}, 
+                          {label: 'Senior Pastor', value: 'Senior Pastor'}, 
+                        ]} />
+                    </div>
                   </div>
                 </div>
 
@@ -438,11 +445,16 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
 
           {/* FOOTER */}
           <div className="px-8 py-4 bg-slate-50 border-t border-slate-200/60 flex gap-3 justify-end flex-shrink-0">
-            <button type="button" onClick={startClose} className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider border border-slate-200 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all flex items-center gap-2">
-             <X size={15} /> Cancel
+            <button 
+              type="button" 
+              disabled={(pendingAddMember || pendingUpdateMember) || profileLoading} 
+              onClick={startClose} 
+              className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider border border-slate-200 text-slate-500 hover:text-rose-700 hover:bg-rose-50 hover:border-rose-700 disabled:opacity-50 disabled:hover:text-slate-500 disabled:hover:bg-transparent disabled:cursor-not-allowed rounded-xl transition-all flex items-center gap-2"
+            >
+              <X size={15} /> Cancel
             </button>
-            <button type="submit" disabled={pendingAddMember || profileLoading} form="member-form" className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2">
-              <Save size={15} /> {pendingAddMember ? 'Saving...' : 'Save Registration'}
+            <button type="submit" disabled={(pendingAddMember || pendingUpdateMember) || profileLoading} form="member-form" className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2">
+              {(pendingAddMember || pendingUpdateMember) ? <><Loader2 size={15} className="animate-spin"/> Saving...</> : <><Save size={15} /> Save Registration</>}
             </button>
           </div>
         </div>

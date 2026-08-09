@@ -33,7 +33,7 @@ class RegisterRequest extends FormRequest
             'last_name'     => 'required|string|max:50',
             'middle_name'   => 'nullable|string|max:50',
             'gender'        => 'required|string|in:Male,Female,Other',
-            'birthday'      => 'nullable|date',
+            'birthday'      => 'required|date',
             'age'           => 'nullable|integer|min:0',
 
             // Family & Social
@@ -49,8 +49,8 @@ class RegisterRequest extends FormRequest
             'home_address'    => 'nullable|string|max:150',
             'country'         => 'nullable|string|max:30',
             'region'          => 'nullable|string|max:30',
-            'city'            => 'nullable|string|max:30',
-            'barangay'        => 'nullable|string|max:30',
+            'city'            => 'required|string|max:30',
+            'barangay'        => 'required|string|max:30',
 
             // Professional & Education
             'occupation'     => 'nullable|string|max:50',
@@ -67,7 +67,7 @@ class RegisterRequest extends FormRequest
             'purpose_reg'         => 'nullable|string|max:200',
             'prev_church'         => 'nullable|string|max:50',
             'church_affiliation'  => 'nullable|string|max:60',
-            'church_id'           => 'nullable|string|max:30',
+            'church_id'           => 'required|string|max:30',
             'cluster_id'          => 'nullable|string|max:30',
             'member_position'     => 'nullable|string|max:30',
             'member_status'       => 'nullable|string|max:20',
