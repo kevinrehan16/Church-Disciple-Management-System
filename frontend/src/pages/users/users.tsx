@@ -189,7 +189,7 @@ export default function Users() {
                 const fullName = user.member 
                   ? `${user.member.firstName} ${user.member.lastName}` 
                   : user.email.split('@')[0];
-                const initialLetter = fullName.charAt(0).toUpperCase();
+                const initialLetter = user?.member?.firstName?.[0]+''+user?.member?.lastName?.[0];
 
                 return (
                   <tr 
