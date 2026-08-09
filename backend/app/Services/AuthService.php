@@ -2,14 +2,16 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Mail;
 use App\Models\User;
-use App\Mail\NewUserTemporaryPasswordMail;
+use App\Models\Member;
+// use App\Mail\NewUserTemporaryPasswordMail;
+use Illuminate\Support\Str;
+// use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Request;
 
 class AuthService
 {
@@ -20,7 +22,7 @@ class AuthService
         // 1. Suriin kung lumampas na sa 5 beses ang pagsubok
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
-            $minutes = ceil($seconds / 60); // Kunin ang katumbas na minuto
+            $minutes = ceil($seconds / 60);
             $minuteText = $minutes == 1 ? 'minute' : 'minutes';
 
             throw ValidationException::withMessages([
@@ -30,17 +32,23 @@ class AuthService
 
         $user = User::where('email', $credentials['email'])->first();
 
-        // 2. Kung mali ang credentials, i-hit ang limiter at i-set sa 900 seconds (15 minutes) ang decay
+        // 2. Kung mali ang credentials o hindi nahanap ang user
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
-            // 900 seconds = 15 minutes
-            RateLimiter::hit($throttleKey, 900);
+            RateLimiter::hit($throttleKey, 900); // 900 seconds = 15 minutes
 
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials.'],
             ]);
         }
 
-        // 3. Kung matagumpay, i-clear ang attempts
+        // 3. 🔒 Suriin kung ang account ay ACTIVE (`is_active` ay true)
+        if (!$user->is_active) {
+            throw ValidationException::withMessages([
+                'email' => ['Your account is currently inactive or restricted. Please contact the system administrator for assistance.'],
+            ]);
+        }
+
+        // 4. Kung matagumpay at active ang user, i-clear ang attempts
         RateLimiter::clear($throttleKey);
 
         return $user;
@@ -57,6 +65,7 @@ class AuthService
                 'password' => Hash::make($tempPassword),
                 'role'     => 'member',
                 'must_change_password' => true,
+                'is_active' => false,
             ]);
 
             // 2. Create Member Profile (I-save natin sa $member variable)
@@ -123,7 +132,7 @@ class AuthService
                 $member->spiritualGifts()->sync($data['spiritual_gifts']);
             }
 
-            Mail::to($user->email)->send(new NewUserTemporaryPasswordMail($tempPassword));
+            // Mail::to($user->email)->send(new NewUserTemporaryPasswordMail($tempPassword));
 
             return $user;
         });
@@ -153,5 +162,58 @@ class AuthService
         $user->save();
 
         return true;
+    }
+
+    public function getPaginatedUsers(Request $request, ?string $role = null)
+    {
+        return User::with(['member'])
+            // 1. FILTER: is_active (Kukuha ng true o false mula sa query params)
+            ->when($request->filled('is_active'), function ($query) use ($request) {
+                $isActive = filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN);
+                $query->where('is_active', $isActive);
+            })
+            // 2. FILTER: role
+            ->byRole($role)
+            ->orderBy('id', 'desc')
+            // 3. SEARCH
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    // Search sa 'users' table (halimbawa: email)
+                    $q->where('email', 'ILIKE', "%{$search}%")
+                        // Search sa related 'member' table gamit ang whereHas
+                        ->orWhereHas('member', function ($memberQuery) use ($search) {
+                            $memberQuery->where('first_name', 'ILIKE', "%{$search}%")
+                                ->orWhere('last_name', 'ILIKE', "%{$search}%");
+                        });
+                });
+            })
+            ->paginate(10);
+    }
+
+    public function getMyProfile(Request $request)
+    {
+        $userId = auth()->id();
+
+        return Member::with([
+            'user',
+            'Church',
+            'Cluster',
+            'spiritualGifts',
+            'familyMembership.family.familyMembers.member'
+        ])
+            ->where('user_id', $userId)
+            ->first();
+    }
+
+    public function getMemberById($id)
+    {
+        return Member::with([
+            'user', // 👈 Para makuha rin ang data mula sa users table (tulad ng email)
+            'Church',
+            'Cluster',
+            'spiritualGifts',
+            'familyMembership.family.familyMembers.member'
+        ])
+            ->find($id);
     }
 }

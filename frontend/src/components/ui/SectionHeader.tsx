@@ -8,7 +8,7 @@ interface SectionHeaderProps {
 
 export default function SectionHeader({ title, icon: Icon, className = "" }: SectionHeaderProps) {
   return (
-    <div className={`flex items-center mb-8 gap-2 ${className}`}>
+    <div className={`flex items-center mb-8 mt-8 gap-2 ${className}`}>
       {/* Icon with circular background */}
       {Icon && (
         <div className="p-1.5 rounded-full bg-[var(--active-parent)]/10 shrink-0">

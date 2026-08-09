@@ -20,7 +20,7 @@ class UserResource extends JsonResource
             'role'      => $this->role,
             'createdAt' => $this->created_at,
             'mustChangePassword' => $this->must_change_password,
-
+            'is_active' => $this->is_active,
             'member' => [
                 'firstName' => $this->member?->first_name ?? 'N/A',
                 'lastName'  => $this->member?->last_name ?? 'N/A',
