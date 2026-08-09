@@ -9,7 +9,7 @@ use Exception;
 class MemberService
 {
 
-    public function getPaginatedMembers($request, ?string $position = null, ?int $rank = null)
+    public function getPaginatedMembers($request, $position = null, ?int $rank = null)
     {
         return Member::with(['user', 'church', 'cluster', 'spiritualGifts'])
             // 1. FILTER

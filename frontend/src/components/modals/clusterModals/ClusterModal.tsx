@@ -98,7 +98,7 @@ export default function ClusterModal({ isOpen, onClose, clusterId, defaultChurch
   const { data: apiInterviewer } = useMembers({
     search: searchTerm,
     page: 1,
-    position: 'Elder,Deacon,Pastoral Staff,Senior Pastor,Pastor',
+    member_position: 'Elder,Deacon,Pastoral Staff,Senior Pastor,Pastor',
   });
 
   const currentInterviewers = Array.isArray(apiInterviewer) 

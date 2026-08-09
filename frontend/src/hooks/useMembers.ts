@@ -7,7 +7,7 @@ import { type Pagination } from '../types/typePagination';
 export interface MemberFilters {
   search?: string;
   page?: number;
-  position?: string;
+  member_position?: string | string[];
   rank?: number;
 }
 

@@ -77,10 +77,26 @@ class Member extends Model
     {
         if (!$position) return $query;
 
-        // I-convert ang comma-separated string sa array (e.g., "Pastor,Elder" -> ["Pastor", "Elder"])
+        // I-convert ang comma-separated string sa array kung kinakailangan
         $positions = is_array($position) ? $position : explode(',', $position);
 
-        return $query->whereIn('member_position', $positions);
+        return $query->where(function ($q) use ($positions) {
+            foreach ($positions as $pos) {
+                $trimmedPos = trim($pos);
+
+                if ($trimmedPos === 'Member') {
+                    // Kapag "Member" ang napili, isama ang tatlong ito
+                    $q->orWhereIn('member_position', [
+                        'No Growth Group',
+                        'Growth Group Member',
+                        'Growth Group Leader'
+                    ]);
+                } else {
+                    // Para sa ibang posisyon (Pastor, Elder, atbp.)
+                    $q->orWhere('member_position', $trimmedPos);
+                }
+            }
+        });
     }
 
     public function scopeByRank($query, $rank)

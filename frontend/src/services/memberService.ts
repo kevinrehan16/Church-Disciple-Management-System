@@ -5,7 +5,7 @@ import type { Pagination } from '../types/typePagination';
 export interface MemberFilters {
   search?: string;
   page?: number;
-  position?: string;
+  member_position?: string | string[];
   rank?: number;
 }
 
@@ -15,7 +15,7 @@ export const memberService = {
       params: {
         search: filters.search,
         page: filters.page || 1,
-        position: filters.position,
+        member_position: filters.member_position,
         rank: filters.rank,
       }
     });
