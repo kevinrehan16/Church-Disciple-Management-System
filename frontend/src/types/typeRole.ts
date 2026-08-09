@@ -18,7 +18,6 @@ export interface Role {
 export interface CreateRolePayload {
   name: string;
   guard_name?: string;
-  is_active?: boolean;
   permissions?: string[]; // Array ng Permission IDs (e.g. [1, 2, 5])
 }
 
@@ -26,7 +25,6 @@ export interface UpdateRolePayload {
   name?: string;
   guard_name?: string;
   permissions?: string[];
-  is_active?: boolean;
 }
 
 export interface RoleQueryParams {

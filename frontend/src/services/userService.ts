@@ -9,6 +9,7 @@ export interface UserFilters {
 
 export interface UpdateRolePayload {
   role: string; // O kaya ay 'super_admin' | 'admin' | 'manager' | 'member'
+  is_active?: boolean;
 }
 
 export const userService = {
