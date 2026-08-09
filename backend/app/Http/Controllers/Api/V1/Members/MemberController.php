@@ -23,14 +23,15 @@ class MemberController extends Controller
     public function index(Request $request)
     {
         $this->authorize('viewAny', Member::class);
-        // 1. Validations (Optional but recommended)
+
+        // 1. Validations (Pinayagan na ang string o array)
         $request->validate([
-            'position' => 'nullable|string',
+            'member_position' => 'nullable',
             'search'   => 'nullable|string',
         ]);
 
         // 2. Kunin ang request params
-        $position = $request->query('position');
+        $position = $request->query('member_position');
         $rank = $request->query('rank');
 
         // 3. Tawagin ang Service

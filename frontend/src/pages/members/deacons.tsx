@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { FaFacebookF, FaMobile, FaEnvelope, FaUsers } from "react-icons/fa";
-import { Filter, ArrowUpDown, Eye, Mars, Venus, Cake, User, MapPin } from 'lucide-react';
+import { FaUsers } from "react-icons/fa";
+import { Filter, ArrowUpDown, Eye, Church, MapPinned, Sprout, CircleX, User, ShieldCheck } from 'lucide-react';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
 import { TableLoading, TableError, TableEmpty } from '../../components/ui/TableStates';
 import { useMembers } from '../../hooks/useMembers';
-import { calculateAge } from '../../utils/formatters';
 import { getLifestageStyles } from '../../utils/formatters';
 // import RegisterMemberModal from '../../components/modals/memberModals/RegisterMemberModal';
 
@@ -18,7 +17,7 @@ export default function Deacons() {
   const { data: apiResponse, isLoading, isError, refetch } = useMembers({
     search: searchTerm,
     page: currentPage,
-    position: 'Deacon', // Example: pwede mo i-uncomment ito in the future kung gusto mong i-filter agad
+    member_position: 'Deacon', // Example: pwede mo i-uncomment ito in the future kung gusto mong i-filter agad
     // rank: 1
   });
   
@@ -62,10 +61,10 @@ export default function Deacons() {
                 <thead className="sticky top-0 z-10 bg-[var(--active-parent)]">
                   <tr className="text-white uppercase tracking-wider text-[10px] font-extrabold border-b border-slate-200/60">
                     <th className="px-6 py-4">Patient Details</th>
-                    <th className="px-6 py-4">Birthday/ Age / Gender</th>
-                    <th className="px-6 py-4">Contacts</th>
+                    <th className="px-6 py-4 text-center">Member Position</th>
+                    <th className="px-6 py-4">Church Details</th>
                     <th className="px-6 py-4 text-center">Life-Stage</th>
-                    <th className="px-6 py-4">Address</th>
+                    <th className="px-6 py-4">GrowthGroup Status</th>
                     <th className="px-6 py-4 text-center">Actions</th>
                   </tr>
                 </thead>
@@ -95,45 +94,34 @@ export default function Deacons() {
                               </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-2 text-slate-900 text-sm font-medium">
-                              <Cake size={14} className="text-slate-400" />
-                              {member.birthday}
-                            </div>
-                            <div className="flex items-center gap-2 text-slate-500 text-xs">
-                              <User size={14} className="text-slate-400" />
-                              <span>{calculateAge(member.age)} yrs</span>
-                              <span>•</span>
-                              <div className='flex items-center justify-center gap-1'>
-                                {member.gender === 'Male' ? (
-                                  <Mars size={14} className="text-slate-400" />
-                                ) : (
-                                  <Venus size={14} className="text-slate-400" />
-                                )}
-                                <span className={`rounded-full text-[11px] font-medium`}>
-                                  {member.gender}
-                                </span>
-                              </div>
-                            </div>
+                        <td className="px-6 py-4 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <span className={`flex items-center justify-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold tracking-wide uppercase ${
+                              ['Senior Pastor', 'Elder'].includes(member.member_position)
+                                ? 'bg-amber-50 text-amber-700 border border-amber-200/60'
+                                : ['Pastor', 'Pastoral Staff', 'Deacon'].includes(member.member_position)
+                                ? 'bg-blue-50 text-blue-700 border border-blue-200/60'
+                                : 'bg-slate-100 text-slate-600 border border-slate-200/60'
+                            }`}>
+                              <User size={10} className="shrink-0"/>
+                              {['Growth Group Member', 'No Growth Group', 'Growth Group Leader'].includes(member.member_position)
+                                ? 'MEMBER'
+                                : member.member_position}
+                            </span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex flex-col gap-1.5">
                             <div className="flex items-center gap-2 text-slate-600">
-                              <FaEnvelope size={12} className="text-rose-400 shrink-0" />
-                              <span className="text-xs truncate max-w-[150px]">{member.email}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-slate-600">
-                              <FaMobile size={12} className="text-cyan-400 shrink-0" />
-                              <span className="text-xs font-mono">
-                                {member.mobile_number || <span className="text-slate-300 italic">No number</span>}
+                              <Church size={12} className="text-indigo-400 shrink-0" />
+                              <span className="text-[13px] font-medium truncate max-w-[150px]">
+                                {member.church_name || <span className="text-slate-300 italic">Unassigned</span>}
                               </span>
                             </div>
                             <div className="flex items-center gap-2 text-slate-600">
-                              <FaFacebookF size={12} className="text-blue-400 shrink-0" />
-                              <span className="text-xs font-normal">
-                                {member.facebook_name || <span className="text-slate-300 italic">No Facebook</span>}
+                              <MapPinned size={12} className="text-rose-400 shrink-0" />
+                              <span className="text-xs font-mono">
+                                {member.cluster_name ? `${member.cluster_name} Cluster` : <span className="text-slate-300 italic">No Cluster</span>}
                               </span>
                             </div>
                           </div>
@@ -145,18 +133,28 @@ export default function Deacons() {
                             </span>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col max-w-[150px]">
-                            {/* Barangay */}
-                            <div className="flex items-center gap-1.5 text-sm font-medium text-slate-900 truncate">
-                              <MapPin size={13} className="text-slate-400 shrink-0" />
-                              {member.barangay || 'N/A'}
-                            </div>
-                            
-                            {/* City */}
-                            <div className="pl-[19px] text-xs text-slate-500 truncate">
-                              {member.city || 'No City Specified'}
-                            </div>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex flex-col gap-1.5 items-start">
+                            {/* 1. TOP: Lalabas lang kapag GG Leader siya */}
+                            {member.is_growth_group_leader && (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200/60 shadow-xs">
+                                <ShieldCheck size={12} className="shrink-0 text-purple-600" />
+                                GrowthGroup Leader
+                              </span>
+                            )}
+
+                            {/* 2. BOTTOM: Membership Status (GG Member o No Growth Group) */}
+                            {member.has_growth_group ? (
+                              <div className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 px-0.5">
+                                <Sprout size={13} className="shrink-0 text-emerald-500" />
+                                <span>GrowthGroup Member</span>
+                              </div>
+                            ) : (
+                              <div className="inline-flex items-center gap-1.5 text-xs text-slate-400 italic px-0.5">
+                                <CircleX size={13} className="shrink-0 text-slate-400" />
+                                <span>No GrowthGroup</span>
+                              </div>
+                            )}
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center">
