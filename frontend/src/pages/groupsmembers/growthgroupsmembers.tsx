@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaLaptopHouse, FaLaptop, FaMobileAlt, FaUserShield, FaUsers, FaUserPlus, FaEye } from "react-icons/fa";
-import { Plus, Sprout, CalendarClock, MapPinHouse } from 'lucide-react';
+import { Sprout, CalendarClock, MapPinHouse } from 'lucide-react';
 import GrowthGroupMemberModal from '../../components/modals/growthgroupmemberModals/GrowthGroupMemberModal';
 import ViewGrowthGroupMembersModal from '../../components/modals/growthgroupmemberModals/ViewGrowthGroupMembersModal';
 import ModuleHeader from '../../components/ui/ModuleHeader';

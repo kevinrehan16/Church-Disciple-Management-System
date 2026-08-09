@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { FaUsers } from 'react-icons/fa';
 import { 
   ShieldUser, 
-  Plus, 
   Edit3, 
   Trash2, 
   ShieldAlert,
@@ -59,11 +58,6 @@ export default function Users() {
     if (window.confirm(`Are you sure you want to delete user "${user.member?.firstName || user.email}"?`)) {
       console.log('Deleting user ID:', user.id);
     }
-  };
-
-  const handleOpenCreateModal = () => {
-    setSelectedUser(null);
-    setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (user: User) => {

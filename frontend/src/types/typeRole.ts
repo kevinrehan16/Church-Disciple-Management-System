@@ -18,6 +18,7 @@ export interface Role {
 export interface CreateRolePayload {
   name: string;
   guard_name?: string;
+  is_active?: boolean;
   permissions?: string[]; // Array ng Permission IDs (e.g. [1, 2, 5])
 }
 
