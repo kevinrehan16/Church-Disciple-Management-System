@@ -36,6 +36,7 @@ class AuthControllerTest extends TestCase
             $table->string('password');
             $table->string('role', 30)->default('member');
             $table->boolean('must_change_password')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });
@@ -158,6 +159,7 @@ class AuthControllerTest extends TestCase
             'password' => Hash::make('Password123!'),
             'role' => 'member',
             'must_change_password' => true,
+            'is_active' => true,
         ], $overrides));
 
         $user->member()->create([
@@ -177,6 +179,7 @@ class AuthControllerTest extends TestCase
             'email' => 'admin@example.com',
             'password' => Hash::make('Password123!'),
             'role' => 'admin',
+            'is_active' => true,
         ]);
 
         $role = Role::findOrCreate('admin', 'sanctum');

@@ -28,57 +28,14 @@ Route::prefix('v1')->group(function () {
         Route::middleware(['role:super_admin|senior_pastor|pastor|admin|staff'])->group(function () {
             Route::post('/register', [AuthController::class, 'register']);
             Route::get('/user', [AuthController::class, 'user']);
+            Route::get('/users', [AuthController::class, 'getAllUsers']);
         });
         Route::post('/logout', [AuthController::class, 'logout']);
 
         // PROFILE ROUTES
         Route::middleware('auth:sanctum')->group(function () {
-
-            // 1. GET /profile/me
-            Route::get('/profile/me', function (Request $request) {
-                $user = $request->user();
-
-                $member = Member::with([
-                    'Church',
-                    'Cluster',
-                    'spiritualGifts',
-                    'familyMembership.family.familyMembers.member' // <--- IDINAGDAG DITO
-                ])
-                    ->where('user_id', $user->id)
-                    ->first();
-
-                if (!$member) {
-                    return response()->json(['message' => 'Member profile not found'], 404);
-                }
-
-                return response()->json([
-                    'success' => true,
-                    'data' => new MemberResource($member)
-                ]);
-            });
-
-            // 2. GET /profile/{id}
-            Route::get('/profile/{id}', function ($id) {
-                $member = Member::with([
-                    'Church',
-                    'Cluster',
-                    'spiritualGifts',
-                    'familyMembership.family.familyMembers.member' // <--- IDINAGDAG DITO
-                ])
-                    ->find($id);
-
-                if (!$member) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Member not found'
-                    ], 404);
-                }
-
-                return response()->json([
-                    'success' => true,
-                    'data' => new MemberResource($member)
-                ]);
-            });
+            Route::get('/profile/me', [AuthController::class, 'myProfile']);
+            Route::get('/profile/{id}', [AuthController::class, 'memberProfile']);
         });
 
         // MEMBERS ROUTES

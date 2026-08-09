@@ -15,6 +15,7 @@ class UserRoleRequest extends FormRequest
     {
         return [
             'role' => 'required|string|exists:roles,name',
+            'is_active' => 'required|boolean',
         ];
     }
 }

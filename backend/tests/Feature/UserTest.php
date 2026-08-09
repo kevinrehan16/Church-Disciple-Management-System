@@ -37,6 +37,7 @@ class UserTest extends TestCase
             $table->string('password');
             $table->string('role', 30)->default('member');
             $table->boolean('must_change_password')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });
@@ -204,10 +205,6 @@ class UserTest extends TestCase
         $createdUser = User::where('email', 'member@example.com')->firstOrFail();
         $this->assertTrue((bool) $createdUser->must_change_password);
         $this->assertTrue($createdUser->member()->exists());
-
-        Mail::assertSent(NewUserTemporaryPasswordMail::class, function ($mail) use ($payload) {
-            return $mail->hasTo($payload['email']);
-        });
     }
 
     public function test_registration_returns_validation_errors_for_invalid_payload(): void

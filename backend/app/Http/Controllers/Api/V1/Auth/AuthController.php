@@ -8,6 +8,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\User\RegisterRequest;
 use App\Http\Requests\Password\ChangePasswordRequest;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\MemberResource;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -55,6 +56,22 @@ class AuthController extends Controller
         return new UserResource($request->user()->load('member'));
     }
 
+    public function getAllUsers(Request $request)
+    {
+        $this->authorize('viewAny', User::class);
+
+        $request->validate([
+            'role' => 'nullable|string',
+            'search'   => 'nullable|string',
+        ]);
+
+        $role = $request->query('role');
+
+        $users = $this->authService->getPaginatedUsers($request, $role);
+
+        return UserResource::collection($users);
+    }
+
     public function register(RegisterRequest $request)
     {
         // Tawagin lang ang service method
@@ -77,5 +94,36 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Password successfully updated. You can now login.',
         ], 200);
+    }
+
+    public function myProfile(Request $request)
+    {
+        $profile = $this->authService->getMyProfile($request);
+
+        if (!$profile) {
+            return response()->json(['message' => 'Your profile not found'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => new MemberResource($profile)
+        ]);
+    }
+
+    public function memberProfile($id)
+    {
+        $member = $this->authService->getMemberById($id);
+
+        if (!$member) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Member not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => new MemberResource($member)
+        ]);
     }
 }

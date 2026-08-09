@@ -26,6 +26,7 @@ import Profiles from './pages/profiles/Profiles';
 
 import Permissions from './pages/permissions/permissions';
 import Roles from './pages/roles/roles';
+import Users from './pages/users/users';
 
 // Protected Route Component
 const ProtectedRoute = () => {
@@ -73,6 +74,7 @@ function App() {
 
                   <Route path="/roles" element={<Roles />} />
                   <Route path="/permissions" element={<Permissions />} />
+                  <Route path="/users" element={<Users />} />
                 </Route>
               </Route>
               

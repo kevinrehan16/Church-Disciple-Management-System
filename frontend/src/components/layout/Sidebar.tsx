@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaUsers, FaUserFriends, FaNetworkWired, FaLayerGroup, FaChartArea, FaCogs, FaAddressCard, FaHandHoldingHeart, FaKey, FaUserShield } from "react-icons/fa";
+import { FaUsers, FaUserFriends, FaNetworkWired, FaLayerGroup, FaChartArea, FaCogs, FaAddressCard, FaHandHoldingHeart, FaKey, FaUserShield, FaUsersCog } from "react-icons/fa";
 import { Settings, ChevronDown, ChevronRight } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -445,7 +445,7 @@ export default function Sidebar({
               )}
             </div>
 
-            {/* ROLE */}
+            {/* ROLES */}
             <div className="relative group/roles">
               <NavLink to="/roles" className={getNavLinkClass}>
                 <FaUserShield size={18} className="shrink-0" />
@@ -456,6 +456,21 @@ export default function Sidebar({
               {isCollapsed && (
                 <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-md shadow-lg pointer-events-none opacity-0 group-hover/roles:opacity-100 transition-opacity duration-150 z-50 whitespace-nowrap border border-slate-700/50">
                   Roles
+                </div>
+              )}
+            </div>
+
+            {/* USERS */}
+            <div className="relative group/users">
+              <NavLink to="/users" className={getNavLinkClass}>
+                <FaUsersCog size={18} className="shrink-0" />
+                <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3'}`}>
+                  Users
+                </span>
+              </NavLink>
+              {isCollapsed && (
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-md shadow-lg pointer-events-none opacity-0 group-hover/users:opacity-100 transition-opacity duration-150 z-50 whitespace-nowrap border border-slate-700/50">
+                  Users
                 </div>
               )}
             </div>

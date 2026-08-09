@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaLaptopHouse, FaLaptop, FaMobileAlt, FaUserShield, FaUsers, FaUserPlus, FaEye } from "react-icons/fa";
-import { Plus, Sprout, CalendarClock, MapPinHouse } from 'lucide-react';
+import { Sprout, CalendarClock, MapPinHouse } from 'lucide-react';
 import GrowthGroupMemberModal from '../../components/modals/growthgroupmemberModals/GrowthGroupMemberModal';
 import ViewGrowthGroupMembersModal from '../../components/modals/growthgroupmemberModals/ViewGrowthGroupMembersModal';
 import ModuleHeader from '../../components/ui/ModuleHeader';
@@ -86,15 +86,7 @@ export default function GrowthGroupsMembers() {
           title="Growth Group Members"
           description="Monitor and organize small groups, leadership structures, and schedules."
           icon={<Sprout size={24} />}
-          actions={
-            <button 
-              className="group flex items-center gap-2 px-4 py-2.5 bg-[#0284c7] hover:bg-[#026ca1] active:scale-95 text-white rounded-xl text-xs font-semibold transition-all shadow-sm cursor-pointer"
-              onClick={() => handleViewGrowthGroup(null)}
-            >
-              <Plus size={15} className="transition-transform group-hover:rotate-90" />
-              Add New Growth Group
-            </button>
-          }
+          
         />
 
         <div className="flex flex-col md:flex-row items-center gap-4 justify-between w-full bg-transparent">
