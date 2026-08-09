@@ -137,7 +137,7 @@ export default function Members() {
                             <div className="flex items-center gap-2 text-slate-600">
                               <MapPinned size={12} className="text-rose-400 shrink-0" />
                               <span className="text-xs font-mono">
-                                {member.cluster_name + ' Cluster' || <span className="text-slate-300 italic">No Cluster</span>}
+                                {member.cluster_name ? `${member.cluster_name} Cluster` : <span className="text-slate-300 italic">No Cluster</span>}
                               </span>
                             </div>
                           </div>
