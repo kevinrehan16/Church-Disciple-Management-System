@@ -112,7 +112,7 @@ class AuthService
                 'church_affiliation' => $data['church_affiliation'] ?? null,
                 'church_id'          => $data['church_id'] ?? null,
                 'cluster_id'          => $data['cluster_id'] ?? null,
-                'member_position'    => $data['member_position'] ?? null,
+                'member_position'    => $data['member_position'] ?? 5,
                 'member_status'      => $data['member_status'] ?? 'Active',
                 'membership_date'    => $data['membership_date'] ?? null,
                 'rec_for_baptism'    => $data['rec_for_baptism'] ?? false,
