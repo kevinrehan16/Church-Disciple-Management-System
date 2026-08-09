@@ -36,6 +36,7 @@ class AuthControllerTest extends TestCase
             $table->string('password');
             $table->string('role', 30)->default('member');
             $table->boolean('must_change_password')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });
