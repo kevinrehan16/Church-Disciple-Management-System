@@ -180,6 +180,9 @@ class UserTest extends TestCase
             'mobile_number' => '09171234567',
             'nickname' => 'Juan',
             'birthday' => '1995-01-15',
+            'city' => 'Parañaque City',
+            'barangay' => 'BF Homes',
+            'church_id' => 1,
         ];
 
         $response = $this->actingAs($admin, 'sanctum')
@@ -241,6 +244,10 @@ class UserTest extends TestCase
             'mobile_number' => '09991234567',
             'nickname' => 'Mia',
             'occupation' => 'Teacher',
+            'birthday' => '1995-01-15',
+            'city' => 'Parañaque City',
+            'barangay' => 'BF Homes',
+            'church_id' => 1,
         ];
 
         $response = $this->actingAs($admin, 'sanctum')
@@ -266,6 +273,9 @@ class UserTest extends TestCase
             'mobile_number' => '09991234567',
             'nickname' => 'Mia',
             'occupation' => 'Teacher',
+            'city' => 'Parañaque City',
+            'barangay' => 'BF Homes',
+            'church_id' => 1,
         ]);
 
         $this->assertNotEmpty($member->mem_id);
