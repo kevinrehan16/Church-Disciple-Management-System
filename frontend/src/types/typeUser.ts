@@ -7,7 +7,6 @@ export interface Member {
 }
 
 export interface User {
-  [x: string]: boolean;
   id: string;
   email: string;
   role: 'super_admin' | 'admin' | 'staff' | string;
