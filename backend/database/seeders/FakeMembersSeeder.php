@@ -19,7 +19,7 @@ class FakeMembersSeeder extends Seeder
 
         Schema::enableForeignKeyConstraints();
 
-        // 1. Gawan ng dedicated Super Admin account
+        // 1. Dedicated Super Admin account
         $superAdminUser = User::create([
             'email' => 'superadmin@gcfsouthmetro.org',
             'password' => Hash::make('kevin123'),
@@ -29,17 +29,34 @@ class FakeMembersSeeder extends Seeder
             'is_active' => true
         ]);
 
-        // IDAGDAG ITO: I-assign ang role gamit ang Spatie permission method
         $superAdminUser->assignRole('super_admin');
 
         Member::factory()->create([
             'user_id' => $superAdminUser->id,
             'first_name' => 'Kevin',
             'last_name' => 'Macandog',
-            'member_position' => 'Member',
+            'member_position' => 'No Growth Group',
         ]);
 
-        // 2. Gawa ng natitirang 999 fake members
-        Member::factory()->count(999)->create();
+        // 2. Paglikha ng specific positions sa `members` table (Total = 45 members)
+
+        // 1 Senior Pastor
+        Member::factory()->seniorPastor()->create();
+
+        // 7 Pastors
+        Member::factory()->pastor()->count(8)->create();
+
+        // 7 Pastoral Staff
+        Member::factory()->pastoralStaff()->count(7)->create();
+
+        // 15 Deacons
+        Member::factory()->deacon()->count(15)->create();
+
+        // 15 Elders
+        Member::factory()->elder()->count(15)->create();
+
+        // 3. Natitirang 954 members (999 target - 45 = 954)
+        // Sila ay magiging random: 'Growth Group Leader', 'Growth Group Member', o 'No Growth Group'
+        Member::factory()->count(954)->create();
     }
 }

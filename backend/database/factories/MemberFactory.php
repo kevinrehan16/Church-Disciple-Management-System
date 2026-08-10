@@ -14,13 +14,8 @@ class MemberFactory extends Factory
         $cities = ['Parañaque City', 'Las Piñas City', 'Pasay City', 'Taguig City', 'Makati City'];
         $barangays = ['BF Homes', 'Don Bosco', 'Marcelo Green', 'San Antonio', 'Moonwalk', 'San Martin de Porres'];
 
-        // Mga pinagpilian mong member positions
-        $positions = [
-            'Senior Pastor',
-            'Pastor',
-            'Pastoral Staff',
-            'Deacon',
-            'Elder',
+        // Default positions para sa regular members
+        $defaultPositions = [
             'Growth Group Leader',
             'Growth Group Member',
             'No Growth Group'
@@ -36,9 +31,46 @@ class MemberFactory extends Factory
             'mobile_number' => '09' . $this->faker->numerify('#########'),
             'city' => $this->faker->randomElement($cities),
             'barangay' => $this->faker->randomElement($barangays),
-            'church_id' => $this->faker->randomElement([1, 2, 3]),
-            // Random member position
-            'member_position' => $this->faker->randomElement($positions),
+            'church_id' => $this->faker->randomElement([1]),
+            'cluster_id' => $this->faker->randomElement([2, 3, 5, 6, 7, 8, 9]),
+            'baptized_immersion' => $this->faker->randomElement([0]),
+            'member_position' => $this->faker->randomElement($defaultPositions),
         ];
+    }
+
+    // States para sa specific leadership positions
+    public function seniorPastor(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'member_position' => 'Senior Pastor',
+        ]);
+    }
+
+    public function pastor(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'member_position' => 'Pastor',
+        ]);
+    }
+
+    public function pastoralStaff(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'member_position' => 'Pastoral Staff',
+        ]);
+    }
+
+    public function deacon(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'member_position' => 'Deacon',
+        ]);
+    }
+
+    public function elder(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'member_position' => 'Elder',
+        ]);
     }
 }

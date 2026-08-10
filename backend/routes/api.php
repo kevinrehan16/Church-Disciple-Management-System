@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\GrowthGroupMember\GrowthGroupMemberController;
 use App\Http\Controllers\Api\V1\Permission\PermissionController;
 use App\Http\Controllers\Api\V1\Role\RoleController;
 use App\Http\Controllers\Api\V1\UserRole\UserRoleController;
+use App\Http\Controllers\Api\V1\DiscipleNetwork\DiscipleNetworkController;
 
 Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
@@ -98,6 +99,10 @@ Route::prefix('v1')->group(function () {
             // User Role Assignment
             Route::post('/users/{user}/roles', [UserRoleController::class, 'assignRole']);
             Route::delete('/users/{user}/roles', [UserRoleController::class, 'removeRole']);
+        });
+
+        Route::middleware(['auth:sanctum'])->group(function () {
+            Route::get('/disciple-network', [DiscipleNetworkController::class, 'index']);
         });
     });
 });
