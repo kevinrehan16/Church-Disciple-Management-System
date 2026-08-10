@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1\Members;
 
-use App\Http\Controllers\Controller;
 use App\Services\MemberService;
+use App\Http\Controllers\Controller;
 use App\Http\Resources\MemberResource;
 use App\Http\Requests\Member\UpdateMemberRequest;
-use App\Models\Member; // <-- Siguraduhing naka-import ito
+use App\Models\Member;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -28,6 +28,7 @@ class MemberController extends Controller
         $request->validate([
             'member_position' => 'nullable',
             'search'   => 'nullable|string',
+            'baptism_statuses'  => 'nullable',
         ]);
 
         // 2. Kunin ang request params

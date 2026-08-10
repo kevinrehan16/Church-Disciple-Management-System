@@ -7,6 +7,7 @@ export interface MemberFilters {
   page?: number;
   member_position?: string | string[];
   rank?: number;
+  baptism_statuses?: string | string[];
 }
 
 export const memberService = {
@@ -17,15 +18,11 @@ export const memberService = {
         page: filters.page || 1,
         member_position: filters.member_position,
         rank: filters.rank,
+        baptism_statuses: filters.baptism_statuses,
       }
     });
     return response.data;
   },
-
-  // getPatientById: async (id: string): Promise<Patient> => {
-  //   const { data } = await apiClient.get(`patients/${id}/`);
-  //   return data;
-  // },
 
   registerMember: async (memberData: FormData | object): Promise<Member> => {
     const { data } = await apiClient.post('register/', memberData);
