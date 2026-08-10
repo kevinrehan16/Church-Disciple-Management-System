@@ -367,16 +367,16 @@ export default function Members() {
                       <td className="px-6 py-4 text-center">
                         <div className="flex items-center justify-center">
                           {member.baptized_immersion === "1" || member.baptized_immersion === 1 ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border tracking-wider uppercase bg-emerald-50 text-emerald-700 border-emerald-200/60">
-                              <Droplets size={13} className="text-emerald-600" />
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border tracking-wider uppercase bg-blue-50 text-blue-700 border-blue-300">
+                              <Droplets size={13} className="text-blue-600" />
                               Baptized
                             </span>
                           ) : member.rec_for_baptism ? (
                             <span 
-                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border tracking-wider uppercase bg-amber-50 text-amber-700 border-amber-200/60"
+                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border tracking-wider uppercase bg-amber-50 text-amber-500 border-amber-300"
                               title={`Baptism Schedule: ${member.baptized_date}`}
                             >
-                              <CalendarCheck2 size={13} className="text-amber-600" />
+                              <CalendarCheck2 size={13} className="text-amber-500" />
                               {member.baptized_date || 'Scheduled'}
                             </span>
                           ) : (
