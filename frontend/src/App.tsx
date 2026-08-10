@@ -17,6 +17,7 @@ import Elders from './pages/members/elders';
 import Deacons from './pages/members/deacons';
 
 import Visitors from './pages/visitors/visitors';
+import DiscipleNetwork from './pages/disciplenetwork/disciplenetwork';
 import GrowthGroupsMembers from './pages/groupsmembers/growthgroupsmembers';
 
 import GrowthGroups from './pages/groupsetup/growthgroups';
@@ -65,6 +66,8 @@ function App() {
                   <Route path="/members/deacons" element={<Deacons />} />
 
                   <Route path="/visitors" element={<Visitors />} />
+
+                  <Route path="/disciple-network" element={<DiscipleNetwork />} />
 
                   <Route path="/groups-members/growth-groups" element={<GrowthGroupsMembers />} />
 
