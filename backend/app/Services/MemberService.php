@@ -16,6 +16,38 @@ class MemberService
             ->byPosition($position)
             ->byRank($rank)
 
+            // 1.5 BAPTISM STATUS FILTER
+            ->when($request->filled('baptism_statuses'), function ($query) use ($request) {
+                $rawStatuses = $request->input('baptism_statuses');
+
+                if (is_string($rawStatuses)) {
+                    $decoded = json_decode($rawStatuses, true);
+                    $statuses = is_array($decoded) ? $decoded : [$rawStatuses];
+                } else {
+                    $statuses = is_array($rawStatuses) ? $rawStatuses : [];
+                }
+
+                if (!empty($statuses)) {
+                    $query->where(function ($q) use ($statuses) {
+                        if (in_array('baptized', $statuses)) {
+                            $q->orWhere('baptized_immersion', '1');
+                        }
+                        if (in_array('scheduled', $statuses)) {
+                            $q->orWhere(function ($subQ) {
+                                $subQ->where('baptized_immersion', '0')
+                                    ->where('rec_for_baptism', true);
+                            });
+                        }
+                        if (in_array('not_yet', $statuses)) {
+                            $q->orWhere(function ($subQ) {
+                                $subQ->where('baptized_immersion', '0')
+                                    ->where('rec_for_baptism', false);
+                            });
+                        }
+                    });
+                }
+            })
+
             // 2. CUSTOM SORT: Rank 1 muna, tapos pinakabagong ID pababa
             ->orderByRaw("CASE WHEN position_rank = 1 THEN 0 ELSE 1 END")
             ->orderBy('id', 'desc')

@@ -9,6 +9,7 @@ export interface MemberFilters {
   page?: number;
   member_position?: string | string[];
   rank?: number;
+  baptism_statuses?: string | string[];
 }
 
 export const useMembers = (filters: MemberFilters) => {
@@ -25,15 +26,6 @@ export const useMembers = (filters: MemberFilters) => {
     placeholderData: (previousData) => previousData,
   });
 };
-
-// // Bagong hook para sa single patient (View Profile)
-// export const usePatientDetails = (patientId: string | null) => {
-//   return useQuery({
-//     queryKey: ['patient', patientId],
-//     queryFn: () => patientService.getPatientById(patientId!),
-//     enabled: !!patientId, // Tatakbo lang kapag may ID
-//   });
-// };
 
 export const useRegisterMember = () => {
   const queryClient = useQueryClient();
