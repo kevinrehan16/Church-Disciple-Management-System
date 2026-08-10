@@ -75,7 +75,7 @@ export default function Deacons() {
                     <TableError colSpan={6} onRetry={() => refetch()} />
                 ) : currentDeacons.length > 0 ? (
                     currentDeacons.map((member: any) => (
-                    <tr key={member.id} className="group hover:bg-[var(--active-parent,rgb(99,102,241))]/5 transition-all duration-200">
+                    <tr key={member.id} className="group odd:bg-slate-50 hover:bg-[var(--active-parent,rgb(99,102,241))]/5 transition-all duration-200">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                               <div className="w-9 h-9 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center font-bold text-xs border border-slate-200 group-hover:bg-[var(--active-parent,rgb(99,102,241))]/10 group-hover:text-[var(--active-parent,rgb(99,102,241))] group-hover:border-[var(--active-parent,rgb(99,102,241))] transition-colors">
