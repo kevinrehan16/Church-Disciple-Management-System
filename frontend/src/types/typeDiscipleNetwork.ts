@@ -1,5 +1,6 @@
 export interface MemberNode {
   nodeKey: string;
+  id?: number | string;
   memberId: number | string;
   parentId: number | string | null;
   name: string;

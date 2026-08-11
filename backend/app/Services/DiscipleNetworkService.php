@@ -48,6 +48,7 @@ class DiscipleNetworkService
         // --- A. MAIN CATEGORY FOLDERS (Nasa ilalim ni Senior Pastor) ---
         $nodes->push([
             'nodeKey'         => 'group-elders',
+            'id'              => 'group-elders',
             'memberId'        => 'group-elders',
             'parentId'        => $seniorPastorId,
             'name'            => 'Elders Group',
@@ -65,6 +66,7 @@ class DiscipleNetworkService
 
         $nodes->push([
             'nodeKey'         => 'group-deacons',
+            'id'              => 'group-deacons',
             'memberId'        => 'group-deacons',
             'parentId'        => $seniorPastorId,
             'name'            => 'Deacons Group',
@@ -82,6 +84,7 @@ class DiscipleNetworkService
 
         $nodes->push([
             'nodeKey'         => 'group-pastors',
+            'id'              => 'group-pastors',
             'memberId'        => 'group-pastors',
             'parentId'        => $seniorPastorId,
             'name'            => 'Pastors & Staff Group',
@@ -100,6 +103,7 @@ class DiscipleNetworkService
         // BAGONG GROUP CARD FOR GG LEADERS
         $nodes->push([
             'nodeKey'         => 'group-gg-leaders',
+            'id'              => 'group-gg-leaders',
             'memberId'        => 'group-gg-leaders',
             'parentId'        => $seniorPastorId,
             'name'            => 'Growth Group Leaders Group',
@@ -150,7 +154,7 @@ class DiscipleNetworkService
                     'Pastor', 'Pastoral Staff' => 'group-pastors',
                     default => $seniorPastorId,
                 },
-                3 => 'group-gg-leaders', // ILAGAY ANG LAHAT NG GG LEADERS SA BAGONG CARD!
+                3 => 'group-gg-leaders',
                 4 => isset($memberGgIds[0]) ? "gg-folder-{$memberGgIds[0]}" : $seniorPastorId,
                 default => $seniorPastorId,
             };
@@ -170,6 +174,7 @@ class DiscipleNetworkService
 
             $nodes->push([
                 'nodeKey'         => "m-{$member->id}-primary",
+                'id'              => $member->id, // <-- Idinagdag dito
                 'memberId'        => $member->id,
                 'parentId'        => $primaryParentId,
                 'name'            => trim("{$member->first_name} {$member->last_name}"),
@@ -194,6 +199,7 @@ class DiscipleNetworkService
                 if ($ggLeaderId && $ggLeaderId !== $member->id) {
                     $nodes->push([
                         'nodeKey'         => "m-{$member->id}-gg-{$ggId}",
+                        'id'              => $member->id, // <-- Idinagdag din dito
                         'memberId'        => $member->id,
                         'parentId'        => "gg-folder-{$ggId}",
                         'name'            => trim("{$member->first_name} {$member->last_name}"),
@@ -217,6 +223,7 @@ class DiscipleNetworkService
             if ($group->leader_id) {
                 $nodes->push([
                     'nodeKey'         => "gg-folder-{$group->id}",
+                    'id'              => "gg-folder-{$group->id}",
                     'memberId'        => "gg-folder-{$group->id}",
                     'parentId'        => $group->leader_id,
                     'name'            => $group->name,
