@@ -26,12 +26,13 @@ Route::prefix('v1')->group(function () {
     // Dito mo ilalagay ang iba pang protected routes sa hinaharap
     Route::middleware('auth:sanctum', 'password.changed')->group(function () {
         // AUTH ROUTES
+        Route::post('/logout', [AuthController::class, 'logout']);
+
         Route::middleware(['role:super_admin|senior_pastor|pastor|admin|staff'])->group(function () {
-            Route::post('/register', [AuthController::class, 'register']);
             Route::get('/user', [AuthController::class, 'user']);
+            Route::post('/register', [AuthController::class, 'register']);
             Route::get('/users', [AuthController::class, 'getAllUsers']);
         });
-        Route::post('/logout', [AuthController::class, 'logout']);
 
         // PROFILE ROUTES
         Route::middleware('auth:sanctum')->group(function () {

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PanelLeft, PanelLeftClose, PanelLeftOpen, Lock, LogOut } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -10,12 +11,14 @@ export default function Topbar({ isCollapsed, setIsCollapsed }: any) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
   const isWhiteBg = theme.topbarBg?.toLowerCase() === '#ffffff' || theme.topbarBg?.toLowerCase() === 'white';
 
   const handleLogout = async () => {
     setIsOpen(false);
     await logout();
+    navigate('/login', { replace: true });
   };
 
   useEffect(() => {
