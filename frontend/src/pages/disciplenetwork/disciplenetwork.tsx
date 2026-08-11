@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Crown, 
   Shield, 
@@ -6,42 +6,50 @@ import {
   UserCheck, 
   UserX, 
   ChevronRight, 
+  ChevronLeft,
   ChevronDown, 
   Search, 
   Sparkles, 
   FolderTree, 
-  Users,
-  Maximize2,
-  Minimize2,
-  RefreshCw,
-  X,
-  ChevronLeft
+  Maximize2, 
+  Minimize2, 
+  Folder, 
+  Link2, 
+  ShieldCheck, 
+  Users
 } from 'lucide-react';
 import { useDiscipleNetwork } from '../../hooks/useDiscipleNetwork';
 
 // --- TYPES ---
 export interface MemberNode {
-  id: number;
-  parentId: number | null;
+  nodeKey: string;
+  memberId: number | string;
+  parentId: number | string | null;
   name: string;
   email: string | null;
-  position: string;
+  churchPosition: string | null;
+  ggRole: 'GG Leader' | 'GG Member' | 'Growth Group' | 'Group' | 'None';
   rank: number;
-  cluster: string;
+  primaryRank: number;
+  hasGrowthGroup: boolean;
+  growthGroupName: string;
+  isDuplicate: boolean;
+  isGroupFolder?: boolean;
   avatarBg: string;
 }
 
 interface TreeNodeProps {
   node: MemberNode;
   allMembers: MemberNode[];
-  childrenMap: Map<number, MemberNode[]>;
+  childrenMap: Map<number | string, MemberNode[]>;
   searchQuery: string;
-  expandedNodes: Set<number | string>;
-  toggleNode: (id: number | string) => void;
-  targetMatchedId: number | null;
+  expandedNodes: Set<string>;
+  toggleNode: (key: string) => void;
+  targetMatchedKey: string | null;
+  ancestorIds?: Set<number | string>;
 }
 
-// --- SINGLE TREE NODE COMPONENT ---
+// --- RECURSIVE TREE NODE COMPONENT ---
 const TreeNode: React.FC<TreeNodeProps> = ({ 
   node, 
   allMembers, 
@@ -49,70 +57,119 @@ const TreeNode: React.FC<TreeNodeProps> = ({
   searchQuery, 
   expandedNodes, 
   toggleNode,
-  targetMatchedId
+  targetMatchedKey,
+  ancestorIds = new Set()
 }) => {
-  const children = childrenMap.get(node.id) || [];
+  const currentAncestors = new Set(ancestorIds);
+  currentAncestors.add(node.memberId);
+
+  // SAFEGUARD: Kapag Duplicate Node, WALANG CHILDREN para iwas infinite loop
+  const rawChildren = node.isDuplicate ? [] : (childrenMap.get(node.memberId) || []);
+  
+  // FILTER CHILDREN WITH CYCLE PROTECTION:
+  // Payagan ang duplicate/secondary nodes dahil leaf nodes sila (100% safe sa loop)
+  const children = rawChildren.filter(child => {
+    if (child.isDuplicate) return true;
+    return !currentAncestors.has(child.memberId);
+  });
+
   const hasChildren = children.length > 0;
-  const isExpanded = expandedNodes.has(node.id);
+  const isExpanded = expandedNodes.has(node.nodeKey);
 
-  // Search Match Highlighting
   const isSearchMatch = searchQuery.trim() !== '' && node.name.toLowerCase().includes(searchQuery.toLowerCase());
-  const isTargetScroll = targetMatchedId === node.id;
+  const isTargetScroll = targetMatchedKey === node.nodeKey;
 
-  // Dynamic Rank & Position Badge Styling Helper
-  const getBadgeStyle = (rank: number, position: string) => {
+  // --- 1. RENDER FOR GROUP / CATEGORY / GG FOLDERS ---
+  if (node.isGroupFolder) {
+    return (
+      <div id={`node-${node.nodeKey}`} className="relative my-2 transition-all">
+        <div 
+          onClick={() => toggleNode(node.nodeKey)}
+          className="flex items-center justify-between p-3.5 rounded-2xl bg-indigo-50/80 hover:bg-indigo-100/90 border border-indigo-200/80 cursor-pointer transition-all shadow-sm select-none"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-1.5 rounded-xl bg-indigo-200/70 text-indigo-800">
+              {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            </div>
+            <Folder size={18} className="text-indigo-600" />
+            <div>
+              <span className="font-bold text-indigo-950 text-sm">{node.name}</span>
+              <span className="text-xs text-indigo-600 font-medium ml-2">({children.length} {children.length === 1 ? 'Item' : 'Items'})</span>
+            </div>
+          </div>
+
+          {/* DULO: Number of Subordinates ONLY (WALANG L5 NO GG BADGE) */}
+          {hasChildren && (
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-xl bg-indigo-100 text-indigo-700 border border-indigo-200">
+              {children.length} {children.length === 1 ? 'Subordinate' : 'Subordinates'}
+            </span>
+          )}
+        </div>
+
+        {hasChildren && isExpanded && (
+          <div className="relative pl-6 md:pl-8 ml-3 border-l-2 border-indigo-200/80 space-y-2 mt-2">
+            {children.map((child) => (
+              <div key={child.nodeKey} className="relative">
+                <span className="absolute -left-6 md:-left-8 top-[29px] w-6 md:w-8 h-[2px] bg-indigo-200/80" />
+                <TreeNode 
+                  node={child} 
+                  allMembers={allMembers} 
+                  childrenMap={childrenMap} 
+                  searchQuery={searchQuery} 
+                  expandedNodes={expandedNodes} 
+                  toggleNode={toggleNode} 
+                  targetMatchedKey={targetMatchedKey} 
+                  ancestorIds={currentAncestors} 
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // --- 2. RENDER FOR PERSON / MEMBER CARDS ---
+  const getBadgeStyle = (rank: number, position: string | null) => {
     switch (rank) {
       case 1:
         return {
-          badge: 'bg-amber-500 text-white border-amber-300',
           border: 'border-l-4 border-l-amber-500 bg-amber-50/30 hover:bg-amber-50/60',
           icon: <Crown size={14} className="text-amber-500" />,
           label: `L1 • ${position || 'Senior Pastor'}`
         };
       case 2:
         return {
-          badge: 'bg-indigo-600 text-white border-indigo-300',
           border: 'border-l-4 border-l-indigo-600 bg-indigo-50/20 hover:bg-indigo-50/50',
           icon: <Shield size={14} className="text-indigo-600" />,
-          label: `L2 • ${position}`
+          label: `L2 • ${position || 'Staff / Elder'}`
         };
       case 3:
         return {
-          badge: 'bg-blue-600 text-white border-blue-300',
           border: 'border-l-4 border-l-blue-500 bg-blue-50/20 hover:bg-blue-50/50',
           icon: <Award size={14} className="text-blue-500" />,
           label: 'L3 • GG Leader'
         };
       case 4:
         return {
-          badge: 'bg-emerald-600 text-white border-emerald-300',
           border: 'border-l-4 border-l-emerald-500 bg-slate-50/80 hover:bg-slate-100',
           icon: <UserCheck size={14} className="text-emerald-500" />,
           label: 'L4 • GG Member'
         };
       default:
         return {
-          badge: 'bg-slate-500 text-white',
           border: 'border-l-4 border-l-slate-400 bg-slate-50',
           icon: <UserX size={14} className="text-slate-400" />,
-          label: 'L5 • No GG'
+          label: 'L5 • Member'
         };
     }
   };
 
-  const style = getBadgeStyle(node.rank, node.position);
-
-  // Categorization Logic for Level 2 under Senior Pastor
-  const isSeniorPastor = node.rank === 1;
-
-  const eldersGroup = useMemo(() => children.filter(c => c.position === 'Elder'), [children]);
-  const deaconsGroup = useMemo(() => children.filter(c => c.position === 'Deacon'), [children]);
-  const pastorsGroup = useMemo(() => children.filter(c => c.position === 'Pastor' || c.position === 'Pastoral Staff'), [children]);
-  const otherL2Group = useMemo(() => children.filter(c => !['Elder', 'Deacon', 'Pastor', 'Pastoral Staff'].includes(c.position)), [children]);
+  const style = getBadgeStyle(node.rank, node.churchPosition);
 
   return (
-    <div id={`node-${node.id}`} className="relative my-2.5 transition-all">
-      {/* NODE CARD CONTAINER */}
+    <div id={`node-${node.nodeKey}`} className="relative my-2.5 transition-all">
+      {/* CARD CONTAINER */}
       <div 
         className={`flex items-center justify-between min-h-[58px] p-3.5 rounded-2xl border border-slate-200/90 shadow-sm transition-all duration-300 select-none ${style.border} ${
           isTargetScroll 
@@ -123,11 +180,10 @@ const TreeNode: React.FC<TreeNodeProps> = ({
         }`}
       >
         <div className="flex items-center gap-3">
-          {/* EXPAND / COLLAPSE BUTTON */}
           {hasChildren ? (
             <button
               type="button"
-              onClick={() => toggleNode(node.id)}
+              onClick={() => toggleNode(node.nodeKey)}
               className="w-7 h-7 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-600 transition-colors shrink-0"
             >
               {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -138,42 +194,55 @@ const TreeNode: React.FC<TreeNodeProps> = ({
             </div>
           )}
 
-          {/* AVATAR */}
+          {/* AVATAR INITIALS */}
           <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shadow-inner shrink-0 ${node.avatarBg}`}>
             {node.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
           </div>
 
-          {/* DETAILS & MULTI-ROLE BADGES */}
+          {/* DETAILS */}
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-bold text-slate-900 text-sm tracking-tight">{node.name}</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200/80">
-                {node.position}
-              </span>
-
-              {/* OPTIONAL: Multi-Role Indicator kung Elder/Pastor na may hawak ding GG */}
-              {node.rank === 2 && hasChildren && (
-                <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/60">
-                  + GG Leader
+              
+              {/* 1. CHURCH POSITION BADGE */}
+              {node.churchPosition && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/80">
+                  {node.churchPosition}
                 </span>
               )}
 
-              {/* OPTIONAL: Indicator kung GG Leader position pero napunta sa Level 5 (Unassigned) */}
-              {node.position === 'Growth Group Leader' && node.rank === 5 && (
-                <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60">
-                  No Active Group
+              {/* 2. DYNAMIC GG ROLE BADGE */}
+              {node.ggRole === 'GG Leader' && (
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/80">
+                  Growth Group Leader
+                </span>
+              )}
+              {node.ggRole === 'GG Member' && (
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                  Growth Group Member
+                </span>
+              )}
+
+              {/* SECONDARY NODE INDICATOR */}
+              {node.isDuplicate && (
+                <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200/60 flex items-center gap-1">
+                  <Link2 size={10} /> Secondary Node
                 </span>
               )}
             </div>
+
+            {/* EMAIL AND GG NAME BELOW */}
             <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
               <span>{node.email || 'No email registered'}</span>
               <span>•</span>
-              <span className="font-medium text-slate-500">{node.cluster}</span>
+              <span className={`font-semibold ${node.hasGrowthGroup ? 'text-indigo-600' : 'text-slate-400 italic'}`}>
+                {node.growthGroupName}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* RIGHT SIDE BADGES & COUNTS */}
+        {/* RIGHT SIDE BADGES */}
         <div className="flex items-center gap-3 shrink-0 ml-4">
           {hasChildren && (
             <span className="text-xs font-semibold px-2.5 py-1 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100">
@@ -181,196 +250,34 @@ const TreeNode: React.FC<TreeNodeProps> = ({
             </span>
           )}
 
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-slate-50 border border-slate-200 text-slate-700">
-            {style.icon}
-            <span>{style.label}</span>
-          </div>
+          {/* LEVEL BADGE (L1 to L4 only) */}
+          {node.rank <= 4 && (
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-slate-50 border border-slate-200 text-slate-700">
+              {style.icon}
+              <span>{style.label}</span>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* NESTED CHILDREN (WITH CENTERED CONNECTOR BRANCH LINES) */}
+      {/* SUBORDINATES / NESTED NODES */}
       {hasChildren && isExpanded && (
         <div className="relative pl-6 md:pl-10 ml-4 border-l-2 border-indigo-200/80 space-y-3 mt-2 transition-all">
-          
-          {/* IF SENIOR PASTOR (LEVEL 1), RENDER THE 3 GROUP CARDS */}
-          {isSeniorPastor ? (
-            <>
-              {/* 1. ELDERS GROUP CARD */}
-              {eldersGroup.length > 0 && (
-                <div id="cat-elders" className="relative my-1">
-                  {/* Perfectly Vertical-Centered Horizontal Line for Group (top-[22px]) */}
-                  <span className="absolute -left-6 md:-left-10 top-[22px] w-6 md:w-10 h-[2px] bg-indigo-200/80" />
-                  
-                  <div 
-                    onClick={() => toggleNode('cat-elders')}
-                    className="flex items-center justify-between p-3 rounded-2xl bg-indigo-50/90 hover:bg-indigo-100/90 border border-indigo-200 cursor-pointer transition-all shadow-sm select-none"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-1 rounded-xl bg-indigo-200/70 text-indigo-800">
-                        {expandedNodes.has('cat-elders') ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                      </div>
-                      <Shield size={18} className="text-indigo-600" />
-                      <div>
-                        <span className="font-bold text-indigo-950 text-sm">Elders Group</span>
-                        <span className="text-xs text-indigo-600 font-medium ml-2">({eldersGroup.length} Members)</span>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-indigo-200 text-indigo-800 uppercase tracking-wider">
-                      Role Group
-                    </span>
-                  </div>
-
-                  {expandedNodes.has('cat-elders') && (
-                    <div className="relative pl-6 md:pl-8 ml-3 border-l-2 border-indigo-200/80 space-y-2 mt-2">
-                      {eldersGroup.map((child) => (
-                        <div key={child.id} className="relative">
-                          {/* Centered Horizontal Line for Child Node (top-[29px]) */}
-                          <span className="absolute -left-6 md:-left-8 top-[29px] w-6 md:w-8 h-[2px] bg-indigo-200/80" />
-                          <TreeNode
-                            node={child}
-                            allMembers={allMembers}
-                            childrenMap={childrenMap}
-                            searchQuery={searchQuery}
-                            expandedNodes={expandedNodes}
-                            toggleNode={toggleNode}
-                            targetMatchedId={targetMatchedId}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* 2. DEACONS GROUP CARD */}
-              {deaconsGroup.length > 0 && (
-                <div id="cat-deacons" className="relative my-1">
-                  <span className="absolute -left-6 md:-left-10 top-[22px] w-6 md:w-10 h-[2px] bg-teal-200/80" />
-
-                  <div 
-                    onClick={() => toggleNode('cat-deacons')}
-                    className="flex items-center justify-between p-3 rounded-2xl bg-teal-50/90 hover:bg-teal-100/90 border border-teal-200 cursor-pointer transition-all shadow-sm select-none"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-1 rounded-xl bg-teal-200/70 text-teal-800">
-                        {expandedNodes.has('cat-deacons') ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                      </div>
-                      <Award size={18} className="text-teal-600" />
-                      <div>
-                        <span className="font-bold text-teal-950 text-sm">Deacons Group</span>
-                        <span className="text-xs text-teal-600 font-medium ml-2">({deaconsGroup.length} Members)</span>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-teal-200 text-teal-800 uppercase tracking-wider">
-                      Role Group
-                    </span>
-                  </div>
-
-                  {expandedNodes.has('cat-deacons') && (
-                    <div className="relative pl-6 md:pl-8 ml-3 border-l-2 border-teal-200/80 space-y-2 mt-2">
-                      {deaconsGroup.map((child) => (
-                        <div key={child.id} className="relative">
-                          <span className="absolute -left-6 md:-left-8 top-[29px] w-6 md:w-8 h-[2px] bg-teal-200/80" />
-                          <TreeNode
-                            node={child}
-                            allMembers={allMembers}
-                            childrenMap={childrenMap}
-                            searchQuery={searchQuery}
-                            expandedNodes={expandedNodes}
-                            toggleNode={toggleNode}
-                            targetMatchedId={targetMatchedId}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* 3. PASTORS & PASTORAL STAFF GROUP CARD */}
-              {pastorsGroup.length > 0 && (
-                <div id="cat-pastors" className="relative my-1">
-                  <span className="absolute -left-6 md:-left-10 top-[22px] w-6 md:w-10 h-[2px] bg-blue-200/80" />
-
-                  <div 
-                    onClick={() => toggleNode('cat-pastors')}
-                    className="flex items-center justify-between p-3 rounded-2xl bg-blue-50/90 hover:bg-blue-100/90 border border-blue-200 cursor-pointer transition-all shadow-sm select-none"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-1 rounded-xl bg-blue-200/70 text-blue-800">
-                        {expandedNodes.has('cat-pastors') ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                      </div>
-                      <Users size={18} className="text-blue-600" />
-                      <div>
-                        <span className="font-bold text-blue-950 text-sm">Pastors & Pastoral Staff Group</span>
-                        <span className="text-xs text-blue-600 font-medium ml-2">({pastorsGroup.length} Members)</span>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-blue-200 text-blue-800 uppercase tracking-wider">
-                      Role Group
-                    </span>
-                  </div>
-
-                  {expandedNodes.has('cat-pastors') && (
-                    <div className="relative pl-6 md:pl-8 ml-3 border-l-2 border-blue-200/80 space-y-2 mt-2">
-                      {pastorsGroup.map((child) => (
-                        <div key={child.id} className="relative">
-                          <span className="absolute -left-6 md:-left-8 top-[29px] w-6 md:w-8 h-[2px] bg-blue-200/80" />
-                          <TreeNode
-                            node={child}
-                            allMembers={allMembers}
-                            childrenMap={childrenMap}
-                            searchQuery={searchQuery}
-                            expandedNodes={expandedNodes}
-                            toggleNode={toggleNode}
-                            targetMatchedId={targetMatchedId}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* OTHER LEVEL 2 MEMBERS IF ANY */}
-              {otherL2Group.length > 0 && (
-                <div className="space-y-2 mt-2">
-                  {otherL2Group.map((child) => (
-                    <div key={child.id} className="relative">
-                      <span className="absolute -left-6 md:-left-10 top-[29px] w-6 md:w-10 h-[2px] bg-indigo-200/80" />
-                      <TreeNode
-                        node={child}
-                        allMembers={allMembers}
-                        childrenMap={childrenMap}
-                        searchQuery={searchQuery}
-                        expandedNodes={expandedNodes}
-                        toggleNode={toggleNode}
-                        targetMatchedId={targetMatchedId}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          ) : (
-            /* STANDARD RENDER FOR LEVEL 2 & LEVEL 3 NODES */
-            children.map((child) => (
-              <div key={child.id} className="relative">
-                {/* Centered Horizontal Line to Node Card Middle (top-[29px]) */}
-                <span className="absolute -left-6 md:-left-10 top-[29px] w-6 md:w-10 h-[2px] bg-indigo-200/80" />
-                <TreeNode
-                  node={child}
-                  allMembers={allMembers}
-                  childrenMap={childrenMap}
-                  searchQuery={searchQuery}
-                  expandedNodes={expandedNodes}
-                  toggleNode={toggleNode}
-                  targetMatchedId={targetMatchedId}
-                />
-              </div>
-            ))
-          )}
-
+          {children.map((child) => (
+            <div key={child.nodeKey} className="relative">
+              <span className="absolute -left-6 md:-left-10 top-[29px] w-6 md:w-10 h-[2px] bg-indigo-200/80" />
+              <TreeNode 
+                node={child} 
+                allMembers={allMembers} 
+                childrenMap={childrenMap} 
+                searchQuery={searchQuery} 
+                expandedNodes={expandedNodes} 
+                toggleNode={toggleNode} 
+                targetMatchedKey={targetMatchedKey} 
+                ancestorIds={currentAncestors} 
+              />
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -383,183 +290,184 @@ export default function LeadershipHierarchyTracker() {
 
   const [activeTab, setActiveTab] = useState<'tree' | 'unassigned'>('tree');
   const [search, setSearch] = useState('');
-  const [expandedNodes, setExpandedNodes] = useState<Set<number | string>>(new Set());
-  const [targetMatchedId, setTargetMatchedId] = useState<number | null>(null);
   
-  // Pagination state for Level 5 / Unassigned Members
+  // STATE PARA SA EXPAND / COLLAPSE BUTTONS ACTIVE EFFECT
+  const [treeState, setTreeState] = useState<'expanded' | 'collapsed' | 'custom'>('expanded');
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  const [targetMatchedKey, setTargetMatchedKey] = useState<string | null>(null);
+
+  // PAGINATION STATE FOR UNASSIGNED
   const [unassignedPage, setUnassignedPage] = useState(1);
   const itemsPerPage = 24;
 
-  const memberMap = useMemo(() => {
-    const map = new Map<number, MemberNode>();
-    membersData.forEach(m => map.set(m.id, m));
-    return map;
-  }, [membersData]);
-
-  // BUILD PARENT -> CHILDREN LOOKUP MAP & COUNTS
+  // PROCESS TREE DATA
   const { rootNodes, unassignedNodes, childrenMap, totalCounts } = useMemo(() => {
-    const map = new Map<number, MemberNode[]>();
+    const map = new Map<number | string, MemberNode[]>();
     const roots: MemberNode[] = [];
     const unassigned: MemberNode[] = [];
 
-    let l1 = 0, l2 = 0, l3 = 0, l4 = 0, l5 = 0;
+    const uniqueMemberMap = new Map<number | string, MemberNode>();
 
-    membersData.forEach((member) => {
-      if (member.rank === 1) l1++;
-      if (member.rank === 2) l2++;
-      if (member.rank === 3) l3++;
-      if (member.rank === 4) l4++;
-      if (member.rank === 5) l5++;
-
-      if (member.rank === 5) {
-        unassigned.push(member);
-      } else if (member.parentId === null) {
-        roots.push(member);
-      } else {
-        const list = map.get(member.parentId) || [];
-        list.push(member);
-        map.set(member.parentId, list);
+    membersData.forEach((node) => {
+      if (!node.isGroupFolder && !uniqueMemberMap.has(node.memberId)) {
+        uniqueMemberMap.set(node.memberId, node);
       }
+
+      if (node.rank === 5) {
+        if (!unassigned.some(u => u.memberId === node.memberId)) {
+          unassigned.push(node);
+        }
+      } else if (node.parentId === null) {
+        roots.push(node);
+      } else {
+        const list = map.get(node.parentId) || [];
+        list.push(node);
+        map.set(node.parentId, list);
+      }
+    });
+
+    let l1 = 0, l2 = 0, l3 = 0, l4 = 0, l5 = 0;
+    uniqueMemberMap.forEach((node) => {
+      if (node.primaryRank === 1) l1++;
+      if (node.primaryRank === 2) l2++;
+      if (node.primaryRank === 3) l3++;
+      if (node.primaryRank === 4) l4++;
+      if (node.primaryRank === 5) l5++;
     });
 
     return {
       rootNodes: roots,
       unassignedNodes: unassigned,
       childrenMap: map,
-      totalCounts: { total: membersData.length, l1, l2, l3, l4, l5 }
+      totalCounts: { total: uniqueMemberMap.size, l1, l2, l3, l4, l5 }
     };
   }, [membersData]);
 
-  // Default expanded nodes
-  React.useEffect(() => {
+  // INITIAL AUTO-EXPAND SETUP
+  useEffect(() => {
     if (rootNodes.length > 0) {
-      const defaultExpanded = new Set<number | string>(rootNodes.map(r => r.id));
-      defaultExpanded.add('cat-elders');
-      defaultExpanded.add('cat-deacons');
-      defaultExpanded.add('cat-pastors');
+      const defaultExpanded = new Set<string>(rootNodes.map(r => r.nodeKey));
+      // Auto-expand Category Folders
+      defaultExpanded.add('group-elders');
+      defaultExpanded.add('group-deacons');
+      defaultExpanded.add('group-pastors');
+      defaultExpanded.add('group-gg-leaders');
+
       setExpandedNodes(defaultExpanded);
+      setTreeState('expanded');
     }
   }, [rootNodes]);
 
-  const toggleNode = (id: number | string) => {
+  // RESET UNASSIGNED PAGE ON SEARCH INPUT CHANGE
+  useEffect(() => {
+    setUnassignedPage(1);
+  }, [search]);
+
+  // TOGGLE NODE (Bawat manual click)
+  const toggleNode = (key: string) => {
+    setTreeState('custom'); // Alisin ang active highlight sa Expand/Collapse buttons kapag manual toggle
     setExpandedNodes((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
       return next;
     });
   };
 
+  // EXPAND ALL ACTION
   const expandAll = () => {
-    const allIds: (number | string)[] = membersData.filter(m => m.rank < 4).map(m => m.id);
-    allIds.push('cat-elders', 'cat-deacons', 'cat-pastors');
-    setExpandedNodes(new Set(allIds));
+    const keys: string[] = membersData.map(m => m.nodeKey);
+    setExpandedNodes(new Set(keys));
+    setTreeState('expanded');
   };
 
+  // COLLAPSE ALL ACTION
   const collapseAll = () => {
-    setExpandedNodes(new Set(rootNodes.map(r => r.id)));
+    setExpandedNodes(new Set(rootNodes.map(r => r.nodeKey)));
+    setTreeState('collapsed');
   };
 
-  const handleClearSearch = () => {
-    setSearch('');
-    setTargetMatchedId(null);
-    setUnassignedPage(1);
-  };
-
-  // SEARCH AND AUTO-SCROLL LOGIC (ENTER KEY)
+  // SEARCH SUBMIT
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!search.trim()) return;
 
-    // Reset pagination
     setUnassignedPage(1);
 
-    // Hanapin ang unang miyembrong nagm-match sa search query
-    const matchedMember = membersData.find(m => 
-      m.name.toLowerCase().includes(search.toLowerCase()) || 
-      (m.email && m.email.toLowerCase().includes(search.toLowerCase()))
+    const matched = membersData.find(m => 
+      !m.isGroupFolder && (
+        m.name.toLowerCase().includes(search.toLowerCase()) || 
+        (m.email && m.email.toLowerCase().includes(search.toLowerCase()))
+      )
     );
 
-    if (!matchedMember) return;
+    if (!matched) return;
 
-    // Kung L5 (Unassigned), kusa ring lilipat sa Unassigned tab
-    if (matchedMember.rank === 5) {
+    if (matched.primaryRank === 5) {
       setActiveTab('unassigned');
       return;
     }
 
-    // Kung nasa Tree, i-expand ang buong pamilya ng leader
     setActiveTab('tree');
-    const nodesToExpand = new Set<number | string>(expandedNodes);
+    setTreeState('custom');
+    const toExpand = new Set<string>(expandedNodes);
+    
+    const visited = new Set<number | string>();
+    let currId: number | string | null = matched.memberId;
 
-    let currId: number | null = matchedMember.id;
-    while (currId !== null) {
-      const currNode = memberMap.get(currId);
+    while (currId !== null && !visited.has(currId)) {
+      visited.add(currId);
+      const currNode = membersData.find(m => m.memberId === currId && !m.isDuplicate);
       if (!currNode) break;
 
-      nodesToExpand.add(currNode.id);
-
-      if (currNode.rank === 2) {
-        if (currNode.position === 'Elder') nodesToExpand.add('cat-elders');
-        else if (currNode.position === 'Deacon') nodesToExpand.add('cat-deacons');
-        else if (currNode.position === 'Pastor' || currNode.position === 'Pastoral Staff') nodesToExpand.add('cat-pastors');
-      }
-
+      toExpand.add(currNode.nodeKey);
       currId = currNode.parentId;
     }
 
-    setExpandedNodes(nodesToExpand);
-    setTargetMatchedId(matchedMember.id);
+    toExpand.add(matched.nodeKey);
+    setExpandedNodes(toExpand);
+    setTargetMatchedKey(matched.nodeKey);
 
-    // Auto-scroll smoothly sa target node DOM element
     setTimeout(() => {
-      const el = document.getElementById(`node-${matchedMember.id}`);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      const el = document.getElementById(`node-${matched.nodeKey}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 200);
   };
 
-  // Filtered Unassigned (Level 5) Members
+  // FILTERED UNASSIGNED MEMBERS
   const filteredUnassigned = useMemo(() => {
     if (!search.trim()) return unassignedNodes;
     return unassignedNodes.filter(m => 
-      m.name.toLowerCase().includes(search.toLowerCase()) || 
-      (m.email && m.email.toLowerCase().includes(search.toLowerCase()))
+      m.name.toLowerCase().includes(search.toLowerCase())
     );
   }, [unassignedNodes, search]);
 
-  // Paginated Unassigned Members
-  const totalUnassignedPages = Math.ceil(filteredUnassigned.length / itemsPerPage) || 1;
+  // PAGINATED UNASSIGNED MEMBERS
   const paginatedUnassigned = useMemo(() => {
     const start = (unassignedPage - 1) * itemsPerPage;
     return filteredUnassigned.slice(start, start + itemsPerPage);
   }, [filteredUnassigned, unassignedPage]);
 
+  // TOTAL PAGES CALCULATION
+  const totalUnassignedPages = useMemo(() => {
+    return Math.ceil(filteredUnassigned.length / itemsPerPage) || 1;
+  }, [filteredUnassigned.length, itemsPerPage]);
+
   if (isLoading) {
     return (
-      <div className="min-h-[400px] flex flex-col items-center justify-center p-8 text-center bg-white rounded-3xl border border-slate-200/80 shadow-sm w-full">
+      <div className="min-h-[400px] flex flex-col items-center justify-center p-8 bg-white rounded-3xl border border-slate-200 shadow-sm w-full">
         <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4" />
         <h3 className="font-bold text-slate-800 text-lg">Loading Disciple Network...</h3>
-        <p className="text-slate-400 text-xs mt-1">Fetching leadership hierarchy and growth group assignments.</p>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="min-h-[300px] flex flex-col items-center justify-center p-8 text-center bg-rose-50/50 rounded-3xl border border-rose-200 text-rose-700 w-full">
-        <h3 className="font-bold text-lg">Nagka-error sa pag-load ng Disciple Network</h3>
-        <p className="text-xs text-rose-500 mt-1 mb-4">Hindi makuha ang data mula sa server. Pakisubukan ulit.</p>
-        <button
-          type="button"
-          onClick={() => refetch()}
-          className="flex items-center gap-2 px-4 py-2 bg-rose-600 text-white font-bold text-xs rounded-xl shadow-sm hover:bg-rose-700 transition-all"
-        >
-          <RefreshCw size={14} /> Subukan Ulit
+      <div className="min-h-[300px] flex flex-col items-center justify-center p-8 bg-rose-50 rounded-3xl border border-rose-200 text-rose-700 w-full">
+        <h3 className="font-bold text-lg">Error loading hierarchy data</h3>
+        <button type="button" onClick={() => refetch()} className="mt-3 px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold">
+          Subukan Ulit
         </button>
       </div>
     );
@@ -569,7 +477,7 @@ export default function LeadershipHierarchyTracker() {
     <div className="min-h-screen bg-slate-900/5 p-3 sm:p-5 md:p-6 font-sans text-slate-800 w-full">
       <div className="w-full space-y-6">
         
-        {/* EXECUTIVE HEADER - FULL WIDTH */}
+        {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-200/80 w-full">
           <div>
             <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">
@@ -578,9 +486,6 @@ export default function LeadershipHierarchyTracker() {
             <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
               Organizational Tree Tracker
             </h1>
-            <p className="text-slate-500 text-xs md:text-sm mt-1">
-              Interactive structural map connecting leaders to members with real-time level hierarchies.
-            </p>
           </div>
 
           <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl border border-slate-200 shrink-0">
@@ -588,7 +493,7 @@ export default function LeadershipHierarchyTracker() {
               type="button"
               onClick={() => setActiveTab('tree')}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                activeTab === 'tree' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                activeTab === 'tree' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'
               }`}
             >
               <FolderTree size={16} /> Hierarchy Tree ({totalCounts.total - totalCounts.l5})
@@ -597,7 +502,7 @@ export default function LeadershipHierarchyTracker() {
               type="button"
               onClick={() => setActiveTab('unassigned')}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                activeTab === 'unassigned' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                activeTab === 'unassigned' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500'
               }`}
             >
               <UserX size={16} /> No Growth Group ({totalCounts.l5})
@@ -605,80 +510,183 @@ export default function LeadershipHierarchyTracker() {
           </div>
         </div>
 
-        {/* METRICS SUMMARY STRIP - FULL WIDTH */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 w-full">
-          <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm">
-            <span className="text-[10px] font-extrabold uppercase text-amber-600 block">Level 1</span>
-            <span className="text-lg font-black text-slate-900">{totalCounts.l1}</span>
-            <span className="text-xs text-slate-400 block font-medium">Senior Pastor</span>
+        {/* METRICS SUMMARY STRIP */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5 w-full">
+          {/* LEVEL 1: SENIOR PASTOR */}
+          <div className="relative group overflow-hidden bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-amber-300 hover:-translate-y-1 transition-all duration-300">
+            {/* Top Accent Line */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600" />
+            
+            {/* Ambient Glow */}
+            <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all duration-500" />
+            
+            {/* Large Background Watermark Icon */}
+            <Crown size={72} className="absolute -right-2 -bottom-2 text-amber-600/5 group-hover:text-amber-600/10 group-hover:scale-110 transition-all duration-500 pointer-events-none" />
+
+            {/* Header Badge & Icon */}
+            <div className="flex items-center justify-between mb-3 relative z-10">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200/60 shadow-2xs">
+                Level 1
+              </span>
+              <div className="p-2 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100/60 text-amber-600 border border-amber-200/80 shadow-xs group-hover:scale-110 transition-transform duration-300">
+                <Crown size={20} />
+              </div>
+            </div>
+
+            {/* Value & Label */}
+            <div className="relative z-10">
+              <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight tabular-nums block">
+                {totalCounts.l1}
+              </span>
+              <span className="text-xs font-bold text-slate-500 mt-0.5 block truncate">
+                Senior Pastor
+              </span>
+            </div>
           </div>
-          <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm">
-            <span className="text-[10px] font-extrabold uppercase text-indigo-600 block">Level 2</span>
-            <span className="text-lg font-black text-slate-900">{totalCounts.l2}</span>
-            <span className="text-xs text-slate-400 block font-medium">Staff / Elders</span>
+
+          {/* LEVEL 2: PASTORAL STAFFS */}
+          <div className="relative group overflow-hidden bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-indigo-300 hover:-translate-y-1 transition-all duration-300">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-400 via-indigo-500 to-indigo-600" />
+            <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all duration-500" />
+            
+            <ShieldCheck size={72} className="absolute -right-2 -bottom-2 text-indigo-600/5 group-hover:text-indigo-600/10 group-hover:scale-110 transition-all duration-500 pointer-events-none" />
+
+            <div className="flex items-center justify-between mb-3 relative z-10">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-2xs">
+                Level 2
+              </span>
+              <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-100/60 text-indigo-600 border border-indigo-200/80 shadow-xs group-hover:scale-110 transition-transform duration-300">
+                <ShieldCheck size={20} />
+              </div>
+            </div>
+
+            <div className="relative z-10">
+              <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight tabular-nums block">
+                {totalCounts.l2}
+              </span>
+              <span className="text-xs font-bold text-slate-500 mt-0.5 block truncate">
+                Pastoral Staffs
+              </span>
+            </div>
           </div>
-          <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm">
-            <span className="text-[10px] font-extrabold uppercase text-blue-600 block">Level 3</span>
-            <span className="text-lg font-black text-slate-900">{totalCounts.l3}</span>
-            <span className="text-xs text-slate-400 block font-medium">GG Leaders</span>
+
+          {/* LEVEL 3: GROWTHGROUP LEADERS */}
+          <div className="relative group overflow-hidden bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600" />
+            <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all duration-500" />
+            
+            <Award size={72} className="absolute -right-2 -bottom-2 text-blue-600/5 group-hover:text-blue-600/10 group-hover:scale-110 transition-all duration-500 pointer-events-none" />
+
+            <div className="flex items-center justify-between mb-3 relative z-10">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200/60 shadow-2xs">
+                Level 3
+              </span>
+              <div className="p-2 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/60 text-blue-600 border border-blue-200/80 shadow-xs group-hover:scale-110 transition-transform duration-300">
+                <Award size={20} />
+              </div>
+            </div>
+
+            <div className="relative z-10">
+              <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight tabular-nums block">
+                {totalCounts.l3}
+              </span>
+              <span className="text-xs font-bold text-slate-500 mt-0.5 block truncate">
+                GrowthGroup Leaders
+              </span>
+            </div>
           </div>
-          <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm">
-            <span className="text-[10px] font-extrabold uppercase text-emerald-600 block">Level 4</span>
-            <span className="text-lg font-black text-slate-900">{totalCounts.l4}</span>
-            <span className="text-xs text-slate-400 block font-medium">GG Members</span>
+
+          {/* LEVEL 4: GROWTHGROUP MEMBERS */}
+          <div className="relative group overflow-hidden bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-emerald-300 hover:-translate-y-1 transition-all duration-300">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600" />
+            <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all duration-500" />
+            
+            <Users size={72} className="absolute -right-2 -bottom-2 text-emerald-600/5 group-hover:text-emerald-600/10 group-hover:scale-110 transition-all duration-500 pointer-events-none" />
+
+            <div className="flex items-center justify-between mb-3 relative z-10">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/60 shadow-2xs">
+                Level 4
+              </span>
+              <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100/60 text-emerald-600 border border-emerald-200/80 shadow-xs group-hover:scale-110 transition-transform duration-300">
+                <Users size={20} />
+              </div>
+            </div>
+
+            <div className="relative z-10">
+              <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight tabular-nums block">
+                {totalCounts.l4}
+              </span>
+              <span className="text-xs font-bold text-slate-500 mt-0.5 block truncate">
+                GrowthGroup Members
+              </span>
+            </div>
           </div>
-          <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm col-span-2 sm:col-span-1">
-            <span className="text-[10px] font-extrabold uppercase text-slate-500 block">Level 5</span>
-            <span className="text-lg font-black text-slate-900">{totalCounts.l5}</span>
-            <span className="text-xs text-slate-400 block font-medium">Unassigned / No GG</span>
+
+          {/* LEVEL 5: NO GROWTHGROUP */}
+          <div className="relative group overflow-hidden bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-rose-300 hover:-translate-y-1 transition-all duration-300 col-span-2 sm:col-span-1">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-400 via-rose-500 to-rose-600" />
+            <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/20 transition-all duration-500" />
+            
+            <UserX size={72} className="absolute -right-2 -bottom-2 text-rose-600/5 group-hover:text-rose-600/10 group-hover:scale-110 transition-all duration-500 pointer-events-none" />
+
+            <div className="flex items-center justify-between mb-3 relative z-10">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200/60 shadow-2xs">
+                Level 5
+              </span>
+              <div className="p-2 rounded-xl bg-gradient-to-br from-rose-50 to-rose-100/60 text-rose-600 border border-rose-200/80 shadow-xs group-hover:scale-110 transition-transform duration-300">
+                <UserX size={20} />
+              </div>
+            </div>
+
+            <div className="relative z-10">
+              <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight tabular-nums block">
+                {totalCounts.l5}
+              </span>
+              <span className="text-xs font-bold text-slate-500 mt-0.5 block truncate">
+                No GrowthGroup
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* TOOLBAR WITH CLEAR SEARCH & ZOOM STABILITY */}
+        {/* TOOLBAR */}
         <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
           <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-96">
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Type name & press Enter to scroll..."
+              placeholder="Type name & press Enter..."
               value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setUnassignedPage(1);
-              }}
-              className="w-full pl-9 pr-24 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-9 pr-24 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             />
-            {search && (
-              <button
-                type="button"
-                onClick={handleClearSearch}
-                className="absolute right-16 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-full"
-                title="Clear Search"
-              >
-                <X size={14} />
-              </button>
-            )}
-            <button
-              type="submit"
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[10px] font-bold transition-all"
-            >
+            <button type="submit" className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-indigo-600 text-white rounded-lg text-[10px] font-bold hover:bg-indigo-700 transition-colors">
               Search
             </button>
           </form>
 
+          {/* EXPAND & COLLAPSE BUTTONS WITH ACTIVE STATE EFFECT */}
           {activeTab === 'tree' && (
-            <div className="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0">
-              <button
-                type="button"
-                onClick={expandAll}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
+            <div className="flex items-center gap-2">
+              <button 
+                type="button" 
+                onClick={expandAll} 
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
+                  treeState === 'expanded'
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-200'
+                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                }`}
               >
                 <Maximize2 size={13} /> Expand Tree
               </button>
-              <button
-                type="button"
-                onClick={collapseAll}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
+              <button 
+                type="button" 
+                onClick={collapseAll} 
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
+                  treeState === 'collapsed'
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-200'
+                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                }`}
               >
                 <Minimize2 size={13} /> Collapse Tree
               </button>
@@ -686,116 +694,81 @@ export default function LeadershipHierarchyTracker() {
           )}
         </div>
 
-        {/* TAB CONTENT 1: INTERACTIVE HIERARCHY TREE */}
+        {/* TREE TAB */}
         {activeTab === 'tree' && (
           <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm overflow-x-auto w-full">
             <div className="min-w-[760px] space-y-4">
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                Leadership Hierarchy Flow (Type name & hit Enter to auto-locate)
-              </div>
-
-              {rootNodes.length > 0 ? (
-                rootNodes.map((rootNode) => (
-                  <TreeNode
-                    key={rootNode.id}
-                    node={rootNode}
-                    allMembers={membersData}
-                    childrenMap={childrenMap}
-                    searchQuery={search}
-                    expandedNodes={expandedNodes}
-                    toggleNode={toggleNode}
-                    targetMatchedId={targetMatchedId}
-                  />
-                ))
-              ) : (
-                <div className="py-12 text-center text-slate-400 font-medium text-sm">
-                  Walang nahanap na Senior Pastor o Root Node sa hierarchy.
-                </div>
-              )}
+              {rootNodes.map((rootNode) => (
+                <TreeNode
+                  key={rootNode.nodeKey}
+                  node={rootNode}
+                  allMembers={membersData}
+                  childrenMap={childrenMap}
+                  searchQuery={search}
+                  expandedNodes={expandedNodes}
+                  toggleNode={toggleNode}
+                  targetMatchedKey={targetMatchedKey}
+                />
+              ))}
             </div>
           </div>
         )}
 
-        {/* TAB CONTENT 2: UNASSIGNED MEMBERS (LEVEL 5 - NO GG) */}
+        {/* UNASSIGNED TAB */}
         {activeTab === 'unassigned' && (
-          <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4 w-full">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-              <div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Unassigned Members (Level 5)
-                </span>
-                {search.trim() && (
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-md border border-indigo-100">
-                      Filtered by "{search}" ({filteredUnassigned.length} of {totalCounts.l5} found)
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleClearSearch}
-                      className="text-xs text-slate-500 underline hover:text-slate-800"
-                    >
-                      Clear filter to view all {totalCounts.l5}
-                    </button>
-                  </div>
-                )}
+          <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-6 w-full">
+            {filteredUnassigned.length === 0 ? (
+              <div className="p-8 text-center text-slate-500 font-medium text-sm">
+                Walang nahanap na miyembro na walang Growth Group.
               </div>
-              <span className="text-xs text-slate-500 font-semibold">
-                Showing {filteredUnassigned.length} of {totalCounts.l5} Members
-              </span>
-            </div>
-
-            {paginatedUnassigned.length > 0 ? (
+            ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {/* MEMBER CARDS GRID */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {paginatedUnassigned.map((member) => (
-                    <div key={member.id} className="p-4 rounded-2xl border border-slate-200/80 bg-slate-50/50 flex items-center justify-between hover:bg-white hover:shadow-md transition-all">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center shrink-0">
-                          {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                        </div>
-                        <div>
-                          <div className="font-bold text-slate-800 text-sm">{member.name}</div>
-                          <div className="text-xs text-slate-400">{member.email || 'No email registered'}</div>
-                        </div>
+                    <div key={member.nodeKey} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center justify-between hover:bg-slate-100/80 transition-colors">
+                      <div className="min-w-0 pr-2">
+                        <h4 className="font-bold text-xs text-slate-800 truncate">{member.name}</h4>
+                        <span className="text-[10px] text-slate-500 block truncate">{member.churchPosition || 'Member'}</span>
                       </div>
-                      <button type="button" className="text-xs font-semibold px-2.5 py-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors shrink-0 ml-2">
-                        Assign GG
-                      </button>
+                      <span className="text-[10px] font-bold text-slate-400 shrink-0">No GrowthGroup</span>
                     </div>
                   ))}
                 </div>
 
-                {/* PAGINATION CONTROLS FOR 650 MEMBERS */}
-                {totalUnassignedPages > 1 && (
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                    <span className="text-xs text-slate-500 font-medium">
-                      Page {unassignedPage} of {totalUnassignedPages}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        disabled={unassignedPage === 1}
-                        onClick={() => setUnassignedPage(p => Math.max(p - 1, 1))}
-                        className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold flex items-center gap-1"
-                      >
-                        <ChevronLeft size={14} /> Prev
-                      </button>
-                      <button
-                        type="button"
-                        disabled={unassignedPage === totalUnassignedPages}
-                        onClick={() => setUnassignedPage(p => Math.min(p + 1, totalUnassignedPages))}
-                        className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold flex items-center gap-1"
-                      >
-                        Next <ChevronRight size={14} />
-                      </button>
-                    </div>
+                {/* PAGINATION CONTROLS */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100">
+                  <div className="text-xs font-medium text-slate-500">
+                    Showing <span className="font-bold text-slate-800">{((unassignedPage - 1) * itemsPerPage) + 1}</span> to{' '}
+                    <span className="font-bold text-slate-800">{Math.min(unassignedPage * itemsPerPage, filteredUnassigned.length)}</span> of{' '}
+                    <span className="font-bold text-slate-800">{filteredUnassigned.length}</span> members
                   </div>
-                )}
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setUnassignedPage(p => Math.max(p - 1, 1))}
+                      disabled={unassignedPage === 1}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                    >
+                      <ChevronLeft size={15} /> Prev
+                    </button>
+
+                    <div className="px-2 text-xs font-bold text-slate-700 select-none">
+                      Page {unassignedPage} of {totalUnassignedPages}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setUnassignedPage(p => Math.min(p + 1, totalUnassignedPages))}
+                      disabled={unassignedPage >= totalUnassignedPages}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                    >
+                      Next <ChevronRight size={15} />
+                    </button>
+                  </div>
+                </div>
               </>
-            ) : (
-              <div className="py-12 text-center text-slate-400 font-medium text-sm">
-                Walang miyembrong nagm-match sa "{search}".
-              </div>
             )}
           </div>
         )}
