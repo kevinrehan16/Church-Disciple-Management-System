@@ -16,9 +16,10 @@ class MemberFactory extends Factory
 
         // Default positions para sa regular members
         $defaultPositions = [
-            'Growth Group Leader',
-            'Growth Group Member',
-            'No Growth Group'
+            // 'Growth Group Leader',
+            // 'Growth Group Member',
+            // 'No Growth Group'
+            'Member'
         ];
 
         return [

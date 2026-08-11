@@ -16,7 +16,7 @@ interface SearchableSelectProps {
   error?: string;
   required?: boolean;
   onChange: (e: { target: { name: string; value: string } }) => void;
-  onSearchChange?: (searchText: string) => void; // 👉 Naayos na ang syntax error dito
+  onSearchChange?: (searchText: string) => void;
 }
 
 export function SearchableSelect({
@@ -35,11 +35,18 @@ export function SearchableSelect({
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const selectedOption = options.find((opt) => String(opt.id) === String(value));
+  // 👉 1. Gumawa tayo ng local state para i-save ang napiling item object
+  const [selectedItem, setSelectedItem] = useState<OptionItem | null>(null);
 
-  const filteredOptions = options.filter((opt) =>
-    (opt?.name || '').toLowerCase().includes((searchQuery || '').toLowerCase())
-  );
+  // 👉 2. I-sync o hanapin ang item kapag nagbago ang value o options
+  useEffect(() => {
+    const found = options.find((opt) => String(opt.id) === String(value));
+    if (found) {
+      setSelectedItem(found);
+    } else if (!value) {
+      setSelectedItem(null);
+    }
+  }, [value, options]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -52,6 +59,7 @@ export function SearchableSelect({
   }, []);
 
   const handleSelect = (opt: OptionItem) => {
+    setSelectedItem(opt); // 👉 Naka-lock na dito ang napiling item para hindi mawala ang display name
     onChange({
       target: {
         name: name,
@@ -60,7 +68,7 @@ export function SearchableSelect({
     });
     setIsOpen(false);
     setSearchQuery('');
-    if (onSearchChange) onSearchChange(''); // Reset search query on parent too kung kailangan
+    if (onSearchChange) onSearchChange('');
   };
 
   return (
@@ -94,8 +102,9 @@ export function SearchableSelect({
           </span>
         )}
 
-        <span className={`truncate w-full ${selectedOption ? 'text-slate-900' : 'text-slate-400'}`}>
-          {selectedOption ? selectedOption.name : placeholder}
+        {/* 👉 3. Ginamit na natin si selectedItem kaya hindi na siya mawawala sa input box */}
+        <span className={`truncate w-full ${selectedItem ? 'text-slate-900' : 'text-slate-400'}`}>
+          {selectedItem ? selectedItem.name : placeholder}
         </span>
 
         <ChevronDown size={15} className="text-slate-400 shrink-0 ml-2" />
@@ -114,8 +123,8 @@ export function SearchableSelect({
               value={searchQuery}
               onChange={(e) => {
                 const query = e.target.value;
-                setSearchQuery(query); // Update local search state para sa instant filtering
-                if (onSearchChange) onSearchChange(query); // Update parent search state para sa API request
+                setSearchQuery(query);
+                if (onSearchChange) onSearchChange(query);
               }}
               className="w-full outline-none text-sm bg-transparent"
               autoFocus
@@ -123,11 +132,14 @@ export function SearchableSelect({
           </div>
 
           <div className="overflow-y-auto flex-grow">
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((opt) => (
+            {options.length > 0 ? (
+              options.map((opt) => (
                 <div
                   key={opt.id}
-                  onClick={() => handleSelect(opt)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    handleSelect(opt);
+                  }}
                   className={`px-4 py-2.5 text-sm cursor-pointer hover:bg-slate-50 flex items-center gap-2 ${
                     String(value) === String(opt.id) ? 'bg-blue-50 text-indigo-600 font-medium' : 'text-slate-700'
                   }`}

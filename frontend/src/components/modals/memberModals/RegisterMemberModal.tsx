@@ -369,25 +369,26 @@ export default function RegisterMemberModal({ isOpen, onClose, memberId }: Modal
                       icon={<MapPinned size={15} />}
                       onChange={handleChange}
                     />
-                    <div className="md:col-span-2">
+                    {/* <div className="md:col-span-2"> */}
                       <InputField label="Purpose of Registration" name="purpose_reg" value={formDataState.purpose_reg || ''} onChange={handleChange} />
-                    </div>
-                    <div className='hidden'>
+                    {/* </div> */}
+                    {/* <div className='hidden'> */}
                       <SelectField 
                         label="Membership Type" 
                         name="member_position" 
                         value={formDataState.member_position || ''} 
                         onChange={handleChange}
                         options={[ 
-                          {label: 'No Growth Group', value: 'No Growth Group'}, 
-                          {label: 'Growth Group Member', value: 'Growth Group Member'}, 
-                          {label: 'Pastoral Staff', value: 'Pastoral Staff'}, 
+                          // {label: 'No Growth Group', value: 'No Growth Group'}, 
+                          // {label: 'Growth Group Member', value: 'Growth Group Member'}, 
+                          {label: 'Member', value: 'Member'}, 
                           {label: 'Deacon', value: 'Deacon'}, 
                           {label: 'Elder', value: 'Elder'}, 
+                          {label: 'Pastoral Staff', value: 'Pastoral Staff'}, 
                           {label: 'Pastor', value: 'Pastor'}, 
                           {label: 'Senior Pastor', value: 'Senior Pastor'}, 
                         ]} />
-                    </div>
+                    {/* </div> */}
                   </div>
                 </div>
 

@@ -35,7 +35,8 @@ class FakeMembersSeeder extends Seeder
             'user_id' => $superAdminUser->id,
             'first_name' => 'Kevin',
             'last_name' => 'Macandog',
-            'member_position' => 'No Growth Group',
+            // 'member_position' => 'No Growth Group',
+            'member_position' => 'Member',
         ]);
 
         // 2. Paglikha ng specific positions sa `members` table (Total = 45 members)

@@ -77,26 +77,10 @@ class Member extends Model
     {
         if (!$position) return $query;
 
-        // I-convert ang comma-separated string sa array kung kinakailangan
         $positions = is_array($position) ? $position : explode(',', $position);
+        $positions = array_map('trim', $positions);
 
-        return $query->where(function ($q) use ($positions) {
-            foreach ($positions as $pos) {
-                $trimmedPos = trim($pos);
-
-                if ($trimmedPos === 'Member') {
-                    // Kapag "Member" ang napili, isama ang tatlong ito
-                    $q->orWhereIn('member_position', [
-                        'No Growth Group',
-                        'Growth Group Member',
-                        'Growth Group Leader'
-                    ]);
-                } else {
-                    // Para sa ibang posisyon (Pastor, Elder, atbp.)
-                    $q->orWhere('member_position', $trimmedPos);
-                }
-            }
-        });
+        return $query->whereIn('member_position', $positions);
     }
 
     public function scopeByRank($query, $rank)
@@ -111,9 +95,9 @@ class Member extends Model
         'Pastoral Staff'        => 2,
         'Elder'                 => 2,
         'Deacon'                => 2,
-        'Growth Group Leader'   => 3,
-        'Growth Group Member'   => 4,
-        'No Growth Group'       => 5,
+        // 'Growth Group Leader'   => 3,
+        // 'Growth Group Member'   => 4,
+        // 'No Growth Group'       => 5,
     ];
 
     // Ito ang "Magic": Automatic na magse-set ng rank bago i-save sa database
