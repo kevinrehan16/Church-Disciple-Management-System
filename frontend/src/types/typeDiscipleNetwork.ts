@@ -1,11 +1,17 @@
 export interface MemberNode {
-  id: number;
-  parentId: number | null;
+  nodeKey: string;
+  memberId: number | string;
+  parentId: number | string | null;
   name: string;
   email: string | null;
-  position: string;
+  churchPosition: string | null;
+  ggRole: 'GG Leader' | 'GG Member' | 'Growth Group' | 'Group' | 'None';
   rank: number;
-  cluster: string;
+  primaryRank: number;
+  hasGrowthGroup: boolean;
+  growthGroupName: string;
+  isDuplicate: boolean;
+  isGroupFolder?: boolean;
   avatarBg: string;
 }
 

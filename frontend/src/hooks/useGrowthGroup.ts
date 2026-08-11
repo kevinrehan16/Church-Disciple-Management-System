@@ -25,6 +25,7 @@ export const useRegisterGrowthGroup = () => {
     mutationFn: (GrowthGroupData: SaveGrowthGroupPayload) => growthGroupService.createGrowthGroup(GrowthGroupData), // Gagamitin ang method mula sa object
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['growth-group'] });
+      queryClient.invalidateQueries({ queryKey: ['growth-groups'] });
     },
     onError: (error: any) => {
       console.error("Growth Group Registration failed:", error.response?.data || error.message);
