@@ -5,6 +5,7 @@ import { Sprout, CalendarClock, MapPinHouse } from 'lucide-react';
 import GrowthGroupMemberModal from '../../components/modals/growthgroupmemberModals/GrowthGroupMemberModal';
 import ViewGrowthGroupMembersModal from '../../components/modals/growthgroupmemberModals/ViewGrowthGroupMembersModal';
 import ModuleHeader from '../../components/ui/ModuleHeader';
+import LoadingChurchCard from '../../components/ui/LoadingChurchCard';
 import SearchInput from '../../components/inputs/SearchInput';
 import { useAllGrowthGroupsMembers } from '../../hooks/useGGMembers';
 import { formatTime } from '../../utils/formatters';
@@ -37,7 +38,7 @@ export default function GrowthGroupsMembers() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const { data: apiResponse } = useAllGrowthGroupsMembers();
+  const { data: apiResponse, isLoading } = useAllGrowthGroupsMembers();
   const currentGGMembers = apiResponse?.data || [];
 
   const [isGrowthGroupMemberModalOpen, setIsGrowthGroupMemberModalOpen] = useState(false);
@@ -125,13 +126,11 @@ export default function GrowthGroupsMembers() {
 
       {/* -- SCROLLABLE CARD AREA -- */}
       <div className="flex-1 overflow-y-auto px-6 pb-6 min-h-0">
-        {currentGrowthGroups.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
-            <p className="text-slate-400 font-medium text-sm">No growth groups found matching your criteria.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pt-1">
-            {currentGrowthGroups.map((gg) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pt-1">
+          {isLoading ? (
+            <LoadingChurchCard count={6} />
+          ) : (
+            currentGrowthGroups?.map((gg) => {
               const maxVisible = 6;
               const members = gg.members || [];
               const visibleMembers = members.slice(0, maxVisible);
@@ -139,8 +138,8 @@ export default function GrowthGroupsMembers() {
 
               return (
                 <div 
-                    key={gg.id} 
-                    className="group bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md hover:-translate-y-1 hover:border-[var(--active-parent,rgb(99,102,241))]/70 transition-all duration-300 p-5 flex flex-col justify-between relative overflow-hidden"
+                  key={gg.id} 
+                  className="group bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md hover:-translate-y-1 hover:border-[var(--active-parent,rgb(99,102,241))]/70 transition-all duration-300 p-5 flex flex-col justify-between relative overflow-hidden"
                 >
                   <div className="absolute top-0 left-0 right-0 h-1 bg-[var(--active-parent,rgb(99,102,241))] opacity-80" />
 
@@ -204,15 +203,15 @@ export default function GrowthGroupsMembers() {
                       <div className="flex items-center justify-between bg-slate-50/50 p-2 rounded-xl border border-slate-100">
                         <div className="flex items-center gap-2.5">
                             <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold shadow-sm shrink-0 group-hover:bg-[var(--active-parent,rgb(99,102,241))]">
-                            {getInitials(gg.leader.first_name, gg.leader.last_name)}
+                            {getInitials(gg.leader?.first_name, gg.leader?.last_name)}
                             </div>
                             <p className="text-xs font-bold text-slate-800">
-                            {gg.leader.first_name} {gg.leader.last_name}
+                            {gg.leader?.first_name} {gg.leader?.last_name}
                             </p>
                         </div>
 
                         <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1 shrink-0 bg-white px-2 py-1 rounded-lg border border-slate-100 shadow-2xs">
-                            <FaMobileAlt size={10} className="text-slate-400" /> {gg.leader.mobile_number}
+                            <FaMobileAlt size={10} className="text-slate-400" /> {gg.leader?.mobile_number}
                         </p>
                       </div>
                     </div>
@@ -291,9 +290,9 @@ export default function GrowthGroupsMembers() {
 
                 </div>
               );
-            })}
-          </div>
-        )}
+            })
+          )}
+        </div>
       </div>
       
       {/* -- PAGINATION FOOTER -- */}
