@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   Crown, 
   Shield, 
@@ -16,7 +16,8 @@ import {
   Folder, 
   Link2, 
   ShieldCheck, 
-  Users
+  Users,
+  ArrowUp
 } from 'lucide-react';
 import { useDiscipleNetwork } from '../../hooks/useDiscipleNetwork';
 
@@ -63,11 +64,8 @@ const TreeNode: React.FC<TreeNodeProps> = ({
   const currentAncestors = new Set(ancestorIds);
   currentAncestors.add(node.memberId);
 
-  // SAFEGUARD: Kapag Duplicate Node, WALANG CHILDREN para iwas infinite loop
   const rawChildren = node.isDuplicate ? [] : (childrenMap.get(node.memberId) || []);
   
-  // FILTER CHILDREN WITH CYCLE PROTECTION:
-  // Payagan ang duplicate/secondary nodes dahil leaf nodes sila (100% safe sa loop)
   const children = rawChildren.filter(child => {
     if (child.isDuplicate) return true;
     return !currentAncestors.has(child.memberId);
@@ -94,11 +92,12 @@ const TreeNode: React.FC<TreeNodeProps> = ({
             <Folder size={18} className="text-indigo-600" />
             <div>
               <span className="font-bold text-indigo-950 text-sm">{node.name}</span>
-              <span className="text-xs text-indigo-600 font-medium ml-2">({children.length} {children.length === 1 ? 'Item' : 'Items'})</span>
+              <span className="text-xs text-indigo-600 font-medium ml-2">
+                ({children.length} {children.length === 1 ? 'member' : 'members'})
+              </span>
             </div>
           </div>
 
-          {/* DULO: Number of Subordinates ONLY (WALANG L5 NO GG BADGE) */}
           {hasChildren && (
             <span className="text-xs font-semibold px-2.5 py-1 rounded-xl bg-indigo-100 text-indigo-700 border border-indigo-200">
               {children.length} {children.length === 1 ? 'Subordinate' : 'Subordinates'}
@@ -106,11 +105,12 @@ const TreeNode: React.FC<TreeNodeProps> = ({
           )}
         </div>
 
+        {/* ALIGNED CONNECTING LINES FOR GROUP FOLDERS */}
         {hasChildren && isExpanded && (
-          <div className="relative pl-6 md:pl-8 ml-3 border-l-2 border-indigo-200/80 space-y-2 mt-2">
+          <div className="relative pl-8 ml-3 border-l-2 border-indigo-200/80 space-y-2 mt-2">
             {children.map((child) => (
               <div key={child.nodeKey} className="relative">
-                <span className="absolute -left-6 md:-left-8 top-[29px] w-6 md:w-8 h-[2px] bg-indigo-200/80" />
+                <span className="absolute -left-8 top-[28px] w-8 h-[2px] bg-indigo-200/80" />
                 <TreeNode 
                   node={child} 
                   allMembers={allMembers} 
@@ -166,10 +166,11 @@ const TreeNode: React.FC<TreeNodeProps> = ({
   };
 
   const style = getBadgeStyle(node.rank, node.churchPosition);
+  const rawGGName = node.growthGroupName;
+  const displayGGName = (!rawGGName || rawGGName === 'Walang GG') ? 'No GrowthGroup' : rawGGName;
 
   return (
     <div id={`node-${node.nodeKey}`} className="relative my-2.5 transition-all">
-      {/* CARD CONTAINER */}
       <div 
         className={`flex items-center justify-between min-h-[58px] p-3.5 rounded-2xl border border-slate-200/90 shadow-sm transition-all duration-300 select-none ${style.border} ${
           isTargetScroll 
@@ -194,24 +195,20 @@ const TreeNode: React.FC<TreeNodeProps> = ({
             </div>
           )}
 
-          {/* AVATAR INITIALS */}
           <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shadow-inner shrink-0 ${node.avatarBg}`}>
             {node.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
           </div>
 
-          {/* DETAILS */}
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-bold text-slate-900 text-sm tracking-tight">{node.name}</span>
               
-              {/* 1. CHURCH POSITION BADGE */}
               {node.churchPosition && (
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/80">
                   {node.churchPosition}
                 </span>
               )}
 
-              {/* 2. DYNAMIC GG ROLE BADGE */}
               {node.ggRole === 'GG Leader' && (
                 <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200/80">
                   Growth Group Leader
@@ -223,7 +220,6 @@ const TreeNode: React.FC<TreeNodeProps> = ({
                 </span>
               )}
 
-              {/* SECONDARY NODE INDICATOR */}
               {node.isDuplicate && (
                 <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200/60 flex items-center gap-1">
                   <Link2 size={10} /> Secondary Node
@@ -231,18 +227,16 @@ const TreeNode: React.FC<TreeNodeProps> = ({
               )}
             </div>
 
-            {/* EMAIL AND GG NAME BELOW */}
             <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
               <span>{node.email || 'No email registered'}</span>
               <span>•</span>
               <span className={`font-semibold ${node.hasGrowthGroup ? 'text-indigo-600' : 'text-slate-400 italic'}`}>
-                {node.growthGroupName}
+                {displayGGName}
               </span>
             </div>
           </div>
         </div>
 
-        {/* RIGHT SIDE BADGES */}
         <div className="flex items-center gap-3 shrink-0 ml-4">
           {hasChildren && (
             <span className="text-xs font-semibold px-2.5 py-1 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100">
@@ -250,7 +244,6 @@ const TreeNode: React.FC<TreeNodeProps> = ({
             </span>
           )}
 
-          {/* LEVEL BADGE (L1 to L4 only) */}
           {node.rank <= 4 && (
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-slate-50 border border-slate-200 text-slate-700">
               {style.icon}
@@ -260,12 +253,12 @@ const TreeNode: React.FC<TreeNodeProps> = ({
         </div>
       </div>
 
-      {/* SUBORDINATES / NESTED NODES */}
+      {/* ALIGNED CONNECTING LINES FOR MEMBER NODES */}
       {hasChildren && isExpanded && (
-        <div className="relative pl-6 md:pl-10 ml-4 border-l-2 border-indigo-200/80 space-y-3 mt-2 transition-all">
+        <div className="relative pl-8 ml-4 border-l-2 border-indigo-200/80 space-y-3 mt-2 transition-all">
           {children.map((child) => (
             <div key={child.nodeKey} className="relative">
-              <span className="absolute -left-6 md:-left-10 top-[29px] w-6 md:w-10 h-[2px] bg-indigo-200/80" />
+              <span className="absolute -left-8 top-[28px] w-8 h-[2px] bg-indigo-200/80" />
               <TreeNode 
                 node={child} 
                 allMembers={allMembers} 
@@ -291,16 +284,21 @@ export default function LeadershipHierarchyTracker() {
   const [activeTab, setActiveTab] = useState<'tree' | 'unassigned'>('tree');
   const [search, setSearch] = useState('');
   
-  // STATE PARA SA EXPAND / COLLAPSE BUTTONS ACTIVE EFFECT
   const [treeState, setTreeState] = useState<'expanded' | 'collapsed' | 'custom'>('expanded');
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [targetMatchedKey, setTargetMatchedKey] = useState<string | null>(null);
+
+  const topRef = useRef<HTMLDivElement>(null);
 
   // PAGINATION STATE FOR UNASSIGNED
   const [unassignedPage, setUnassignedPage] = useState(1);
   const itemsPerPage = 24;
 
-  // PROCESS TREE DATA
+  const scrollToTop = () => {
+    topRef.current?.scrollIntoView({ behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const { rootNodes, unassignedNodes, childrenMap, totalCounts } = useMemo(() => {
     const map = new Map<number | string, MemberNode[]>();
     const roots: MemberNode[] = [];
@@ -345,27 +343,27 @@ export default function LeadershipHierarchyTracker() {
 
   // INITIAL AUTO-EXPAND SETUP
   useEffect(() => {
-    if (rootNodes.length > 0) {
-      const defaultExpanded = new Set<string>(rootNodes.map(r => r.nodeKey));
-      // Auto-expand Category Folders
-      defaultExpanded.add('group-elders');
-      defaultExpanded.add('group-deacons');
-      defaultExpanded.add('group-pastors');
-      defaultExpanded.add('group-gg-leaders');
-
-      setExpandedNodes(defaultExpanded);
+    if (rootNodes.length > 0 && membersData.length > 0) {
+      const keys: string[] = membersData.map(m => m.nodeKey);
+      setExpandedNodes(new Set(keys));
       setTreeState('expanded');
     }
-  }, [rootNodes]);
+  }, [rootNodes, membersData]);
 
   // RESET UNASSIGNED PAGE ON SEARCH INPUT CHANGE
   useEffect(() => {
     setUnassignedPage(1);
   }, [search]);
 
-  // TOGGLE NODE (Bawat manual click)
+  // RESET SEARCH HIGHLIGHT WHEN SEARCH IS CLEAR / EMPTY
+  useEffect(() => {
+    if (!search.trim()) {
+      setTargetMatchedKey(null);
+    }
+  }, [search]);
+
   const toggleNode = (key: string) => {
-    setTreeState('custom'); // Alisin ang active highlight sa Expand/Collapse buttons kapag manual toggle
+    setTreeState('custom'); 
     setExpandedNodes((prev) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
@@ -374,20 +372,17 @@ export default function LeadershipHierarchyTracker() {
     });
   };
 
-  // EXPAND ALL ACTION
   const expandAll = () => {
     const keys: string[] = membersData.map(m => m.nodeKey);
     setExpandedNodes(new Set(keys));
     setTreeState('expanded');
   };
 
-  // COLLAPSE ALL ACTION
   const collapseAll = () => {
     setExpandedNodes(new Set(rootNodes.map(r => r.nodeKey)));
     setTreeState('collapsed');
   };
 
-  // SEARCH SUBMIT
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!search.trim()) return;
@@ -434,7 +429,6 @@ export default function LeadershipHierarchyTracker() {
     }, 200);
   };
 
-  // FILTERED UNASSIGNED MEMBERS
   const filteredUnassigned = useMemo(() => {
     if (!search.trim()) return unassignedNodes;
     return unassignedNodes.filter(m => 
@@ -442,13 +436,11 @@ export default function LeadershipHierarchyTracker() {
     );
   }, [unassignedNodes, search]);
 
-  // PAGINATED UNASSIGNED MEMBERS
   const paginatedUnassigned = useMemo(() => {
     const start = (unassignedPage - 1) * itemsPerPage;
     return filteredUnassigned.slice(start, start + itemsPerPage);
   }, [filteredUnassigned, unassignedPage]);
 
-  // TOTAL PAGES CALCULATION
   const totalUnassignedPages = useMemo(() => {
     return Math.ceil(filteredUnassigned.length / itemsPerPage) || 1;
   }, [filteredUnassigned.length, itemsPerPage]);
@@ -474,7 +466,9 @@ export default function LeadershipHierarchyTracker() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900/5 p-3 sm:p-5 md:p-6 font-sans text-slate-800 w-full">
+    <div className="min-h-screen bg-slate-900/5 p-3 sm:p-5 md:p-6 font-sans text-slate-800 w-full relative">
+      <div ref={topRef} />
+
       <div className="w-full space-y-6">
         
         {/* HEADER */}
@@ -505,7 +499,7 @@ export default function LeadershipHierarchyTracker() {
                 activeTab === 'unassigned' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500'
               }`}
             >
-              <UserX size={16} /> No Growth Group ({totalCounts.l5})
+              <UserX size={16} /> No GrowthGroup ({totalCounts.l5})
             </button>
           </div>
         </div>
@@ -514,16 +508,10 @@ export default function LeadershipHierarchyTracker() {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5 w-full">
           {/* LEVEL 1: SENIOR PASTOR */}
           <div className="relative group overflow-hidden bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-amber-300 hover:-translate-y-1 transition-all duration-300">
-            {/* Top Accent Line */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600" />
-            
-            {/* Ambient Glow */}
             <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all duration-500" />
-            
-            {/* Large Background Watermark Icon */}
             <Crown size={72} className="absolute -right-2 -bottom-2 text-amber-600/5 group-hover:text-amber-600/10 group-hover:scale-110 transition-all duration-500 pointer-events-none" />
 
-            {/* Header Badge & Icon */}
             <div className="flex items-center justify-between mb-3 relative z-10">
               <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200/60 shadow-2xs">
                 Level 1
@@ -533,7 +521,6 @@ export default function LeadershipHierarchyTracker() {
               </div>
             </div>
 
-            {/* Value & Label */}
             <div className="relative z-10">
               <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight tabular-nums block">
                 {totalCounts.l1}
@@ -548,7 +535,6 @@ export default function LeadershipHierarchyTracker() {
           <div className="relative group overflow-hidden bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-indigo-300 hover:-translate-y-1 transition-all duration-300">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-400 via-indigo-500 to-indigo-600" />
             <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all duration-500" />
-            
             <ShieldCheck size={72} className="absolute -right-2 -bottom-2 text-indigo-600/5 group-hover:text-indigo-600/10 group-hover:scale-110 transition-all duration-500 pointer-events-none" />
 
             <div className="flex items-center justify-between mb-3 relative z-10">
@@ -574,7 +560,6 @@ export default function LeadershipHierarchyTracker() {
           <div className="relative group overflow-hidden bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600" />
             <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all duration-500" />
-            
             <Award size={72} className="absolute -right-2 -bottom-2 text-blue-600/5 group-hover:text-blue-600/10 group-hover:scale-110 transition-all duration-500 pointer-events-none" />
 
             <div className="flex items-center justify-between mb-3 relative z-10">
@@ -600,7 +585,6 @@ export default function LeadershipHierarchyTracker() {
           <div className="relative group overflow-hidden bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-emerald-300 hover:-translate-y-1 transition-all duration-300">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600" />
             <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all duration-500" />
-            
             <Users size={72} className="absolute -right-2 -bottom-2 text-emerald-600/5 group-hover:text-emerald-600/10 group-hover:scale-110 transition-all duration-500 pointer-events-none" />
 
             <div className="flex items-center justify-between mb-3 relative z-10">
@@ -626,7 +610,6 @@ export default function LeadershipHierarchyTracker() {
           <div className="relative group overflow-hidden bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-rose-300 hover:-translate-y-1 transition-all duration-300 col-span-2 sm:col-span-1">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-400 via-rose-500 to-rose-600" />
             <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/20 transition-all duration-500" />
-            
             <UserX size={72} className="absolute -right-2 -bottom-2 text-rose-600/5 group-hover:text-rose-600/10 group-hover:scale-110 transition-all duration-500 pointer-events-none" />
 
             <div className="flex items-center justify-between mb-3 relative z-10">
@@ -665,7 +648,6 @@ export default function LeadershipHierarchyTracker() {
             </button>
           </form>
 
-          {/* EXPAND & COLLAPSE BUTTONS WITH ACTIVE STATE EFFECT */}
           {activeTab === 'tree' && (
             <div className="flex items-center gap-2">
               <button 
@@ -723,48 +705,44 @@ export default function LeadershipHierarchyTracker() {
               </div>
             ) : (
               <>
-                {/* MEMBER CARDS GRID */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {paginatedUnassigned.map((member) => (
                     <div key={member.nodeKey} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center justify-between hover:bg-slate-100/80 transition-colors">
                       <div className="min-w-0 pr-2">
-                        <h4 className="font-bold text-xs text-slate-800 truncate">{member.name}</h4>
-                        <span className="text-[10px] text-slate-500 block truncate">{member.churchPosition || 'Member'}</span>
+                        <p className="font-bold text-slate-900 text-sm truncate">{member.name}</p>
+                        <p className="text-xs text-slate-400 truncate">{member.email || 'No email'}</p>
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400 shrink-0">No GrowthGroup</span>
                     </div>
                   ))}
                 </div>
 
                 {/* PAGINATION CONTROLS */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100">
-                  <div className="text-xs font-medium text-slate-500">
-                    Showing <span className="font-bold text-slate-800">{((unassignedPage - 1) * itemsPerPage) + 1}</span> to{' '}
-                    <span className="font-bold text-slate-800">{Math.min(unassignedPage * itemsPerPage, filteredUnassigned.length)}</span> of{' '}
-                    <span className="font-bold text-slate-800">{filteredUnassigned.length}</span> members
-                  </div>
-
+                <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-slate-100 gap-3">
+                  <span className="text-xs text-slate-500 font-medium">
+                    Showing {((unassignedPage - 1) * itemsPerPage) + 1} to {Math.min(unassignedPage * itemsPerPage, filteredUnassigned.length)} of {filteredUnassigned.length} entries
+                  </span>
+                  
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => setUnassignedPage(p => Math.max(p - 1, 1))}
                       disabled={unassignedPage === 1}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                      className="px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200 bg-white text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
                     >
-                      <ChevronLeft size={15} /> Prev
+                      Prev
                     </button>
-
-                    <div className="px-2 text-xs font-bold text-slate-700 select-none">
-                      Page {unassignedPage} of {totalUnassignedPages}
-                    </div>
-
+                    
+                    <span className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-slate-100 rounded-xl">
+                      {unassignedPage} / {totalUnassignedPages}
+                    </span>
+                    
                     <button
                       type="button"
                       onClick={() => setUnassignedPage(p => Math.min(p + 1, totalUnassignedPages))}
-                      disabled={unassignedPage >= totalUnassignedPages}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                      disabled={unassignedPage === totalUnassignedPages}
+                      className="px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200 bg-white text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
                     >
-                      Next <ChevronRight size={15} />
+                      Next
                     </button>
                   </div>
                 </div>
@@ -772,8 +750,17 @@ export default function LeadershipHierarchyTracker() {
             )}
           </div>
         )}
-
       </div>
+
+      {/* SCROLL TO TOP FLOATING BUTTON */}
+      <button
+        type="button"
+        onClick={scrollToTop}
+        className="fixed bottom-6 right-6 z-50 p-3.5 bg-indigo-600 text-white rounded-2xl shadow-xl hover:bg-indigo-700 transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 group border border-indigo-400/30 cursor-pointer"
+        title="Scroll to top"
+      >
+        <ArrowUp size={20} className="group-hover:-translate-y-0.5 transition-transform" />
+      </button>
     </div>
   );
 }
