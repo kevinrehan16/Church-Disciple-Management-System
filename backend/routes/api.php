@@ -1,10 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\Member;
-use App\Http\Resources\MemberResource;
-
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Members\MemberController;
 use App\Http\Controllers\Api\V1\Visitors\VisitorController;
@@ -27,24 +23,17 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum', 'password.changed')->group(function () {
         // AUTH ROUTES
         Route::post('/logout', [AuthController::class, 'logout']);
-
-        Route::middleware(['role:super_admin|senior_pastor|pastor|admin|staff'])->group(function () {
-            Route::get('/user', [AuthController::class, 'user']);
-            Route::post('/register', [AuthController::class, 'register']);
-            Route::get('/users', [AuthController::class, 'getAllUsers']);
-        });
+        Route::get('/user', [AuthController::class, 'user']);
+        Route::post('/register', [AuthController::class, 'register']);
+        Route::get('/users', [AuthController::class, 'getAllUsers']);
 
         // PROFILE ROUTES
-        Route::middleware('auth:sanctum')->group(function () {
-            Route::get('/profile/me', [AuthController::class, 'myProfile']);
-            Route::get('/profile/{id}', [AuthController::class, 'memberProfile']);
-        });
+        Route::get('/profile/me', [AuthController::class, 'myProfile']);
+        Route::get('/profile/{id}', [AuthController::class, 'memberProfile']);
 
         // MEMBERS ROUTES
-        Route::middleware(['role:super_admin|senior_pastor|pastor|admin|staff'])->group(function () {
-            Route::get('/members', [MemberController::class, 'index']);
-            Route::put('/members/{member}', [MemberController::class, 'update']);
-        });
+        Route::get('/members', [MemberController::class, 'index']);
+        Route::put('/members/{member}', [MemberController::class, 'update']);
 
         // VISITORS ROUTES
         Route::get('/visitors', [VisitorController::class, 'index']);
@@ -61,7 +50,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/clusters', [ClusterController::class, 'store']);
         Route::put('/clusters/{cluster}', [ClusterController::class, 'update']);
 
-        // GOWTH GROUPS ROUTES
+        // GROWTH GROUPS ROUTES
         Route::get('/growth-groups', [GrowthGroupController::class, 'index']);
         Route::post('/growth-groups', [GrowthGroupController::class, 'store']);
         Route::put('/growth-groups/{growth_group}', [GrowthGroupController::class, 'update']);

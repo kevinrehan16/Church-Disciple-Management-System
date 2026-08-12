@@ -1,7 +1,11 @@
 import { useTheme } from '../../contexts/ThemeContext';
 import { Loader2 } from 'lucide-react';
 
-export default function LoadingState(){
+interface loadingStateProps {
+  description: string;
+}
+
+export default function LoadingState({description}: loadingStateProps){
   useTheme(); // Initialize theme context hook
   const activeColorStyle = { color: 'var(--active-parent, rgb(99,102,241))' };
 
@@ -29,7 +33,7 @@ export default function LoadingState(){
 
         {/* Text Details */}
         <div className="text-center space-y-1 z-10">
-          <h3 className="text-sm font-extrabold text-slate-800">Loading profile</h3>
+          <h3 className="text-sm font-extrabold text-slate-800">{description}</h3>
           <p className="text-xs text-slate-400">Please wait a moment...</p>
         </div>
 

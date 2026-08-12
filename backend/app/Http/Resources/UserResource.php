@@ -28,6 +28,15 @@ class UserResource extends JsonResource
                 'church_id'    => $this->member?->church_id ?? 'N/A',
                 'cluster_id'    => $this->member?->cluster_id ?? 'N/A',
             ],
+            // --- IDAGDAG ITO PARA SA SPATIE ROLES AT PERMISSIONS ---
+            'roles'              => $this->getRoleNames(),
+            'permissions'        => $this->getAllPermissions()->pluck('name'),
+
+            // --- IDAGDAG ITO KUNG MAY GUSTO KANG IPASA NA POLICIES/GATES ---
+            'can' => [
+                'update' => $request->user()?->can('update', $this->resource),
+                'delete' => $request->user()?->can('delete', $this->resource),
+            ],
         ];
     }
 }

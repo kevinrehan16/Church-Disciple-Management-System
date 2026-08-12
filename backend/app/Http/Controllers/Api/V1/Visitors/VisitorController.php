@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\VisitorService;
 use App\Http\Resources\VisitorResource;
 use App\Http\Requests\Visitor\StoreVisitorRequest;
+use App\Models\Visitor;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -20,7 +21,8 @@ class VisitorController extends Controller
 
     public function index(Request $request)
     {
-        // Ipasa ang lahat ng request inputs (kabilang ang 'search' at 'page') bilang array
+        $this->authorize('viewAny', Visitor::class);
+
         $visitors = $this->visitorService->getAllVisitors($request->all());
 
         return VisitorResource::collection($visitors);
@@ -28,6 +30,8 @@ class VisitorController extends Controller
 
     public function store(StoreVisitorRequest $request): JsonResponse
     {
+        $this->authorize('create', Visitor::class);
+
         try {
             // Kunin ang validated data mula sa Request
             $data = $request->validated();

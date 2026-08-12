@@ -33,7 +33,7 @@ export default function ProfileScreen() {
 function MyProfileFetcher() {
   const { data, isLoading, isError } = useMyProfile();
 
-  if (isLoading) return <LoadingState />;
+  if (isLoading) return <LoadingState description='Loading Profile Module...' />;
   if (isError || !data) return <ErrorState message="Hindi makuha ang iyong profile data." />;
 
   return <ProfileUI data={data} isSelf={true} />;
@@ -42,7 +42,7 @@ function MyProfileFetcher() {
 function MemberProfileFetcher({ id }: { id: number }) {
   const { data, isLoading, isError } = useMemberProfile(id);
 
-  if (isLoading) return <LoadingState />;
+  if (isLoading) return <LoadingState description='Loading Profile Module...' />;
   if (isError || !data) return <ErrorState message="Hindi nahanap ang profile ng member na ito." />;
 
   return <ProfileUI data={data} isSelf={false} />;
@@ -51,7 +51,7 @@ function MemberProfileFetcher({ id }: { id: number }) {
 // ==========================================
 // 3. UI COMPONENTS (Loading & Error)
 // ==========================================
-<LoadingState />
+<LoadingState description='Loading Profile Module...' />
 
 const ErrorState = ({ message }: { message: string }) => (
   <div className="w-full min-h-[70vh] flex flex-col items-center justify-center p-4">

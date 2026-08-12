@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { FaNetworkWired } from 'react-icons/fa';
 import { 
   Crown, 
   Shield, 
@@ -19,6 +20,8 @@ import {
   ArrowUp
 } from 'lucide-react';
 import { useDiscipleNetwork } from '../../hooks/useDiscipleNetwork';
+import LoadingState from '../../components/ui/LoadingState';
+import ModuleHeader from '../../components/ui/ModuleHeader';
 
 // --- TYPES ---
 export interface MemberNode {
@@ -446,10 +449,7 @@ export default function LeadershipHierarchyTracker() {
 
   if (isLoading) {
     return (
-      <div className="min-h-[400px] flex flex-col items-center justify-center p-8 bg-white rounded-3xl border border-slate-200 shadow-sm w-full">
-        <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4" />
-        <h3 className="font-bold text-slate-800 text-lg">Loading Disciple Network...</h3>
-      </div>
+      <LoadingState description='Loading Disciple Network Module...' />
     );
   }
 
@@ -465,46 +465,21 @@ export default function LeadershipHierarchyTracker() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900/5 p-3 sm:p-5 md:p-6 font-sans text-slate-800 w-full relative">
+    <div className="min-h-screen bg-slate-900/5 p-3 sm:p-5 md:p-6 text-slate-800 w-full relative">
       <div ref={topRef} />
 
       <div className="w-full space-y-6">
         
         {/* HEADER */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-200/80 w-full">
-          <div>
-            <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">
-              <Sparkles size={15} /> Church Leadership Architecture
-            </div>
-            <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
-              Organizational Tree Tracker
-            </h1>
-          </div>
-
-          <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl border border-slate-200 shrink-0">
-            <button
-              type="button"
-              onClick={() => setActiveTab('tree')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                activeTab === 'tree' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'
-              }`}
-            >
-              <FolderTree size={16} /> Hierarchy Tree ({totalCounts.total - totalCounts.l5})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('unassigned')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                activeTab === 'unassigned' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500'
-              }`}
-            >
-              <UserX size={16} /> No GrowthGroup ({totalCounts.l5})
-            </button>
-          </div>
-        </div>
+        <ModuleHeader
+          title="Disciple Network"
+          description="Visual map of the church's discipleship structure, leadership tiers, and member relationships."
+          icon={<FaNetworkWired size={24} />}
+          actions=''
+        />
 
         {/* METRICS SUMMARY STRIP */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5 w-full">
+        <div className="grid font-sans grid-cols-2 sm:grid-cols-5 gap-3.5 w-full">
           {/* LEVEL 1: SENIOR PASTOR */}
           <div className="relative group overflow-hidden bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-amber-300 hover:-translate-y-1 transition-all duration-300">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600" />
@@ -640,9 +615,9 @@ export default function LeadershipHierarchyTracker() {
               placeholder="Type name & press Enter..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-24 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full pl-9 pr-24 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             />
-            <button type="submit" className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-indigo-600 text-white rounded-lg text-[10px] font-bold hover:bg-indigo-700 transition-colors">
+            <button type="submit" className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2.5 py-2 bg-indigo-600 text-white rounded-lg text-[10px] font-bold hover:bg-indigo-700 transition-colors">
               Search
             </button>
           </form>
@@ -652,7 +627,7 @@ export default function LeadershipHierarchyTracker() {
               <button 
                 type="button" 
                 onClick={expandAll} 
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all border ${
                   treeState === 'expanded'
                     ? 'bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-200'
                     : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
@@ -663,7 +638,7 @@ export default function LeadershipHierarchyTracker() {
               <button 
                 type="button" 
                 onClick={collapseAll} 
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all border ${
                   treeState === 'collapsed'
                     ? 'bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-200'
                     : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
@@ -673,6 +648,27 @@ export default function LeadershipHierarchyTracker() {
               </button>
             </div>
           )}
+
+          <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
+            <button
+              type="button"
+              onClick={() => setActiveTab('tree')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+                activeTab === 'tree' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'
+              }`}
+            >
+              <FolderTree size={16} /> Hierarchy Tree ({totalCounts.total - totalCounts.l5})
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('unassigned')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+                activeTab === 'unassigned' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500'
+              }`}
+            >
+              <UserX size={16} /> No GrowthGroup ({totalCounts.l5})
+            </button>
+          </div>
         </div>
 
         {/* TREE TAB */}
