@@ -8,6 +8,7 @@ export interface MemberFilters {
   member_position?: string | string[];
   rank?: number;
   baptism_statuses?: string | string[];
+  growth_group_statuses?: string | string[];
 }
 
 export const memberService = {
@@ -19,6 +20,7 @@ export const memberService = {
         member_position: filters.member_position,
         rank: filters.rank,
         baptism_statuses: filters.baptism_statuses,
+        growth_group_statuses: filters.growth_group_statuses,
       }
     });
     return response.data;

@@ -10,6 +10,7 @@ export interface MemberFilters {
   member_position?: string | string[];
   rank?: number;
   baptism_statuses?: string | string[];
+  growth_group_statuses?: string | string[];
 }
 
 export const useMembers = (filters: MemberFilters) => {

@@ -12,7 +12,7 @@ class MemberService
     public function getPaginatedMembers($request, $position = null, ?int $rank = null)
     {
         return Member::with(['user', 'church', 'cluster', 'spiritualGifts'])
-            // 1. FILTER
+            // 1. FILTER BY POSITION
             ->byPosition($position)
             ->byRank($rank)
 
@@ -48,7 +48,35 @@ class MemberService
                 }
             })
 
-            // 2. CUSTOM SORT: Rank 1 muna, tapos pinakabagong ID pababa
+            // 1.6 GROWTH GROUP STATUS FILTER (ITAMA NATIN DITO)
+            // 1.6 GROWTH GROUP STATUS FILTER (AND Logic kapag marami ang pinili)
+            ->when($request->filled('growth_group_statuses'), function ($query) use ($request) {
+                $rawGG = $request->input('growth_group_statuses');
+
+                if (is_string($rawGG)) {
+                    $decoded = json_decode($rawGG, true);
+                    $ggStatuses = is_array($decoded) ? $decoded : [$rawGG];
+                } else {
+                    $ggStatuses = is_array($rawGG) ? $rawGG : [];
+                }
+
+                if (!empty($ggStatuses)) {
+                    $query->where(function ($q) use ($ggStatuses) {
+                        // I-loop ang bawat napiling checkbox at i-chain gamit ang `where` (AND)
+                        foreach ($ggStatuses as $status) {
+                            if ($status === 'GrowthGroup Leader') {
+                                $q->whereHas('ledGrowthGroups');
+                            } elseif ($status === 'GrowthGroup Member') {
+                                $q->whereHas('growthGroups');
+                            } elseif ($status === 'No Growth Group') {
+                                $q->whereDoesntHave('growthGroups');
+                            }
+                        }
+                    });
+                }
+            })
+
+            // 2. CUSTOM SORT
             ->orderByRaw("CASE WHEN position_rank = 1 THEN 0 ELSE 1 END")
             ->orderBy('id', 'desc')
 
