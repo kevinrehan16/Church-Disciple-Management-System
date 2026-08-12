@@ -6,7 +6,6 @@ import {
   UserCheck, 
   UserX, 
   ChevronRight, 
-  ChevronLeft,
   ChevronDown, 
   Search, 
   Sparkles, 
