@@ -24,21 +24,19 @@ class MemberController extends Controller
     {
         $this->authorize('viewAny', Member::class);
 
-        // 1. Validations (Pinayagan na ang string o array)
+        // 1. Validations 
         $request->validate([
-            'member_position' => 'nullable',
-            'search'   => 'nullable|string',
-            'baptism_statuses'  => 'nullable',
+            'member_position'         => 'nullable',
+            'search'                  => 'nullable|string',
+            'baptism_statuses'        => 'nullable',
+            'growth_group_statuses'   => 'nullable', // <--- Idagdag ito
         ]);
 
-        // 2. Kunin ang request params
         $position = $request->query('member_position');
         $rank = $request->query('rank');
 
-        // 3. Tawagin ang Service
         $members = $this->memberService->getPaginatedMembers($request, $position, $rank);
 
-        // 4. Return via Resource
         return MemberResource::collection($members);
     }
 
