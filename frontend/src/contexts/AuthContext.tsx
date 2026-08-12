@@ -6,24 +6,23 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   fetchUser: () => Promise<void>;
-  login: (credentials: Record<string, any>) => Promise<any>; // 👈 Binago mula Promise<void> patungong Promise<any>
+  login: (credentials: Record<string, any>) => Promise<any>;
   logout: () => void;
+  hasPermission: (permission: string) => boolean; // 👈 Idagdag ito
+  hasRole: (role: string) => boolean;             // 👈 Idagdag ito
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  // User info is kept ONLY in React memory state (not in localStorage)
   const [user, setUser] = useState<any | null>(null);
   
-  // Set initial authentication status based on token presence
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return !!localStorage.getItem('auth_token');
   });
   
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // 1. Fetch User Info upon refresh
   const fetchUser = useCallback(async () => {
     const token = localStorage.getItem('auth_token');
     if (!token) {
@@ -43,7 +42,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error: any) {
       console.error("Fetch user error:", error);
       
-      // CRITICAL FIX: Burahin LANG ang token kapag 401 Unauthenticated ang nire-return!
       if (error.response?.status === 401) {
         localStorage.removeItem('auth_token');
         setUser(null);
@@ -54,24 +52,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // 2. Login Function
   const login = async (credentials: Record<string, any>) => {
     const response = await apiClient.post('/login', credentials);
 
     const token = response.data.token || response.data.access_token;
     const userData = response.data.data || response.data.user;
 
-    // TOKEN LANG ANG ISASAVE SA LOCALSTORAGE
     localStorage.setItem('auth_token', token);
 
-    // USER DATA IS SAVED ONLY IN REACT MEMORY
     setUser(userData);
     setIsAuthenticated(true);
 
     return response.data;
   };
 
-  // 3. Logout Function
   const logout = useCallback(async () => {
     try {
       await apiClient.post('/logout'); 
@@ -84,6 +78,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  // --- 🛠️ MGA HELPER FUNCTIONS PARA SA SPATIE PERMISSIONS & ROLES ---
+  const hasPermission = (permission: string): boolean => {
+    if (!user || !user.permissions) return false;
+    // Sinusuportahan nito kung ang permissions ay array ng strings o objects
+    return user.permissions.includes(permission);
+  };
+
+  const hasRole = (role: string): boolean => {
+    if (!user || !user.roles) return false;
+    return user.roles.includes(role);
+  };
+  // -----------------------------------------------------------------
+
   useEffect(() => {
     if (window.location.pathname !== '/login') {
       fetchUser();
@@ -93,7 +100,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [fetchUser]);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, fetchUser, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, fetchUser, login, logout, hasPermission, hasRole }}>
       {children}
     </AuthContext.Provider>
   );

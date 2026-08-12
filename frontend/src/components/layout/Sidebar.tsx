@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import { FaUsers, FaUserFriends, FaNetworkWired, FaLayerGroup, FaChartArea, FaCogs, FaAddressCard, FaHandHoldingHeart, FaKey, FaUserShield, FaUsersCog } from "react-icons/fa";
 import { Settings, ChevronDown, ChevronRight } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
 import { getInitials } from '../../utils/formatters';
 
 const getColor = (variable: string) => `var(${variable})`;
@@ -14,7 +14,7 @@ export default function Sidebar({
   isCollapsed: boolean; 
   onOpenSettings: () => void; 
 }) {
-  const { user } = useAuth();
+  const { hasPermission, user } = useAuth();
   const location = useLocation();
 
   // 1. STATE: Initialized base sa URL pag load
@@ -106,6 +106,7 @@ export default function Sidebar({
       <nav className={`flex-1 p-4 space-y-3 scrollbar-thin ${isCollapsed ? 'overflow-visible' : 'overflow-y-auto overflow-x-hidden'}`}>
         
         {/* DASHBOARD WITH HOVER TOOLTIP */}
+        {hasPermission('view_dashboard') && (
         <div className="relative group/dashboard">
           <NavLink to="/" className={getNavLinkClass}>
             <FaChartArea size={18} className="shrink-0" />
@@ -118,13 +119,15 @@ export default function Sidebar({
               Dashboard
             </div>
           )}
-        </div>
+        </div>)}
 
         <div>
           <SectionHeader title="Navigations" />
           <div className="space-y-1.5">
+
             {/* PROFILE WITH HOVER TOOLTIP */}
-            <div className="relative group/profile">
+            {hasPermission('view_profiles') && (
+              <div className="relative group/profile">
               <NavLink to="/profile/me" className={getNavLinkClass}>
                 <FaAddressCard size={18} className="shrink-0" />
                 <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3'}`}>
@@ -136,93 +139,104 @@ export default function Sidebar({
                   Profile
                 </div>
               )}
-            </div>
-            {/* MEMBERS DROPDOWN WITH POP-OUT MENU */}
-            <div className="relative group/members">
-              <button onClick={toggleMembers} className={`${navLinkBase} justify-between ${isMembersActive ? activeParentClass : inactiveParentClass} ${isCollapsed ? 'justify-center px-0' : ''}`}>
-                <div className="flex items-center">
-                  <FaUsers size={18} className="shrink-0" />
-                  <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3 text-left'}`}>
-                    Members
-                  </span>
-                </div>
-                <div className={`overflow-hidden transition-all duration-300 flex items-center justify-end ${isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[20px] opacity-100'}`}>
-                  {isMembersOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </div>
-              </button>
-              
-              {/* Accordion (Visible only when sidebar is OPEN) */}
-              {!isCollapsed && (
-                <div 
-                  className={`grid transition-all duration-500 ease-in-out ${
-                    isMembersOpen ? 'grid-rows-[1fr] opacity-100 mt-1' : 'grid-rows-[0fr] opacity-0'
-                  }`}
-                >
-                  <div className="overflow-hidden relative w-full space-y-1">
-                    <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />
-                    
-                    <NavLink to="/members/all" className="group flex items-center w-full text-sm h-9 relative z-10">
-                      {({ isActive }) => (
-                        <div className="pl-[23px] flex items-center w-full h-full">
-                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                          <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>All Members</div>
-                        </div>
-                      )}
-                    </NavLink>
-                    <NavLink to="/members/pastoral-staff" className="group flex items-center w-full text-sm h-9 relative z-10">
-                      {({ isActive }) => (
-                        <div className="pl-[23px] flex items-center w-full h-full">
-                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                          <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Pastoral Staff</div>
-                        </div>
-                      )}
-                    </NavLink>
-                    <NavLink to="/members/elders" className="group flex items-center w-full text-sm h-9 relative z-10">
-                      {({ isActive }) => (
-                        <div className="pl-[23px] flex items-center w-full h-full">
-                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                          <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Elders</div>
-                        </div>
-                      )}
-                    </NavLink>
-                    <NavLink to="/members/deacons" className="group flex items-center w-full text-sm h-9 relative z-10">
-                      {({ isActive }) => (
-                        <div className="pl-[23px] flex items-center w-full h-full">
-                          <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
-                          <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Deacons</div>
-                        </div>
-                      )}
-                    </NavLink>
-                  </div>
-                </div>
-              )}
+            </div>)}
 
-              {/* Fly-out Pop-out Menu */}
-              {isCollapsed && (
-                <div className="absolute left-full top-0 pl-2 w-52 opacity-0 pointer-events-none group-hover/members:opacity-100 group-hover/members:pointer-events-auto transition-all duration-200 ease-in-out z-50">
-                  <div className="py-2 rounded-xl shadow-xl border border-slate-700/40 flex flex-col space-y-1 px-1.5 bg-slate-800" style={{ backgroundColor: getColor('--sidebar-bg') }}>
-                    <div className="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-700/30 mb-1">
-                      Members Menu
-                    </div>
-                    <NavLink to="/members/all" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
-                      All Members
-                    </NavLink>
-                    <NavLink to="/members/pastoral-staff" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
-                      Pastoral Staff
-                    </NavLink>
-                    <NavLink to="/members/elders" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
-                      Elders
-                    </NavLink>
-                    <NavLink to="/members/deacons" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
-                      Deacons
-                    </NavLink>
+            {/* MEMBERS DROPDOWN WITH POP-OUT MENU */}
+            {(hasPermission('view_members') || hasPermission('view_pastors') || hasPermission('view_elders') || hasPermission('view_deacons')) && (
+              <div className="relative group/members">
+                <button onClick={toggleMembers} className={`${navLinkBase} justify-between ${isMembersActive ? activeParentClass : inactiveParentClass} ${isCollapsed ? 'justify-center px-0' : ''}`}>
+                  <div className="flex items-center">
+                    <FaUsers size={18} className="shrink-0" />
+                    <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3 text-left'}`}>
+                      Members
+                    </span>
                   </div>
-                </div>
-              )}
-            </div>
+                  <div className={`overflow-hidden transition-all duration-300 flex items-center justify-end ${isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[20px] opacity-100'}`}>
+                    {isMembersOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                  </div>
+                </button>
+                
+                {/* Accordion (Visible only when sidebar is OPEN) */}
+                {!isCollapsed && (
+                  <div 
+                    className={`grid transition-all duration-500 ease-in-out ${
+                      isMembersOpen ? 'grid-rows-[1fr] opacity-100 mt-1' : 'grid-rows-[0fr] opacity-0'
+                    }`}
+                  >
+                    <div className="overflow-hidden relative w-full space-y-1">
+                      <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />
+                      
+                      {hasPermission('view_members') && (
+                        <NavLink to="/members/all" className="group flex items-center w-full text-sm h-9 relative z-10">
+                        {({ isActive }) => (
+                          <div className="pl-[23px] flex items-center w-full h-full">
+                            <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                            <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>All Members</div>
+                          </div>
+                        )}
+                      </NavLink>)}
+
+                      { hasPermission('view_pastors') && (
+                        <NavLink to="/members/pastoral-staff" className="group flex items-center w-full text-sm h-9 relative z-10">
+                        {({ isActive }) => (
+                          <div className="pl-[23px] flex items-center w-full h-full">
+                            <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                            <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Pastoral Staff</div>
+                          </div>
+                        )}
+                      </NavLink>)}
+
+                      {hasPermission('view_elders') && (
+                        <NavLink to="/members/elders" className="group flex items-center w-full text-sm h-9 relative z-10">
+                        {({ isActive }) => (
+                          <div className="pl-[23px] flex items-center w-full h-full">
+                            <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                            <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Elders</div>
+                          </div>
+                        )}
+                      </NavLink>)}
+
+                      {hasPermission('view_deacons') && (
+                        <NavLink to="/members/deacons" className="group flex items-center w-full text-sm h-9 relative z-10">
+                        {({ isActive }) => (
+                          <div className="pl-[23px] flex items-center w-full h-full">
+                            <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />
+                            <div className={`flex-1 flex items-center h-full px-3 rounded-lg transition-colors duration-150 ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 group-hover:bg-slate-700/40 group-hover:text-white'}`}>Deacons</div>
+                          </div>
+                        )}
+                      </NavLink>)}
+                    </div>
+                  </div>
+                )}
+
+                {/* Fly-out Pop-out Menu */}
+                {isCollapsed && (
+                  <div className="absolute left-full top-0 pl-2 w-52 opacity-0 pointer-events-none group-hover/members:opacity-100 group-hover/members:pointer-events-auto transition-all duration-200 ease-in-out z-50">
+                    <div className="py-2 rounded-xl shadow-xl border border-slate-700/40 flex flex-col space-y-1 px-1.5 bg-slate-800" style={{ backgroundColor: getColor('--sidebar-bg') }}>
+                      <div className="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-700/30 mb-1">
+                        Members Menu
+                      </div>
+                      <NavLink to="/members/all" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                        All Members
+                      </NavLink>
+                      <NavLink to="/members/pastoral-staff" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                        Pastoral Staff
+                      </NavLink>
+                      <NavLink to="/members/elders" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                        Elders
+                      </NavLink>
+                      <NavLink to="/members/deacons" className={({ isActive }) => `flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors ${isActive ? 'text-white font-bold bg-slate-700/30' : 'text-slate-400 hover:bg-slate-700/40 hover:text-white'}`}>
+                        Deacons
+                      </NavLink>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             
             {/* VISITORS */}
-            <div className="relative group/visitors">
+            {hasPermission('view_visitors') && (
+              <div className="relative group/visitors">
               <NavLink to="/visitors" className={getNavLinkClass}>
                 <FaUserFriends size={18} className="shrink-0" />
                 <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3'}`}>
@@ -234,7 +248,7 @@ export default function Sidebar({
                   Visitors
                 </div>
               )}
-            </div>
+            </div>)}
 
             {/* DISCIPLE NETWORK */}
             <div className="relative group/network">

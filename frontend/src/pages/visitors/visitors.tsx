@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import { FaFacebookSquare, FaMobile, FaEnvelope, FaUserFriends } from "react-icons/fa";
 import { Plus, Filter, ArrowUpDown, Mars, Venus, Eye, Calendar, Clock } from 'lucide-react';
 import ModuleHeader from '../../components/ui/ModuleHeader';
@@ -9,6 +10,7 @@ import { getLifestageStyles } from '../../utils/formatters';
 import VisitorModal from '../../components/modals/visitorModals/VisitorModal';
 
 export default function Visitors() {
+  const { hasPermission } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -42,6 +44,7 @@ export default function Visitors() {
         description="Centralized management of visitor profiles, visit history, follow-up activities, and church engagement."
         icon={<FaUserFriends size={24} />}
         actions={
+          (hasPermission('manage_visitors') || hasPermission('create_visitors')) && (
           <button 
             className="group flex items-center gap-2 px-5 py-2.5 bg-[#0284c7] hover:bg-[#026ca1] active:scale-95 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-rose-500/10"
             onClick={() => handleViewVisitor('')}
@@ -49,6 +52,7 @@ export default function Visitors() {
             <Plus size={16} className="transition-transform group-hover:rotate-90" />
             Add New Visitor
           </button>
+          )
         }
       />
 

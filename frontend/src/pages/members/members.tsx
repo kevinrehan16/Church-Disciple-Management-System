@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { FaUsers, FaUser } from "react-icons/fa";
 import { Plus, Filter, ChevronDown, Eye, ShieldCheck, UserPen, Church, MapPinned, Sprout, CircleX, CalendarCheck2, Droplets } from 'lucide-react';
 import ModuleHeader from '../../components/ui/ModuleHeader';
@@ -9,6 +10,7 @@ import { useMembers } from '../../hooks/useMembers';
 import RegisterMemberModal from '../../components/modals/memberModals/RegisterMemberModal';
 
 export default function Members() {
+  const { hasPermission } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPositions, setSelectedPositions] = useState<string[]>([]); 
@@ -112,16 +114,17 @@ export default function Members() {
         description="Centralized database for managing congregant profiles, leadership assignments, and real-time membership status."
         icon={<FaUsers size={24} />}
         actions={
-          <button 
-            className="group relative overflow-hidden flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-semibold transition-all duration-200 active:scale-95"
-            onClick={() => handleViewProfile('')}
-          >
-            {/* Subtly nagliligid ang background opacity/highlight kapag hinOVER */}
-            <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-200" />
-
-            <Plus size={16} className="transition-transform duration-300 group-hover:rotate-90 relative z-10" />
-            <span className="relative z-10">Register New Member</span>
-          </button>
+          /* I-check kung may permission siyang gumawa/mag-register ng miyembro */
+          (hasPermission('manage_members') || hasPermission('create_members')) && (
+            <button 
+              className="group relative overflow-hidden flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-semibold transition-all duration-200 active:scale-95"
+              onClick={() => handleViewProfile('')}
+            >
+              <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-200" />
+              <Plus size={16} className="transition-transform duration-300 group-hover:rotate-90 relative z-10" />
+              <span className="relative z-10">Register New Member</span>
+            </button>
+          )
         }
       />
 
@@ -485,20 +488,26 @@ export default function Members() {
                       </td>
                       <td className="px-6 py-4 text-center">
                         <div className='flex items-center gap-1'>
-                          <button 
-                            className="inline-flex items-center justify-center p-2 rounded-xl text-cyan-600 bg-cyan-50/80 border border-cyan-200/60 hover:bg-cyan-500 hover:text-white hover:border-cyan-500 transition-all duration-200 active:scale-95"
-                            title="Edit Profile"
-                            onClick={() => handleViewProfile(member.id)}
-                          >
-                            <UserPen size={15} />
-                          </button>
-                          <Link 
-                            to={`/member/${member.id}`}
-                            className="inline-flex items-center justify-center p-2 rounded-xl text-green-600 bg-green-50/80 border border-green-200/60 hover:bg-green-500 hover:text-white hover:border-green-500 transition-all duration-200 active:scale-95"
-                            title="View Profile"
-                          >
-                            <Eye size={15} />
-                          </Link>
+                          {(hasPermission('manage_members') || hasPermission('edit_members')) && (
+                            <button 
+                              className="inline-flex items-center justify-center p-2 rounded-xl text-cyan-600 bg-cyan-50/80 border border-cyan-200/60 hover:bg-cyan-500 hover:text-white hover:border-cyan-500 transition-all duration-200 active:scale-95"
+                              title="Edit Profile"
+                              onClick={() => handleViewProfile(member.id)}
+                            >
+                              <UserPen size={15} />
+                            </button>
+                          )}
+                          
+                          {(hasPermission('manage_members') || hasPermission('view_members_profile')) && (
+                            <Link 
+                              to={`/member/${member.id}`}
+                              className="inline-flex items-center justify-center p-2 rounded-xl text-green-600 bg-green-50/80 border border-green-200/60 hover:bg-green-500 hover:text-white hover:border-green-500 transition-all duration-200 active:scale-95"
+                              title="View Profile"
+                            >
+                              <Eye size={15} />
+                            </Link>
+                          )}
+                          
                         </div>
                       </td>
                     </tr>
