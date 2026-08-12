@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function LoadingChurchCluster({ count = 3 }) {
   return (
     <div className="w-full space-y-4">
