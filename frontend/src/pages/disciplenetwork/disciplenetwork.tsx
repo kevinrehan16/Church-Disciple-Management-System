@@ -9,7 +9,6 @@ import {
   ChevronRight, 
   ChevronDown, 
   Search, 
-  Sparkles, 
   FolderTree, 
   Maximize2, 
   Minimize2, 
