@@ -78,21 +78,16 @@ Route::prefix('v1')->group(function () {
         });
 
         // USER ROLE PERMISSION MANAGEMENT ROUTES
-        Route::middleware(['auth:sanctum', 'role:super_admin'])->group(function () {
-            // Permissions Management
-            Route::apiResource('permissions', PermissionController::class)->only(['index', 'update', 'store', 'destroy']);
+        // Permissions Management
+        Route::apiResource('permissions', PermissionController::class)->only(['index', 'update', 'store', 'destroy']);
+        // Roles Management & Syncing Permissions
+        Route::apiResource('roles', RoleController::class);
+        Route::post('/roles/{role}/permissions', [RoleController::class, 'syncPermissions']);
+        // User Role Assignment
+        Route::post('/users/{user}/roles', [UserRoleController::class, 'assignRole']);
+        Route::delete('/users/{user}/roles', [UserRoleController::class, 'removeRole']);
 
-            // Roles Management & Syncing Permissions
-            Route::apiResource('roles', RoleController::class);
-            Route::post('/roles/{role}/permissions', [RoleController::class, 'syncPermissions']);
-
-            // User Role Assignment
-            Route::post('/users/{user}/roles', [UserRoleController::class, 'assignRole']);
-            Route::delete('/users/{user}/roles', [UserRoleController::class, 'removeRole']);
-        });
-
-        Route::middleware(['auth:sanctum'])->group(function () {
-            Route::get('/disciple-network', [DiscipleNetworkController::class, 'index']);
-        });
+        // Disciple Network
+        Route::get('/disciple-network', [DiscipleNetworkController::class, 'index']);
     });
 });

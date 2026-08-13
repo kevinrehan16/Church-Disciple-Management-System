@@ -4,6 +4,9 @@ import { Plus, Sprout, CalendarClock, MapPinHouse, Church, MapPinned, Edit3, Tra
 import GrowthGroupModal from '../../components/modals/growthgroupModals/GrowthGroupModal';
 import { useGrowthGroup } from '../../hooks/useGrowthGroup';
 import ModuleHeader from '../../components/ui/ModuleHeader';
+import { TableLoading } from '../../components/ui/TableStates';
+import { TableError } from '../../components/ui/TableStates';
+import { TableEmpty } from '../../components/ui/TableStates';
 import SearchInput from '../../components/inputs/SearchInput';
 import { formatTime } from '../../utils/formatters';
 // import { TableLoading, TableError, TableEmpty } from '../../components/ui/TableStates';
@@ -15,7 +18,7 @@ export default function GrowthGroups() {
   const [selectedChurch, setSelectedChurch] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
 
-  const { data: apiResponse } = useGrowthGroup({
+  const { data: apiResponse, isLoading, isError, refetch } = useGrowthGroup({
     search: searchTerm,
     page: currentPage,
     church_id: selectedChurch,
@@ -105,14 +108,12 @@ export default function GrowthGroups() {
             </thead>
 
             <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
-              {currentGrowthGroups.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="text-center py-12 text-slate-400 font-medium">
-                    No growth groups found matching your criteria.
-                  </td>
-                </tr>
-              ) : (
-                currentGrowthGroups.map((gg : any) => (
+              {isLoading ? (
+                    <TableLoading rows={5} columns={6} />
+                ) : isError ? (
+                    <TableError colSpan={6} onRetry={() => refetch()} />
+                ) : currentGrowthGroups.length > 0 ? (
+                  currentGrowthGroups.map((gg : any) => (
                   <tr key={gg.id} className="group odd:bg-slate-50 hover:bg-[var(--active-parent,rgb(99,102,241))]/5 transition-colors">
                     
                     {/* Name & Code */}
@@ -207,6 +208,8 @@ export default function GrowthGroups() {
 
                   </tr>
                 ))
+                ) : (
+                  <TableEmpty colSpan={6} />
               )}
             </tbody>
 

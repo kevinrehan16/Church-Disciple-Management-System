@@ -7,12 +7,14 @@ import {
 import { useChurches } from '../../hooks/useChurches';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import SearchInput from '../../components/inputs/SearchInput';
+import ChurchModal from '../../components/modals/churchModals/ChurchModal';
+import LoadingChurchCard from '../../components/ui/LoadingChurchCard';
 
 export default function Churches() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: apiResponse } = useChurches({
+  const { data: apiResponse, isLoading } = useChurches({
     search: searchTerm,
     page: currentPage,
   });
@@ -27,12 +29,12 @@ export default function Churches() {
   };
 
   // const [selectedChurchId, setSelectedChurchId] = useState<string | null>(null);
-  // const [isChurchModalOpen, setIsChurchModalOpen] = useState(false);
+  const [isChurchModalOpen, setIsChurchModalOpen] = useState(false);
 
   const handleViewChurch = (churchId: any) => {
     // Open church modal (selected church id handled elsewhere)
-    // setIsChurchModalOpen(true);
     console.log(churchId);
+    setIsChurchModalOpen(true);
   };
 
   return (
@@ -82,118 +84,122 @@ export default function Churches() {
         
         {/* Card Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {currentChurches.map((church) => (
-          <div 
-              key={church.id} 
-              className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 p-5 flex flex-col justify-between relative overflow-hidden group"
-          >
-              {/* Top Border Indicator */}
-              <div className={`absolute top-0 left-0 right-0 h-1.5 ${church.is_active ? 'bg-[var(--active-parent)]' : 'bg-slate-300'}`} />
+          {isLoading ? (
+            // Tawagin lang ang component at sabihin kung ilang skeleton ang gusto mo
+            <LoadingChurchCard count={6} />
+          ) : (
+            currentChurches.map((church) => (
+              <div 
+                key={church.id} 
+                className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 p-5 flex flex-col justify-between relative overflow-hidden group"
+              >
+                {/* Top Border Indicator */}
+                <div className={`absolute top-0 left-0 right-0 h-1.5 ${church.is_active ? 'bg-[var(--active-parent)]' : 'bg-slate-300'}`} />
 
-              <div>
-              {/* Card Header: Code, Main Campus Badge, & Animated Status Indicator */}
-              <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <div className="flex items-center gap-2 mb-4 flex-wrap">
+                <div>
+                  {/* Card Header: Code, Main Campus Badge, & Animated Status Indicator */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <div className="flex items-center gap-2 mb-4 flex-wrap">
                         <span className="flex items-center gap-1 text-xs font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded border border-slate-200">
                           <FingerprintPattern size={12} className="fill-slate-500 text-slate-500" />
                           {church.code}
                         </span>
                         {church.is_main_campus && (
-                        <span className="flex items-center gap-1 text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full">
+                          <span className="flex items-center gap-1 text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full">
                             <Star size={12} className="fill-amber-500 text-amber-500" />
                             Main
-                        </span>
+                          </span>
                         )}
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-[var(--active-parent)]/50 text-white rounded-full group-hover:bg-[var(--active-parent)]/80 group-hover:text-white transition-all shadow-sm">
-                        <FaCross size={16} />
                       </div>
-                      <h3 className="text-lg font-bold text-slate-800 leading-tight group-hover:text-[var(--active-parent)] transition-colors">
-                        {church.name}
-                      </h3>
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-[var(--active-parent)]/50 text-white rounded-full group-hover:bg-[var(--active-parent)]/80 group-hover:text-white transition-all shadow-sm">
+                          <FaCross size={16} />
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-800 leading-tight group-hover:text-[var(--active-parent)] transition-colors">
+                          {church.name}
+                        </h3>
+                      </div>
+                    </div>
+
+                    {/* ANIMATED STATUS DOT (PULSING EFFECT) */}
+                    <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-full shrink-0">
+                      <span className="relative flex h-2.5 w-2.5">
+                        {church.is_active && (
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        )}
+                        <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${church.is_active ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
+                      </span>
+                      <span className="text-[11px] font-semibold text-slate-600">
+                        {church.is_active ? 'Active' : 'Inactive'}
+                      </span>
                     </div>
                   </div>
 
-                  {/* 2. ANIMATED STATUS DOT (PULSING EFFECT) */}
-                  <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-full shrink-0">
-                  <span className="relative flex h-2.5 w-2.5">
-                      {church.is_active && (
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      )}
-                      <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${church.is_active ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
-                  </span>
-                  <span className="text-[11px] font-semibold text-slate-600">
-                      {church.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                  </div>
-              </div>
-
-              {/* Stats Metrics Bar */}
-              <div className="grid grid-cols-2 gap-3 my-4 p-3 bg-slate-50/80 rounded-lg border border-slate-100 group-hover:bg-[var(--active-parent)]/80 group-hover:border-[var(--active-parent)]/90">
-                  <div className="flex items-center gap-2.5">
+                  {/* Stats Metrics Bar */}
+                  <div className="grid grid-cols-2 gap-3 my-4 p-3 bg-slate-50/80 rounded-lg border border-slate-100 group-hover:bg-[var(--active-parent)]/80 group-hover:border-[var(--active-parent)]/90">
+                    <div className="flex items-center gap-2.5">
                       <div className="p-2 bg-indigo-50 text-indigo-600 rounded-md">
-                          <Layers size={18} />
+                        <Layers size={18} />
                       </div>
                       <div>
-                          <p className="text-xs text-slate-500 font-medium group-hover:text-white">Clusters</p>
-                          <p className="text-sm font-bold text-slate-800">{church.clusters_count}</p>
+                        <p className="text-xs text-slate-500 font-medium group-hover:text-white">Clusters</p>
+                        <p className="text-sm font-bold text-slate-800">{church.clusters_count}</p>
                       </div>
-                  </div>
+                    </div>
 
-                  <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2.5">
                       <div className="p-2 bg-emerald-50 text-emerald-600 rounded-md">
-                          <Users size={18} />
+                        <Users size={18} />
                       </div>
                       <div>
-                          <p className="text-xs text-slate-500 font-medium group-hover:text-white">Growth Groups</p>
-                          <p className="text-sm font-bold text-slate-800">{church.growth_groups_count}</p>
+                        <p className="text-xs text-slate-500 font-medium group-hover:text-white">Growth Groups</p>
+                        <p className="text-sm font-bold text-slate-800">{church.growth_groups_count}</p>
                       </div>
+                    </div>
                   </div>
-              </div>
 
-              {/* Contact Information */}
-              <div className="space-y-2 text-sm text-slate-600 mb-6">
-                  <div className="flex items-start gap-2.5">
-                  <MapPin size={16} className="text-slate-400 mt-0.5 shrink-0" />
-                  <span className="line-clamp-2">{church.address}</span>
+                  {/* Contact Information */}
+                  <div className="space-y-2 text-sm text-slate-600 mb-6">
+                    <div className="flex items-start gap-2.5">
+                      <MapPin size={16} className="text-slate-400 mt-0.5 shrink-0" />
+                      <span className="line-clamp-2">{church.address}</span>
+                    </div>
+                    {church.contact_number && (
+                      <div className="flex items-center gap-2.5">
+                        <Phone size={16} className="text-slate-400 shrink-0" />
+                        <span>{church.contact_number}</span>
+                      </div>
+                    )}
+                    {church.email && (
+                      <div className="flex items-center gap-2.5">
+                        <Mail size={16} className="text-slate-400 shrink-0" />
+                        <span className="truncate">{church.email}</span>
+                      </div>
+                    )}
                   </div>
-                  {church.contact_number && (
-                  <div className="flex items-center gap-2.5">
-                      <Phone size={16} className="text-slate-400 shrink-0" />
-                      <span>{church.contact_number}</span>
-                  </div>
-                  )}
-                  {church.email && (
-                  <div className="flex items-center gap-2.5">
-                      <Mail size={16} className="text-slate-400 shrink-0" />
-                      <span className="truncate">{church.email}</span>
-                  </div>
-                  )}
-              </div>
-              </div>
+                </div>
 
-              {/* 3. EDIT & DELETE BUTTONS WITH HOVER BORDER & BACKGROUND */}
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-              <button 
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-blue-600 text-xs font-semibold text-white hover:bg-blue-800 hover:border-blue-900 transition-all duration-200 active:scale-95"
-                  onClick={()=> handleViewChurch(church.id)}
-              >
-                  <Pencil size={14} />
-                  Edit
-              </button>
-              
-              <button 
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50/80 hover:border-rose-200 transition-all duration-200 active:scale-95"
-              >
-                  <Trash2 size={14} />
-                  Delete
-              </button>
+                {/* EDIT & DELETE BUTTONS */}
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <button 
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-blue-600 text-xs font-semibold text-white hover:bg-blue-800 hover:border-blue-900 transition-all duration-200 active:scale-95"
+                    onClick={() => handleViewChurch(church.id)}
+                  >
+                    <Pencil size={14} />
+                    Edit
+                  </button>
+                  
+                  <button 
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50/80 hover:border-rose-200 transition-all duration-200 active:scale-95"
+                  >
+                    <Trash2 size={14} />
+                    Delete
+                  </button>
+                </div>
               </div>
-
-          </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
       
@@ -229,13 +235,13 @@ export default function Churches() {
       )}
 
 
-      {/* {isChurchModalOpen && (
+      {isChurchModalOpen && (
         <ChurchModal 
         isOpen={isChurchModalOpen}
         onClose={() => setIsChurchModalOpen(false)} 
         // churchId={selectedChurchId}
         />
-      )} */}
+      )}
     </div>
   );
 }
