@@ -5,24 +5,29 @@ import { modalAnimation } from '../../../utils/ModalAnimation';
 import SectionHeader from '../../ui/SectionHeader';
 import { InputField } from '../../inputs/InputField';
 import { SelectField } from '../../inputs/SelectField';
-import { useRegisterChurch } from '../../../hooks/useChurches';
+import { useRegisterChurch, useChurchById, useUpdateChurch } from '../../../hooks/useChurches'; // Idagdag ang update hook mo kung meron
 
 interface ChurchModalProps {
   isOpen: boolean;
   onClose: () => void;
+  churchId: string | null;
 }
 
-export default function ChurchModal({ isOpen, onClose }: ChurchModalProps) {
+export default function ChurchModal({ isOpen, onClose, churchId }: ChurchModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addChurch } = useRegisterChurch();
+  const { mutate: updateChurch } = useUpdateChurch();
   
-  // I-adjust ang hook na ito base sa actual mutation hook mo para sa Churches
+  // 1. Kunin ang data ng church kapag may churchId (Edit mode)
+  // I-adjust depende kung paano ibinabalik ng hook mo ang data (e.g. data?.data o data)
+  const { data: churchResponse, isLoading: isFetchingChurch } = useChurchById(churchId as string);
+
+  const churchData = (churchResponse as any)?.data || churchResponse;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
-    // Gamitin ang CreateChurchPayload para sa type-checking
     const formattedData = {
         name: formData.get('name') as string,
         code: formData.get('code') as string,
@@ -33,12 +38,20 @@ export default function ChurchModal({ isOpen, onClose }: ChurchModalProps) {
         is_active: formData.get('is_active') === 'true',
     };
 
-    // Safe na ipasa dahil compliant na sa CreateChurchPayload interface
-    addChurch(formattedData, { 
-        onSuccess: () => {
-            startClose();
-        }
-    });
+    if (churchId) {
+      updateChurch({id: churchId, formattedData}, { 
+          onSuccess: () => {
+              startClose();
+          }
+      });
+    } else {
+      // Create new church
+      addChurch(formattedData, { 
+          onSuccess: () => {
+              startClose();
+          }
+      });
+    }
   };
 
   if (!isOpen) return null;
@@ -65,9 +78,11 @@ export default function ChurchModal({ isOpen, onClose }: ChurchModalProps) {
         <div className="px-8 py-6 bg-[var(--active-parent,rgb(99,102,241))] flex items-center justify-between text-white flex-shrink-0">
           <div>
             <h2 className="text-xl font-extrabold tracking-tight">
-                Church Registration
+              {churchId ? 'Edit Church Information' : 'Church Registration'}
             </h2>
-            <p className="text-white/80 text-xs mt-0.5 font-medium">Add a new church location to the network.</p>
+            <p className="text-white/80 text-xs mt-0.5 font-medium">
+              {churchId ? 'Update church location details.' : 'Add a new church location to the network.'}
+            </p>
           </div>
           <button onClick={startClose} className="p-2 hover:bg-white/10 active:scale-95 rounded-full transition-all">
             <X size={20} />
@@ -76,43 +91,50 @@ export default function ChurchModal({ isOpen, onClose }: ChurchModalProps) {
 
         {/* Scrollable Form Body */}
         <div className="p-6 overflow-y-auto space-y-8">
-          <form id="church-form" onSubmit={handleSubmit} className="space-y-10">
-            
-            {/* Section 1: Basic Info */}
-            <div>
+          {isFetchingChurch && churchId ? (
+            <div className="flex justify-center items-center py-20 text-slate-500 font-medium">
+              Loading church data...
+            </div>
+          ) : (
+            <form id="church-form" onSubmit={handleSubmit} className="space-y-10">
+              
+              {/* Section 1: Basic Info */}
+              <div>
                 <SectionHeader title="Basic Information" icon={Building2} />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Church Name & Code */}
                     <InputField 
                       label="Church Name" 
                       name='name' 
                       placeholder="e.g. GCF SouthMetro" 
                       icon={<Church size={15}/>} 
+                      defaultValue={churchData?.name || ''}
                       required 
                     />
                     <InputField 
                       label="Church Code" 
                       name='code' 
                       placeholder="e.g. GCFSM" 
+                      defaultValue={churchData?.code || ''}
                       required 
                     />
                     
-                    {/* Status & Main Campus */}
                     <SelectField 
                       label="Main Campus?" 
                       name='is_main_campus' 
                       options={mainCampusOptions} 
+                      defaultValue={String(churchData?.is_main_campus ?? 'false')}
                     />
                     <SelectField 
                       label="Status" 
                       name='is_active' 
                       options={statusOptions} 
+                      defaultValue={String(churchData?.is_active ?? 'true')}
                     />
                 </div>
-            </div>
+              </div>
 
-            {/* Section 2: Contact Details */}
-            <div>
+              {/* Section 2: Contact Details */}
+              <div>
                 <SectionHeader title="Contact Information" icon={Phone} />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <InputField 
@@ -120,6 +142,7 @@ export default function ChurchModal({ isOpen, onClose }: ChurchModalProps) {
                       name='contact_number' 
                       placeholder="e.g. 09187654321" 
                       icon={<Phone size={15}/>} 
+                      defaultValue={churchData?.contact_number || ''}
                     />
                     <InputField 
                       label="Email Address" 
@@ -127,28 +150,30 @@ export default function ChurchModal({ isOpen, onClose }: ChurchModalProps) {
                       type="email"
                       placeholder="e.g. south@disciplenetwork.org" 
                       icon={<Mail size={15}/>} 
+                      defaultValue={churchData?.email || ''}
                     />
                 </div>
-            </div>
+              </div>
 
-            {/* Section 3: Location */}
-            <div>
+              {/* Section 3: Location */}
+              <div>
                 <SectionHeader title="Location Details" icon={MapPin} />
                 <div className="space-y-4">
-                    {/* Gumamit ng textarea para sa kumpletong address katulad ng sa design reference */}
                     <div className="space-y-1">
                       <label className="text-sm font-medium text-slate-700">Complete Address</label>
                       <textarea 
                         name='address'
                         placeholder="House/Unit No., Street, Barangay, City, Province"
+                        defaultValue={churchData?.address || ''}
                         className="w-full p-2.5 rounded-lg border border-slate-200 focus:border-[var(--active-parent,rgb(99,102,241))] focus:ring-4 focus:ring-[var(--active-parent,rgb(99,102,241))]/10 outline-none transition-all h-24 resize-none text-sm text-slate-700"
                         required
                       />
                     </div>
                 </div>
-            </div>
+              </div>
 
-          </form>
+            </form>
+          )}
         </div>
 
         {/* Footer Actions - Sticky */}
@@ -160,8 +185,13 @@ export default function ChurchModal({ isOpen, onClose }: ChurchModalProps) {
             >
                 <X size={15} /> Cancel
             </button>
-            <button type="submit" form="church-form" className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2">
-                <Save size={15} /> Save Church
+            <button 
+              type="submit" 
+              form="church-form" 
+              disabled={isFetchingChurch && !!churchId}
+              className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2"
+            >
+                <Save size={15} /> {churchId ? 'Update Church' : 'Save Church'}
             </button>
         </div>
       </div>

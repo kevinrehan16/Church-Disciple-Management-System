@@ -17,6 +17,7 @@ class ClusterResource extends JsonResource
             'code'         => $this->code,
             'is_active'    => (bool) $this->is_active,
             'church'       => new ChurchResource($this->whenLoaded('church')),
+            'member_id'    => $this->member_id,
             'cluster_mentor' => $this->whenLoaded('leader', function () {
                 return [
                     'id' => $this->leader->id,

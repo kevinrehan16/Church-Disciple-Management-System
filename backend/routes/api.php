@@ -42,16 +42,19 @@ Route::prefix('v1')->group(function () {
         // CHURCHES ROUTES
         Route::get('/churches', [ChurchController::class, 'index']);
         Route::post('/churches', [ChurchController::class, 'store']);
+        Route::get('/churches/{church}', [ChurchController::class, 'show']);
         Route::put('/churches/{church}', [ChurchController::class, 'update']);
 
         // CLUSTERS ROUTES
         Route::get('/clusters', [ClusterController::class, 'index']);
         Route::get('/clusters/grouped', [ClusterController::class, 'indexGrouped']);
+        Route::get('/clusters/{cluster}', [ClusterController::class, 'show']);
         Route::post('/clusters', [ClusterController::class, 'store']);
         Route::put('/clusters/{cluster}', [ClusterController::class, 'update']);
 
         // GROWTH GROUPS ROUTES
         Route::get('/growth-groups', [GrowthGroupController::class, 'index']);
+        Route::get('/growth-groups/{growth_group}', [GrowthGroupController::class, 'show']);
         Route::post('/growth-groups', [GrowthGroupController::class, 'store']);
         Route::put('/growth-groups/{growth_group}', [GrowthGroupController::class, 'update']);
 

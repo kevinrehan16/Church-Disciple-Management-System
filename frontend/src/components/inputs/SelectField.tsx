@@ -7,6 +7,7 @@ interface SelectFieldProps {
   options: { label: string; value: string | number }[];
   icon?: React.ReactNode;
   value?: string | number;
+  defaultValue?: string | number;
   readOnly?: boolean;
   required?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;

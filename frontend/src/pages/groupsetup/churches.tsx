@@ -28,12 +28,12 @@ export default function Churches() {
     }
   };
 
-  // const [selectedChurchId, setSelectedChurchId] = useState<string | null>(null);
+  const [selectedChurchId, setSelectedChurchId] = useState<string | null>(null);
   const [isChurchModalOpen, setIsChurchModalOpen] = useState(false);
 
   const handleViewChurch = (churchId: any) => {
     // Open church modal (selected church id handled elsewhere)
-    console.log(churchId);
+    setSelectedChurchId(churchId);
     setIsChurchModalOpen(true);
   };
 
@@ -239,7 +239,7 @@ export default function Churches() {
         <ChurchModal 
         isOpen={isChurchModalOpen}
         onClose={() => setIsChurchModalOpen(false)} 
-        // churchId={selectedChurchId}
+        churchId={selectedChurchId}
         />
       )}
     </div>

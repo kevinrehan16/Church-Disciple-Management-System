@@ -22,6 +22,11 @@ export const clusterService = {
         return response.data;
     },
 
+    getClusterById: async (id: any): Promise<GroupedChurch> => {
+        const response = await apiClient.get(`clusters/${id}`);
+        return response.data;
+    },
+
     getClustersByChurchId: async (filters: ClusterFilters): Promise<PaginatedClustersResponse> => {
         const response = await apiClient.get<PaginatedClustersResponse>('clusters', {
             params: filters, // Dito na papasok ang church_id, search, page, atbp.

@@ -21,6 +21,16 @@ export const useClusters = (filters: ClusterGroupFilters) => {
   });
 };
 
+export const useClusterById = (id: any) => {
+  return useQuery<GroupedChurch, Error>({
+    queryKey: ['grouped-cluster', id],
+    queryFn: () => clusterService.getClusterById(id),
+    staleTime: 1000 * 60 * 5,
+    placeholderData: (previousData) => previousData,
+    enabled: !!id
+  });
+};
+
 export const useClustersByChurchId = (filters: ClusterFilters) => {
   return useQuery<PaginatedClustersResponse, Error>({
     queryKey: ['clusters-by-church', filters],

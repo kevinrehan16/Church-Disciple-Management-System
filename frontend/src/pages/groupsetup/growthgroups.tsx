@@ -190,7 +190,7 @@ export default function GrowthGroups() {
                     <td className="py-4 px-5 text-right">
                       <div className="flex items-center justify-end gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
                         <button 
-                          onClick={() => alert(`Edit GG ID: ${gg.id}`)}
+                          onClick={() => handleViewGrowthGroup(gg.id)}
                           className="p-1.5 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 rounded-lg transition-colors"
                           title="Edit Growth Group"
                         >

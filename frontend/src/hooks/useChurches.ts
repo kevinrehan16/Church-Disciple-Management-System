@@ -20,6 +20,19 @@ export const useChurches = (filters: ChurchFilters) => {
   });
 };
 
+export const useChurchById = (id: any) => {
+  return useQuery<Church, Error>({
+    queryKey: ['church', id], 
+    
+    // Ipapasa natin ang buong object sa service
+    queryFn: () => churchService.getChurchById(id), 
+    
+    staleTime: 1000 * 60 * 5,
+    placeholderData: (previousData) => previousData,
+    enabled: !!id
+  });
+};
+
 export const useRegisterChurch = () => {
   const queryClient = useQueryClient();
 
@@ -30,6 +43,23 @@ export const useRegisterChurch = () => {
     },
     onError: (error: any) => {
       console.error("Registration failed:", error.response?.data || error.message);
+    }
+  });
+};
+
+export const useUpdateChurch = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    // Dito ay sinasabi natin na kukunin niya ang 'id' at ang 'formData' object
+    mutationFn: ({ id, formattedData }: { id: string | number; formattedData: any }) => 
+      churchService.updateChurch(String(id), formattedData),
+      
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['churches'] });
+    },
+    onError: (error: any) => {
+      console.error("Update Cluster failed:", error.response?.data || error.message);
     }
   });
 };

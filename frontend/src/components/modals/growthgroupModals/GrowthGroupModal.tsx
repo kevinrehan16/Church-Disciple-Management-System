@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   X, 
   Church, 
@@ -9,7 +9,7 @@ import {
   Users,
   MapPinned 
 } from 'lucide-react';
-import { useRegisterGrowthGroup } from '../../../hooks/useGrowthGroup';
+import { useRegisterGrowthGroup, useGrowthGroupById, useUpdateGrowthGroup } from '../../../hooks/useGrowthGroup';
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import SectionHeader from '../../ui/SectionHeader';
 import { InputField } from '../../inputs/InputField';
@@ -22,7 +22,7 @@ import { useMembers } from '../../../hooks/useMembers';
 interface GrowthGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
-  GrowthGroupId: string | number;
+  GrowthGroupId: string | number | null;
   initialData?: {
     church_id: number;
     cluster_id: number;
@@ -66,8 +66,13 @@ const DEMOGRAPHIC_OPTIONS = [
 export default function GrowthGroupModal({ isOpen, onClose, GrowthGroupId, initialData }: GrowthGroupModalProps) {
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const { mutate: addGrowthGroup } = useRegisterGrowthGroup();
+  const { mutate: updateGrowthGroup } = useUpdateGrowthGroup();
   
-  console.log(GrowthGroupId);
+  // 1. Kunin ang data gamit ang useGrowthGroupById kapag may GrowthGroupId
+  const { data: groupResponse, isLoading: isFetchingGroup } = useGrowthGroupById(GrowthGroupId as string);
+
+  const fetchedGroup = (groupResponse as any)?.data || groupResponse;
+
   const [formData, setFormData] = useState({
     church_id: initialData?.church_id || 0,
     cluster_id: initialData?.cluster_id || 0,
@@ -81,6 +86,68 @@ export default function GrowthGroupModal({ isOpen, onClose, GrowthGroupId, initi
     target_demographic: initialData?.target_demographic || 'nextgen',
     is_active: initialData?.is_active ?? true,
   });
+
+  const loadedGroupIdRef = useRef<any>(null);
+
+  // 2. I-populate ang form kapag nagbago ang fetchedGroup o initialData
+  useEffect(() => {
+    if (!isOpen) {
+      loadedGroupIdRef.current = null;
+      return;
+    }
+
+    if (loadedGroupIdRef.current === GrowthGroupId) return;
+
+    if (initialData) {
+      setFormData({
+        church_id: initialData.church_id || 0,
+        cluster_id: initialData.cluster_id || 0,
+        leader_id: initialData.leader_id || 0,
+        name: initialData.name || '',
+        code: initialData.code || '',
+        meeting_day: initialData.meeting_day || 'Sunday',
+        meeting_time: initialData.meeting_time || '13:00:00',
+        location_type: initialData.location_type || 'onsite',
+        venue_address: initialData.venue_address || '',
+        target_demographic: initialData.target_demographic || 'nextgen',
+        is_active: initialData.is_active ?? true,
+      });
+      loadedGroupIdRef.current = GrowthGroupId;
+      return;
+    }
+
+    if (GrowthGroupId && fetchedGroup) {
+      setFormData({
+        church_id: fetchedGroup.church_id || fetchedGroup.church?.id || 0,
+        cluster_id: fetchedGroup.cluster_id || fetchedGroup.cluster?.id || 0,
+        leader_id: fetchedGroup.leader_id || fetchedGroup.leader?.id || 0,
+        name: fetchedGroup.name || '',
+        code: fetchedGroup.code || '',
+        meeting_day: fetchedGroup.meeting_day || 'Sunday',
+        meeting_time: fetchedGroup.meeting_time || '13:00:00',
+        location_type: fetchedGroup.location_type || 'onsite',
+        venue_address: fetchedGroup.venue_address || '',
+        target_demographic: fetchedGroup.target_demographic || 'nextgen',
+        is_active: fetchedGroup.is_active ?? true,
+      });
+      loadedGroupIdRef.current = GrowthGroupId;
+    } else if (!GrowthGroupId) {
+      setFormData({
+        church_id: 0,
+        cluster_id: 0,
+        leader_id: 0,
+        name: '',
+        code: '',
+        meeting_day: 'Sunday',
+        meeting_time: '13:00:00',
+        location_type: 'onsite',
+        venue_address: '',
+        target_demographic: 'nextgen',
+        is_active: true,
+      });
+      loadedGroupIdRef.current = GrowthGroupId;
+    }
+  }, [isOpen, GrowthGroupId, initialData, fetchedGroup]);
 
   // State para sa Leader search query sa SearchableSelect
   const [leaderSearchTerm, setLeaderSearchTerm] = useState('');
@@ -114,35 +181,65 @@ export default function GrowthGroupModal({ isOpen, onClose, GrowthGroupId, initi
     page: 1,
   });
 
-  // Pag-map ng Church data papuntang { id, name }
-  const churchList = Array.isArray(apiChurch) 
+  // Pag-map ng Church data
+  let churchList = Array.isArray(apiChurch) 
     ? apiChurch.map((church: any) => ({ id: church.id, name: church.name }))
     : Array.isArray(apiChurch?.data) 
       ? apiChurch.data.map((church: any) => ({ id: church.id, name: church.name }))
       : [];
 
-  // Pag-map ng Cluster data papuntang { id, name }
-  const clusterList = Array.isArray(apiClusters) 
+  // Saluhin ang kasalukuyang church kung sakaling hindi umabot sa 1st page
+  const currentChurch = fetchedGroup?.church;
+  if (currentChurch?.id) {
+    if (!churchList.some((c: any) => Number(c.id) === Number(currentChurch.id))) {
+      churchList = [{ id: currentChurch.id, name: currentChurch.name }, ...churchList];
+    }
+  }
+
+  // Pag-map ng Cluster data (Dito naapektuhan hangga't walang napipiling church_id)
+  let clusterList = Array.isArray(apiClusters) 
     ? apiClusters.map((cluster: any) => ({ id: cluster.id, name: cluster.name }))
     : Array.isArray(apiClusters?.data) 
       ? apiClusters.data.map((cluster: any) => ({ id: cluster.id, name: cluster.name }))
       : [];
 
-  // Pag-map ng Leader data papuntang { id, name } galing sa members API
+  // Saluhin ang kasalukuyang cluster kung sakaling wala pa sa listahan habang naglo-load
+  const currentCluster = fetchedGroup?.cluster;
+  if (currentCluster?.id) {
+    if (!clusterList.some((cl: any) => Number(cl.id) === Number(currentCluster.id))) {
+      clusterList = [{ id: currentCluster.id, name: currentCluster.name }, ...clusterList];
+    }
+  }
+
+  // Pag-map ng Leader data galing sa members API
   const currentLeaders = Array.isArray(apiLeader) 
     ? apiLeader 
     : (apiLeader?.data || []);
 
-  const leaderList = currentLeaders.map((member: any) => ({
+  let leaderList = currentLeaders.map((member: any) => ({
     id: member.id,
     name: member.full_name,
   }));
+
+  // Saluhin ang kasalukuyang leader kung sakaling nasa ibang page siya (backend-driven)
+  const currentLeader = fetchedGroup?.leader;
+  const currentLeaderId = fetchedGroup?.leader_id || currentLeader?.id;
+  if (currentLeaderId) {
+    if (!leaderList.some((l: any) => Number(l.id) === Number(currentLeaderId))) {
+      const leaderName = currentLeader ? `${currentLeader.first_name} ${currentLeader.last_name}` : `Leader #${currentLeaderId}`;
+      leaderList = [{ id: currentLeaderId, name: leaderName }, ...leaderList];
+    }
+  }
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    addGrowthGroup(formData, { onSuccess: () => startClose() });
+    if (GrowthGroupId) {
+      updateGrowthGroup({ id: GrowthGroupId, formData }, { onSuccess: () => startClose() });
+    } else {
+      addGrowthGroup(formData, { onSuccess: () => startClose() });
+    }
   };
 
   return (
@@ -157,7 +254,7 @@ export default function GrowthGroupModal({ isOpen, onClose, GrowthGroupId, initi
         <div className="px-8 py-6 bg-[var(--active-parent)] flex items-center justify-between text-white flex-shrink-0">
           <div>
             <h2 className="text-xl font-extrabold tracking-tight">
-              {initialData ? 'Edit Growth Group' : 'Create New Growth Group'}
+              {GrowthGroupId ? 'Edit Growth Group' : 'Create New Growth Group'}
             </h2>
             <p className="text-white/80 text-xs mt-0.5 font-medium">
               Fill in the details to set up a new discipleship growth group.
@@ -174,164 +271,170 @@ export default function GrowthGroupModal({ isOpen, onClose, GrowthGroupId, initi
 
         {/* Scrollable Form Body */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
-          <form id="growth-group-form" onSubmit={handleSubmit} className="space-y-6">
-            
-            {/* Section 1: Hierarchy Association */}
-            <div>
-              <SectionHeader title="Church & Cluster Assignment" icon={Church} />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                <SearchableSelect
-                  label="GCF Church Attending"
-                  name="church_id"
-                  value={formData.church_id || ''}
-                  options={churchList}
-                  placeholder="Select Church"
-                  icon={<Church size={15} />}
-                  onChange={handleChange}
-                />
-
-                <SearchableSelect
-                  label="GCF Cluster Group"
-                  name="cluster_id"
-                  value={formData.cluster_id || ''}
-                  options={clusterList}
-                  placeholder="Select Cluster"
-                  icon={<MapPinned size={15} />}
-                  onChange={handleChange}
-                />
-              </div>
+          {isFetchingGroup && GrowthGroupId ? (
+            <div className="flex justify-center items-center py-20 text-slate-500 font-medium">
+              Loading growth group data...
             </div>
-
-            {/* Section 2: Group Information */}
-            <div>
-              <SectionHeader title="Group Information" icon={Users} />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
-                <div className="md:col-span-2">
-                  <InputField
-                    label="Group Name"
-                    name="name"
-                    placeholder="e.g. Arise"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <InputField
-                    label="Group Code"
-                    name="code"
-                    placeholder="e.g. ARISE"
-                    value={formData.code}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <SelectField 
-                  label="Target Demographic" 
-                  name="target_demographic" 
-                  value={formData.target_demographic}
-                  options={DEMOGRAPHIC_OPTIONS}
-                  required
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            {/* Section 3: Leadership */}
-            <div>
-              <SectionHeader title="Group Leadership" icon={UserCheck} />
-              <div className="mt-2">
-                <SearchableSelect
-                  label="Group Leader"
-                  name="leader_id"
-                  value={formData.leader_id || ''}
-                  options={leaderList}
-                  placeholder="Select Group Leader"
-                  icon={<UserCheck size={15} />}
-                  onChange={handleChange}
-                  onSearchChange={(text: string) => setLeaderSearchTerm(text)}
-                />
-              </div>
-            </div>
-
-            {/* Section 4: Meeting Schedule & Location */}
-            <div>
-              <SectionHeader title="Meeting Schedule & Venue" icon={Calendar} />
+          ) : (
+            <form id="growth-group-form" onSubmit={handleSubmit} className="space-y-6">
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
-                <SelectField 
-                  label="Meeting Day" 
-                  name="meeting_day" 
-                  value={formData.meeting_day}
-                  options={DAY_OPTIONS}
-                  required
-                  onChange={handleChange}
-                />
+              {/* Section 1: Hierarchy Association */}
+              <div>
+                <SectionHeader title="Church & Cluster Assignment" icon={Church} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                  <SearchableSelect
+                    label="GCF Church Attending"
+                    name="church_id"
+                    value={formData.church_id || ''}
+                    options={churchList}
+                    placeholder="Select Church"
+                    icon={<Church size={15} />}
+                    onChange={handleChange}
+                  />
 
-                <InputField
-                  label="Meeting Time"
-                  name="meeting_time"
-                  type="time"
-                  step="1"
-                  value={formData.meeting_time}
-                  onChange={handleChange}
-                  required
-                />
-
-                <SelectField 
-                  label="Location Type" 
-                  name="location_type" 
-                  value={formData.location_type}
-                  options={LOCATION_TYPE_OPTIONS}
-                  required
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="mt-4">
-                <InputField
-                  label="Venue Address / Link"
-                  name="venue_address"
-                  placeholder="e.g. GCFSouthMetro, 2nd Floor, Room 310 or Zoom Link"
-                  value={formData.venue_address}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Section 5: Active Status Toggle */}
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200/80">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${formData.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
-                  <ShieldCheck size={18} />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900">Group Status</h4>
-                  <p className="text-xs text-slate-500">Enable this growth group for operational & member assignment use.</p>
+                  <SearchableSelect
+                    label="GCF Cluster Group"
+                    name="cluster_id"
+                    value={formData.cluster_id || ''}
+                    options={clusterList}
+                    placeholder={formData.church_id ? "Select Cluster" : "Select Church First"}
+                    icon={<MapPinned size={15} />}
+                    onChange={handleChange}
+                  />
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                  formData.is_active ? 'bg-emerald-600' : 'bg-slate-300'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    formData.is_active ? 'translate-x-6' : 'translate-x-1'
+              {/* Section 2: Group Information */}
+              <div>
+                <SectionHeader title="Group Information" icon={Users} />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                  <div className="md:col-span-2">
+                    <InputField
+                      label="Group Name"
+                      name="name"
+                      placeholder="e.g. Arise"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <InputField
+                      label="Group Code"
+                      name="code"
+                      placeholder="e.g. ARISE"
+                      value={formData.code}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <SelectField 
+                    label="Target Demographic" 
+                    name="target_demographic" 
+                    value={formData.target_demographic}
+                    options={DEMOGRAPHIC_OPTIONS}
+                    required
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              {/* Section 3: Leadership */}
+              <div>
+                <SectionHeader title="Group Leadership" icon={UserCheck} />
+                <div className="mt-2">
+                  <SearchableSelect
+                    label="Group Leader"
+                    name="leader_id"
+                    value={formData.leader_id || ''}
+                    options={leaderList}
+                    placeholder="Select Group Leader"
+                    icon={<UserCheck size={15} />}
+                    onChange={handleChange}
+                    onSearchChange={(text: string) => setLeaderSearchTerm(text)}
+                  />
+                </div>
+              </div>
+
+              {/* Section 4: Meeting Schedule & Location */}
+              <div>
+                <SectionHeader title="Meeting Schedule & Venue" icon={Calendar} />
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                  <SelectField 
+                    label="Meeting Day" 
+                    name="meeting_day" 
+                    value={formData.meeting_day}
+                    options={DAY_OPTIONS}
+                    required
+                    onChange={handleChange}
+                  />
+
+                  <InputField
+                    label="Meeting Time"
+                    name="meeting_time"
+                    type="time"
+                    step="1"
+                    value={formData.meeting_time}
+                    onChange={handleChange}
+                    required
+                  />
+
+                  <SelectField 
+                    label="Location Type" 
+                    name="location_type" 
+                    value={formData.location_type}
+                    options={LOCATION_TYPE_OPTIONS}
+                    required
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <InputField
+                    label="Venue Address / Link"
+                    name="venue_address"
+                    placeholder="e.g. GCFSouthMetro, 2nd Floor, Room 310 or Zoom Link"
+                    value={formData.venue_address}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Section 5: Active Status Toggle */}
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200/80">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg ${formData.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
+                    <ShieldCheck size={18} />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900">Active Status</h4>
+                    <p className="text-xs text-slate-500">Enable this growth group for operational & member assignment use.</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                    formData.is_active ? 'bg-emerald-600' : 'bg-slate-300'
                   }`}
-                />
-              </button>
-            </div>
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      formData.is_active ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
 
-          </form>
+            </form>
+          )}
         </div>
 
         {/* Footer Actions */}
@@ -346,9 +449,10 @@ export default function GrowthGroupModal({ isOpen, onClose, GrowthGroupId, initi
           <button 
             type="submit" 
             form="growth-group-form" 
-            className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2"
+            disabled={isFetchingGroup && !!GrowthGroupId && !initialData}
+            className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2"
           >
-            <Save size={15} /> Save Growth Group
+            <Save size={15} /> {GrowthGroupId ? 'Update Growth Group' : 'Save Growth Group'}
           </button>
         </div>
 
