@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Church, UserCheck, ShieldCheck, Layers, Save, UserStar } from 'lucide-react';
-import { useRegisterCluster, useUpdateCluster, useClusters } from '../../../hooks/useClusters';
+import { useRegisterCluster, useUpdateCluster, useClusterById } from '../../../hooks/useClusters';
 import { useMembers } from '../../../hooks/useMembers';
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import { useChurches } from '../../../hooks/useChurches';
@@ -29,9 +29,10 @@ export default function ClusterModal({ isOpen, onClose, clusterId, defaultChurch
   const { mutate: addCluster, isPending: isCreating } = useRegisterCluster();
   const { mutate: updateCluster, isPending: isUpdating } = useUpdateCluster();
 
-  // Fetch Clusters data para makuha ang data kung edit mode at walang initialData
-  const { data: apiResponse } = useClusters({ search: '', page: 1 });
-  const allClusters = (apiResponse as any)?.data || (Array.isArray(apiResponse) ? apiResponse : []);
+  // 1. Gamitin ang useClusterById para makuha ang data ng cluster kapag may clusterId at active ang modal
+  const { data: clusterResponse, isLoading: isFetchingCluster } = useClusterById(clusterId as string);
+
+  const fetchedCluster = (clusterResponse as any)?.data || clusterResponse;
 
   // Form State
   const [formData, setFormData] = useState({
@@ -66,23 +67,16 @@ export default function ClusterModal({ isOpen, onClose, clusterId, defaultChurch
       return;
     }
 
-    if (clusterId) {
-      // Hanapin ang cluster sa loob ng allClusters
-      const foundCluster = allClusters.flatMap((c: any) => 
-        (c.clusters || []).map((cl: any) => ({ ...cl, church_id: c.id }))
-      ).find((c: any) => String(c.id) === String(clusterId));
-
-      if (foundCluster) {
-        setFormData({
-          church_id: foundCluster.church_id || 1,
-          name: foundCluster.name || '',
-          code: foundCluster.code || '',
-          member_id: foundCluster.cluster_mentor?.id || foundCluster.member_id || 0,
-          is_active: foundCluster.is_active ?? true,
-        });
-        loadedClusterIdRef.current = clusterId;
-      }
-    } else {
+    if (clusterId && fetchedCluster) {
+      setFormData({
+        church_id: fetchedCluster.church_id || fetchedCluster.church?.id || 1,
+        name: fetchedCluster.name || '',
+        code: fetchedCluster.code || '',
+        member_id: fetchedCluster.cluster_mentor?.id || fetchedCluster.member_id || 0,
+        is_active: fetchedCluster.is_active ?? true,
+      });
+      loadedClusterIdRef.current = clusterId;
+    } else if (!clusterId) {
       setFormData({
         church_id: defaultChurchId || 1,
         name: '',
@@ -92,7 +86,7 @@ export default function ClusterModal({ isOpen, onClose, clusterId, defaultChurch
       });
       loadedClusterIdRef.current = clusterId;
     }
-  }, [isOpen, clusterId, defaultChurchId, initialData, allClusters]);
+  }, [isOpen, clusterId, defaultChurchId, initialData, fetchedCluster]);
 
   // Fetch Members/Leaders data
   const { data: apiInterviewer } = useMembers({
@@ -105,12 +99,36 @@ export default function ClusterModal({ isOpen, onClose, clusterId, defaultChurch
     ? apiInterviewer 
     : (apiInterviewer?.data || []);
   
-  const headOptions = currentInterviewers.map((member: any) => ({
+  // Buuin ang base options galing sa mga nakuha ng pagination
+  let headOptions = currentInterviewers.map((member: any) => ({
     value: member.id,
     label: member.full_name,
     id: member.id,
     name: member.full_name,
   }));
+
+  // === SOLUSYON SA HINDI PAGLITAW NG LEADER SA PAGINATION ===
+  // Kung nakalagay sa edit mode at may kasalukuyang mentor/leader ang cluster pero wala sa 1st page options,
+  // idagdag natin siya manually sa options list para lumabas sa dropdown.
+  const leaderId = fetchedCluster?.member_id;
+  
+  if (leaderId) {
+    const isAlreadyInOptions = headOptions.some((opt: any) => Number(opt.id) === Number(leaderId));
+    
+    // Kung ang lider ay hindi kasama sa unang 10 options ng pagination, 
+    // idagdag natin siya manually gamit ang member_id
+    if (!isAlreadyInOptions) {
+      headOptions = [
+        {
+          value: leaderId,
+          label: fetchedCluster?.cluster_mentor?.full_name || `Leader #${leaderId}`,
+          id: leaderId,
+          name: fetchedCluster?.cluster_mentor?.full_name || `Leader #${leaderId}`,
+        },
+        ...headOptions
+      ];
+    }
+  }
 
   // Fetch Churches data
   const { data: apiChurch } = useChurches({ 
@@ -118,11 +136,26 @@ export default function ClusterModal({ isOpen, onClose, clusterId, defaultChurch
     page: 1 
   });
 
-  const churchList = Array.isArray(apiChurch) 
+  let churchList = Array.isArray(apiChurch) 
     ? apiChurch.map((church: any) => ({ value: church.id, label: church.name, id: church.id, name: church.name }))
     : Array.isArray(apiChurch?.data) 
       ? apiChurch.data.map((church: any) => ({ value: church.id, label: church.name, id: church.id, name: church.name }))
       : [];
+  
+  if (defaultChurchId) {
+    const isChurchInList = churchList.some((c: any) => Number(c.id) === Number(defaultChurchId));
+    if (!isChurchInList) {
+      churchList = [
+        {
+          value: defaultChurchId,
+          label: fetchedCluster?.church?.name || `Church #${defaultChurchId}`,
+          id: defaultChurchId,
+          name: fetchedCluster?.church?.name || `Church #${defaultChurchId}`,
+        },
+        ...churchList
+      ];
+    }
+  }
 
   if (!isOpen) return null;
 
@@ -187,114 +220,120 @@ export default function ClusterModal({ isOpen, onClose, clusterId, defaultChurch
 
         {/* Scrollable Form Body */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
-          <form id="cluster-form" onSubmit={handleSubmit} className="space-y-6">
-            
-            {/* Section 1: Associated Church */}
-            <div>
-              <SectionHeader title="Associated Church" icon={Church} />
-              <div className="mt-2">
-                {isChurchLocked ? (
-                  <div>
-                    <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider ml-1">
-                      Church <span className="text-red-500">*</span>
-                    </label>
-                    <div className="mt-1 w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 flex items-center justify-between cursor-not-allowed">
-                      <span className="font-medium flex items-center gap-2">
-                        <Church size={15} className="text-slate-400" />
-                        {churchList.find((c: any) => c.id === formData.church_id)?.name || 'Selected Church'}
-                      </span>
-                      <span className="text-[10px] font-bold uppercase bg-slate-200 text-slate-500 px-2 py-0.5 rounded">Locked</span>
+          {isFetchingCluster && clusterId && !initialData ? (
+            <div className="flex justify-center items-center py-20 text-slate-500 font-medium">
+              Loading cluster data...
+            </div>
+          ) : (
+            <form id="cluster-form" onSubmit={handleSubmit} className="space-y-6">
+              
+              {/* Section 1: Associated Church */}
+              <div>
+                <SectionHeader title="Associated Church" icon={Church} />
+                <div className="mt-2">
+                  {isChurchLocked ? (
+                    <div>
+                      <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider ml-1">
+                        Church <span className="text-red-500">*</span>
+                      </label>
+                      <div className="mt-1 w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-600 flex items-center justify-between cursor-not-allowed">
+                        <span className="font-medium flex items-center gap-2">
+                          <Church size={15} className="text-slate-400" />
+                          {churchList.find((c: any) => c.id === formData.church_id)?.name || 'Selected Church'}
+                        </span>
+                        <span className="text-[10px] font-bold uppercase bg-slate-200 text-slate-500 px-2 py-0.5 rounded">Locked</span>
+                      </div>
                     </div>
+                  ) : (
+                    <SearchableSelect
+                      label="Church"
+                      name="church_id"
+                      value={formData.church_id || ''}
+                      options={churchList}
+                      placeholder="Select Church"
+                      icon={<Church size={15} />}
+                      onChange={handleChurchChange}
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Section 2: Cluster Information */}
+              <div>
+                <SectionHeader title="Cluster Information" icon={Layers} />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                  {/* Cluster Name */}
+                  <div className="md:col-span-2">
+                    <InputField
+                      label="Cluster Name"
+                      name="name"
+                      placeholder="e.g. Dasma"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      required
+                    />
                   </div>
-                ) : (
+
+                  {/* Cluster Code */}
+                  <div>
+                    <InputField
+                      label="Code"
+                      name="code"
+                      placeholder="DSM"
+                      value={formData.code}
+                      onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Cluster Leadership */}
+              <div>
+                <SectionHeader title="Cluster Leadership" icon={UserCheck} />
+                <div className="mt-2">
                   <SearchableSelect
-                    label="Church"
-                    name="church_id"
-                    value={formData.church_id || ''}
-                    options={churchList}
-                    placeholder="Select Church"
-                    icon={<Church size={15} />}
-                    onChange={handleChurchChange}
-                  />
-                )}
-              </div>
-            </div>
-
-            {/* Section 2: Cluster Information */}
-            <div>
-              <SectionHeader title="Cluster Information" icon={Layers} />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
-                {/* Cluster Name */}
-                <div className="md:col-span-2">
-                  <InputField
-                    label="Cluster Name"
-                    name="name"
-                    placeholder="e.g. Dasma"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                  />
-                </div>
-
-                {/* Cluster Code */}
-                <div>
-                  <InputField
-                    label="Code"
-                    name="code"
-                    placeholder="DSM"
-                    value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                    required
+                    label="Cluster Head (Leader)"
+                    name="member_id"
+                    value={formData.member_id || ''}
+                    options={headOptions}
+                    placeholder="Select Cluster Head"
+                    icon={<UserStar size={15} />}
+                    onChange={handleHeadChange}
+                    onSearchChange={(text: string) => setSearchTerm(text)}
                   />
                 </div>
               </div>
-            </div>
 
-            {/* Section 3: Cluster Leadership */}
-            <div>
-              <SectionHeader title="Cluster Leadership" icon={UserCheck} />
-              <div className="mt-2">
-                <SearchableSelect
-                  label="Cluster Head (Leader)"
-                  name="member_id"
-                  value={formData.member_id || ''}
-                  options={headOptions}
-                  placeholder="Select Cluster Head"
-                  icon={<UserStar size={15} />}
-                  onChange={handleHeadChange}
-                  onSearchChange={(text: string) => setSearchTerm(text)}
-                />
-              </div>
-            </div>
-
-            {/* Section 4: Active Status Toggle */}
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200/80">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${formData.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
-                  <ShieldCheck size={18} />
+              {/* Section 4: Active Status Toggle */}
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200/80">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg ${formData.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
+                    <ShieldCheck size={18} />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900">Cluster Status</h4>
+                    <p className="text-xs text-slate-500">Enable this cluster for operational use.</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900">Cluster Status</h4>
-                  <p className="text-xs text-slate-500">Enable this cluster for operational use.</p>
-                </div>
-              </div>
 
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                  formData.is_active ? 'bg-emerald-600' : 'bg-slate-300'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    formData.is_active ? 'translate-x-6' : 'translate-x-1'
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                    formData.is_active ? 'bg-emerald-600' : 'bg-slate-300'
                   }`}
-                />
-              </button>
-            </div>
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      formData.is_active ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
 
-          </form>
+            </form>
+          )}
         </div>
 
         {/* Footer Actions */}
@@ -309,7 +348,7 @@ export default function ClusterModal({ isOpen, onClose, clusterId, defaultChurch
           <button 
             type="submit" 
             form="cluster-form" 
-            disabled={isCreating || isUpdating}
+            disabled={isCreating || isUpdating || (isFetchingCluster && !!clusterId && !initialData)}
             className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-xl shadow-lg shadow-emerald-600/10 transition-all flex items-center gap-2"
           >
             <Save size={15} /> {clusterId ? 'Update Cluster' : 'Save Cluster'}

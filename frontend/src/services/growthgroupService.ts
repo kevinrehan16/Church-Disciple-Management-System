@@ -21,9 +21,19 @@ export const growthGroupService = {
         return response.data;
     },
 
+    getGrowthGroupById: async (id: any): Promise<GrowthGroup> => {
+        const response = await apiClient.get(`growth-groups/${id}`);
+        return response.data;
+    },
+
     createGrowthGroup: async (payload: SaveGrowthGroupPayload): Promise<GrowthGroup> => {
         const response = await apiClient.post('growth-groups/', payload);
         return response.data.data;
+    },
+
+    updateGrowthGroup: async (id: string, payload: SaveGrowthGroupPayload): Promise<GrowthGroup> => {
+        const response = await apiClient.put(`/growth-groups/${id}`, payload);
+        return response.data.data || response.data;
     },
 
 }

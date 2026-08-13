@@ -55,7 +55,7 @@ class ClusterController extends Controller
     public function show(Cluster $cluster): JsonResponse
     {
         return response()->json([
-            'data' => new ClusterResource($cluster->load('church'))
+            'data' => new ClusterResource($cluster->load(['church', 'leader']))
         ]);
     }
 

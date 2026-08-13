@@ -4,7 +4,7 @@ import { ggMembersService } from '../services/ggmembersService';
 
 export const useAllGrowthGroupsMembers = () => {
   return useQuery<GrowthGroupApiResponse, Error>({
-    queryKey: ['growth-groups'],
+    queryKey: ['growth-groups-members'],
     queryFn: () => ggMembersService.getAllGrowthGroupsMembers(),
     staleTime: 1000 * 60 * 5,
     placeholderData: (previousData) => previousData,
@@ -13,7 +13,7 @@ export const useAllGrowthGroupsMembers = () => {
 
 export const useGrowthGroupMembers = (id: string | number) => {
   return useQuery<GrowthGroupApiResponse, Error>({
-    queryKey: ['growth-group', id],
+    queryKey: ['growth-group-member', id],
     queryFn: () => ggMembersService.getGrowthGroupMembers(id),
     enabled: Boolean(id),
     staleTime: 1000 * 60 * 5,
@@ -40,7 +40,7 @@ export const useAddGrowthGroupMember = () => {
     }) => ggMembersService.addMemberToGrowthGroup(growthGroupId, formData),
       
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['growth-groups'] });
+      queryClient.invalidateQueries({ queryKey: ['growth-groups-members'] });
     },
     onError: (error: any) => {
       console.error("Add Growth Group Member failed:", error.response?.data || error.message);
