@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import {FaMapMarkedAlt, FaLaptopHouse, FaLaptop, FaUserShield, FaUsers, FaMobileAlt, FaUserPlus, FaEye} from 'react-icons/fa';
+
+import {FaMapMarkedAlt} from 'react-icons/fa';
 import ModuleHeader from '../../components/ui/ModuleHeader';
-import SearchInput from '../../components/inputs/SearchInput';
+// import SearchInput from '../../components/inputs/SearchInput';
 
 export default function ClusterGroupMembers() {
 
@@ -18,14 +18,14 @@ export default function ClusterGroupMembers() {
         />
 
         <div className="flex flex-col md:flex-row items-center gap-4 justify-between w-full bg-transparent">
-          <SearchInput 
-            // value={searchTerm}
+          {/* <SearchInput 
+            value={searchTerm}
             onChange={(val) => {
-            //   setSearchTerm(val);
-            //   setCurrentPage(1);
+              setSearchTerm(val);
+              setCurrentPage(1);
             }}
             placeholder="Search group name, code, or leader..."
-          />
+          /> */}
           
         </div>
       </div>
