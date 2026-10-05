@@ -289,7 +289,7 @@ export default function Sidebar({
                   <div className="overflow-hidden relative w-full space-y-1">
                     <div className="absolute left-[23px] top-0 bottom-0 w-[1px] bg-slate-700/50 z-0" />
                     
-                    <NavLink to="/groups-members/clusters" className="group flex items-center w-full text-sm h-9 relative z-10">
+                    <NavLink to="/groups-members/cluster-groups" className="group flex items-center w-full text-sm h-9 relative z-10">
                       {({ isActive }) => (
                         <div className="pl-[23px] flex items-center w-full h-full">
                           <span className={`h-[1px] shrink-0 transition-all duration-150 ${isActive ? 'w-3 bg-[var(--active-parent)] shadow-[0_0_8px_var(--active-parent)]' : 'w-3 bg-slate-600 group-hover:bg-[var(--active-parent)]'}`} />

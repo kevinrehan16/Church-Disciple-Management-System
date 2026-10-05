@@ -19,6 +19,7 @@ import Deacons from './pages/members/deacons';
 import Visitors from './pages/visitors/visitors';
 import DiscipleNetwork from './pages/disciplenetwork/disciplenetwork';
 import GrowthGroupsMembers from './pages/groupsmembers/growthgroupsmembers';
+import ClusterGroupMembers from './pages/groupsmembers/clustergroupmembers';
 
 import GrowthGroups from './pages/groupsetup/growthgroups';
 import Clusters from './pages/groupsetup/clusters';
@@ -69,6 +70,7 @@ function App() {
 
                   <Route path="/disciple-network" element={<DiscipleNetwork />} />
 
+                  <Route path="/groups-members/cluster-groups" element={<ClusterGroupMembers />} />
                   <Route path="/groups-members/growth-groups" element={<GrowthGroupsMembers />} />
 
                   <Route path="/group-setup/churches" element={<Churches />} />
