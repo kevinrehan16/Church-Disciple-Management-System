@@ -12,7 +12,7 @@ export default function ClusterGroupMembers() {
       <div className="px-6 py-4 space-y-4 shrink-0">
         <ModuleHeader
           title="Cluster Group Members"
-          description="Monitor and organize cluster groups, leadership structures, and schedules."
+          description="Monitor and organize cluster groups and their members effectively."
           icon={<FaMapMarkedAlt size={24} />}
           
         />
