@@ -47,6 +47,7 @@ Route::prefix('v1')->group(function () {
 
         // CLUSTERS ROUTES
         Route::get('/clusters', [ClusterController::class, 'index']);
+        Route::get('/clusters/members', [ClusterController::class, 'indexClustersMembers']);
         Route::get('/clusters/grouped', [ClusterController::class, 'indexGrouped']);
         Route::get('/clusters/{cluster}', [ClusterController::class, 'show']);
         Route::post('/clusters', [ClusterController::class, 'store']);

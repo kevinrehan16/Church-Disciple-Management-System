@@ -7,6 +7,7 @@ use App\Http\Requests\Cluster\StoreClusterRequest;
 use App\Http\Requests\Cluster\UpdateClusterRequest;
 use App\Http\Resources\ClusterResource;
 use App\Http\Resources\ChurchWithClustersResource;
+use App\Http\Resources\ClusterMGResource;
 use App\Models\Cluster;
 use App\Services\ClusterService;
 use Illuminate\Http\JsonResponse;
@@ -30,6 +31,18 @@ class ClusterController extends Controller
         $clusters = $this->clusterService->getPaginatedClusters($filters, $perPage);
 
         return ClusterResource::collection($clusters);
+    }
+
+    public function indexClustersMembers(Request $request): JsonResponse
+    {
+        $clusters = $this->clusterService->getPaginatedClustersMembers(
+            $request->integer('per_page', 15)
+        );
+
+        return response()->json([
+            'message' => 'Cluster members retrieved successfully.',
+            'data' => ClusterMGResource::collection($clusters)->response()->getData(true),
+        ], 200);
     }
 
     public function indexGrouped(Request $request): AnonymousResourceCollection
