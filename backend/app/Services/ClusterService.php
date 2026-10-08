@@ -15,6 +15,13 @@ class ClusterService
             ->paginate($perPage);
     }
 
+    public function getPaginatedClustersMembers(int $perPage = 15): LengthAwarePaginator
+    {
+        return Cluster::with(['members', 'growthGroups'])
+            ->withCount(['members', 'growthGroups'])
+            ->paginate($perPage);
+    }
+
     public function getPaginatedClusters(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $query = Cluster::query()
