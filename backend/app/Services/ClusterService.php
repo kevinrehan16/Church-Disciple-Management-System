@@ -17,7 +17,7 @@ class ClusterService
 
     public function getPaginatedClustersMembers(int $perPage = 15): LengthAwarePaginator
     {
-        return Cluster::with(['members', 'growthGroups'])
+        return Cluster::with(['members', 'leader', 'growthGroups'])
             ->withCount(['members', 'growthGroups'])
             ->paginate($perPage);
     }

@@ -18,6 +18,7 @@ class ClusterMGResource extends JsonResource
             'is_active' => $this->is_active,
             'number_of_members' => $this->members_count ?? $this->members->count(),
             'number_of_growth_groups' => $this->growth_groups_count ?? $this->growthGroups->count(),
+            'leader' => ClusterMemberResource::make($this->whenLoaded('leader')),
             'members' => ClusterMemberResource::collection($this->whenLoaded('members')),
             'growth_groups' => ClusterGrowthGroupResource::collection($this->whenLoaded('growthGroups')),
             'created_at' => $this->created_at,

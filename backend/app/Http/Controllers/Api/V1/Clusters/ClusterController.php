@@ -41,7 +41,7 @@ class ClusterController extends Controller
 
         return response()->json([
             'message' => 'Cluster members retrieved successfully.',
-            'data' => ClusterMGResource::collection($clusters)->response()->getData(true),
+            'data' => ClusterMGResource::collection($clusters),
         ], 200);
     }
 
