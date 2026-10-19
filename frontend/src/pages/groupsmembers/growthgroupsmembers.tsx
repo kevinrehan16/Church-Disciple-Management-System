@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaLaptopHouse, FaLaptop, FaMobileAlt, FaUserShield, FaUsers, FaUserPlus, FaEye } from "react-icons/fa";
-import { Sprout, CalendarClock, MapPinHouse } from 'lucide-react';
+import { Sprout, CalendarClock, MapPinHouse, UserSearch } from 'lucide-react';
 import GrowthGroupMemberModal from '../../components/modals/growthgroupmemberModals/GrowthGroupMemberModal';
 import ViewGrowthGroupMembersModal from '../../components/modals/growthgroupmemberModals/ViewGrowthGroupMembersModal';
 import ModuleHeader from '../../components/ui/ModuleHeader';
@@ -87,7 +87,16 @@ export default function GrowthGroupsMembers() {
           title="Growth Group Members"
           description="Monitor and organize small groups, leadership structures, and schedules."
           icon={<Sprout size={24} />}
-          
+          actions={
+            <button 
+              className="group relative overflow-hidden flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-semibold transition-all duration-200 active:scale-95"
+              // onClick={() => handleViewProfile('')}
+            >
+              <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-200" />
+              <UserSearch size={16} className="transition-transform duration-300 relative z-10" />
+              <span className="relative z-10">For Follow Ups</span>
+            </button>
+        }
         />
 
         <div className="flex flex-col md:flex-row items-center gap-4 justify-between w-full bg-transparent">
