@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\Permission\PermissionController;
 use App\Http\Controllers\Api\V1\Role\RoleController;
 use App\Http\Controllers\Api\V1\UserRole\UserRoleController;
 use App\Http\Controllers\Api\V1\DiscipleNetwork\DiscipleNetworkController;
+use App\Http\Controllers\Api\V1\Imports\MemberExcelController;
 
 Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
@@ -93,5 +94,9 @@ Route::prefix('v1')->group(function () {
 
         // Disciple Network
         Route::get('/disciple-network', [DiscipleNetworkController::class, 'index']);
+
+        Route::prefix('import')->group(function () {
+            Route::post('/members', [MemberExcelController::class, 'import']);
+        });
     });
 });
