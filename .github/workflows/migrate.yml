@@ -2,7 +2,7 @@ name: Run Database Migrations to Supabase
 
 on:
   push:
-    branches: [staging, main]
+    branches: [main]
 
 jobs:
   migrate-supabase:
@@ -23,24 +23,14 @@ jobs:
           cd backend
           composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Select Supabase Credentials based on Branch
-        id: set_credentials
+      - name: Select Production Supabase Credentials
         run: |
-          if [ "${{ github.ref_name }}" == "main" ]; then
-            echo "Using PRODUCTION Supabase credentials..."
-            echo "DB_HOST=${{ secrets.PROD_DB_HOST }}" >> $GITHUB_ENV
-            echo "DB_DATABASE=${{ secrets.PROD_DB_DATABASE }}" >> $GITHUB_ENV
-            echo "DB_USERNAME=${{ secrets.PROD_DB_USERNAME }}" >> $GITHUB_ENV
-            echo "DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}" >> $GITHUB_ENV
-            echo "DB_PORT=${{ secrets.PROD_DB_PORT }}" >> $GITHUB_ENV
-          else
-            echo "Using STAGING Supabase credentials..."
-            echo "DB_HOST=${{ secrets.STAGING_DB_HOST }}" >> $GITHUB_ENV
-            echo "DB_DATABASE=${{ secrets.STAGING_DB_DATABASE }}" >> $GITHUB_ENV
-            echo "DB_USERNAME=${{ secrets.STAGING_DB_USERNAME }}" >> $GITHUB_ENV
-            echo "DB_PASSWORD=${{ secrets.STAGING_DB_PASSWORD }}" >> $GITHUB_ENV
-            echo "DB_PORT=${{ secrets.STAGING_DB_PORT }}" >> $GITHUB_ENV
-          fi
+          echo "Using PRODUCTION Supabase credentials..."
+          echo "DB_HOST=${{ secrets.PROD_DB_HOST }}" >> $GITHUB_ENV
+          echo "DB_DATABASE=${{ secrets.PROD_DB_DATABASE }}" >> $GITHUB_ENV
+          echo "DB_USERNAME=${{ secrets.PROD_DB_USERNAME }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "DB_PORT=${{ secrets.PROD_DB_PORT }}" >> $GITHUB_ENV
 
       - name: Run Migrations to Supabase Live Database
         run: |
