@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { X, Filter, ArrowUpDown, ChevronDown } from 'lucide-react';
+import { X, Filter, ChevronDown } from 'lucide-react';
 import { FaMars, FaVenus, FaMobileAlt, FaFacebook, FaCalendarAlt, FaMapMarkerAlt, FaUserCheck } from 'react-icons/fa';
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import SearchInput from '../../inputs/SearchInput';

@@ -364,7 +364,6 @@ export default function GrowthGroupsMembers() {
         <FollowUpModal 
           isOpen={isFollowUpModalOpen}
           onClose={() => setIsFollowUpModalOpen(false)}
-          growthGroupId={selectedGroupForView}
         />
       )}
     </div>
