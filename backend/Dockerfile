@@ -1,15 +1,16 @@
 FROM php:8.2-cli
 
-# Install system dependencies, PostgreSQL driver, at GD extension requirements
+# Install system dependencies, PostgreSQL driver, GD, at ZIP extension requirements
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libpng-dev \
     libjpeg-dev \
+    libzip-dev \
     zip \
     unzip \
     git \
     && docker-php-ext-configure gd --with-jpeg \
-    && docker-php-ext-install pdo pdo_pgsql gd
+    && docker-php-ext-install pdo pdo_pgsql gd zip
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
