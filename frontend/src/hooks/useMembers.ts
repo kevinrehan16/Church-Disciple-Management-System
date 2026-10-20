@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-// I-import natin ang 'patientService' imbes na yung individual functions
+// I-import natin ang 'MemberService' imbes na yung individual functions
 import { memberService } from '../services/memberService';
 import { type Member } from '../types/typeMember';
 import { type Pagination } from '../types/typePagination';

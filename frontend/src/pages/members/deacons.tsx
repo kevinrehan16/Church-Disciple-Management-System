@@ -60,7 +60,7 @@ export default function Deacons() {
             <table className="w-full text-left text-sm border-separate border-spacing-0">
                 <thead className="sticky top-0 z-10 bg-[var(--active-parent)]">
                   <tr className="text-white uppercase tracking-wider text-[10px] font-extrabold border-b border-slate-200/60">
-                    <th className="px-6 py-4">Patient Details</th>
+                    <th className="px-6 py-4">Member Details</th>
                     <th className="px-6 py-4 text-center">Member Position</th>
                     <th className="px-6 py-4">Church Details</th>
                     <th className="px-6 py-4 text-center">Life-Stage</th>
