@@ -21,8 +21,11 @@ export default function FollowUpModal({
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPositions, setSelectedPositions] = useState<string[]>(['Follow Up']); 
+  const [selectedGrowthGroupStatuses, setSelectedGrowthGroupStatuses] = useState<string[]>(['No Growth Group']); 
+  const [isGrowthGroupDropdownOpen, setIsGrowthGroupDropdownOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const growthGroupDropdownRef = useRef<HTMLDivElement>(null);
 
   const positionOptions = [
     'Senior Pastor',
@@ -38,6 +41,7 @@ export default function FollowUpModal({
     search: searchTerm,
     page: currentPage,
     member_position: selectedPositions.length > 0 ? selectedPositions : "Follow Up",
+    growth_group_statuses: selectedGrowthGroupStatuses,
   });
 
   const currentMembers = apiResponse?.data || [];
@@ -47,6 +51,10 @@ export default function FollowUpModal({
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
+      }
+
+      if (growthGroupDropdownRef.current && !growthGroupDropdownRef.current.contains(event.target as Node)) {
+        setIsGrowthGroupDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -58,6 +66,17 @@ export default function FollowUpModal({
       const updated = prev.includes(position)
         ? prev.filter(p => p !== position)
         : [...prev, position];
+      
+      return updated;
+    });
+    setCurrentPage(1); // Balik sa page 1 kapag nagbago ang filter
+  };
+
+  const handleGrowthGroupCheckboxChange = (growthgroup: string) => {
+    setSelectedGrowthGroupStatuses(prev => {
+      const updated = prev.includes(growthgroup)
+        ? prev.filter(gg => gg !== growthgroup)
+        : [...prev, growthgroup];
       
       return updated;
     });
@@ -102,6 +121,7 @@ export default function FollowUpModal({
 
         {/* Scrollable Form Body */}
         <div className="p-3 overflow-y-auto space-y-2 flex-1">
+            
             <div className="flex flex-col md:flex-row items-center gap-4 justify-between w-full bg-transparent">
                 <SearchInput 
                 value={searchTerm}
@@ -111,79 +131,159 @@ export default function FollowUpModal({
                 }}
                 placeholder="Search by member's name..."
                 />
-                
-                <div className="flex items-center gap-2.5 w-full md:w-auto justify-end relative" ref={dropdownRef}>
-                    <button
-                    type="button"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className={`flex items-center gap-2 px-4 py-3 bg-white text-slate-600 rounded-xl text-sm font-semibold shadow-sm transition-all outline-none border
-                        ${isDropdownOpen
-                        ? 'border-[var(--active-parent,rgb(249,115,22))] ring-4 ring-[var(--active-parent,rgb(249,115,22))]/15' 
-                        : 'border-slate-200/80 hover:bg-slate-50'}`}
-                    >
-                    {/* Lalabas ang orange color kung bukas ang dropdown o kung may napiling filter */}
-                    <Filter 
-                        size={14} 
-                        className={isDropdownOpen ? 'text-[var(--active-parent,rgb(249,115,22))]' : 'text-slate-500'} 
-                    />
-                    
-                    <span>Member Position {selectedPositions.length > 0 && `(${selectedPositions.length})`}</span>
-                    
-                    <ChevronDown 
-                        size={14} 
-                        className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-[var(--active-parent,rgb(249,115,22))]' : 'text-slate-400'}`} 
-                    />
-                    </button>
 
-                    {/* Dropdown Menu */}
-                    {isDropdownOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-200/80 rounded-xl shadow-lg py-2 z-50">
-                        <div className="px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        Filter by Position
-                        </div>
-                        <div className="max-h-60 overflow-y-auto px-1">
-                        {positionOptions.map((pos) => {
-                            const isChecked = selectedPositions.includes(pos);
-                            return (
-                            <label
-                                key={pos}
-                                className={`flex items-center gap-3 px-3 py-2 mt-0.5 rounded-lg cursor-pointer text-sm font-medium transition-colors ${
-                                isChecked ? 'bg-[var(--active-parent,rgb(16,185,129))]/10 text-[var(--active-parent,rgb(16,185,129))]-700' : 'text-slate-600 hover:bg-slate-50'
-                                }`}
-                            >
-                                <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={() => handleCheckboxChange(pos)}
-                                style={{
-                                    accentColor: 'var(--active-parent, rgb(16, 185, 129))'
-                                }}
-                                className="w-4 h-4 rounded border-slate-300 cursor-pointer"
-                                />
-                                <span className={isChecked ? 'text-[var(--active-parent,rgb(16,185,129))] font-semibold' : ''}>
-                                {pos}
-                                </span>
-                            </label>
-                            );
-                        })}
-                        </div>
-                        {selectedPositions.length > 0 && (
-                        <div className="border-t border-slate-100 mt-1 pt-1 px-2">
-                            <button
-                            type="button"
-                            onClick={() => {
-                                setSelectedPositions([]);
-                                setCurrentPage(1);
-                            }}
-                            className="w-full text-center py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                            >
-                            Clear Filters
-                            </button>
-                        </div>
-                        )}
-                    </div>
-                    )}
+                {/* FOR MEMBER POSITIOn FILTER */}
+        <div className='flex items-center justify-center gap-1'>
+          <div className="flex items-center gap-2.5 w-full md:w-auto justify-end relative" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className={`flex items-center gap-2 px-4 py-3 bg-white text-slate-600 rounded-xl text-sm font-semibold shadow-sm transition-all outline-none border
+                ${isDropdownOpen
+                  ? 'border-[var(--active-parent,rgb(249,115,22))] ring-4 ring-[var(--active-parent,rgb(249,115,22))]/15' 
+                  : 'border-slate-200/80 hover:bg-slate-50'}`}
+            >
+              {/* Lalabas ang orange color kung bukas ang dropdown o kung may napiling filter */}
+              <Filter 
+                size={14} 
+                className={isDropdownOpen ? 'text-[var(--active-parent,rgb(249,115,22))]' : 'text-slate-500'} 
+              />
+              
+              <span>Member Position {selectedPositions.length > 0 && `(${selectedPositions.length})`}</span>
+              
+              <ChevronDown 
+                size={14} 
+                className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-[var(--active-parent,rgb(249,115,22))]' : 'text-slate-400'}`} 
+              />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-200/80 rounded-xl shadow-lg py-2 z-50">
+                <div className="px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Filter by Position
                 </div>
+                <div className="max-h-60 overflow-y-auto px-1">
+                  {positionOptions.map((pos) => {
+                    const isChecked = selectedPositions.includes(pos);
+                    return (
+                      <label
+                        key={pos}
+                        className={`flex items-center gap-3 px-3 py-2 mt-0.5 rounded-lg cursor-pointer text-sm font-medium transition-colors ${
+                          isChecked ? 'bg-[var(--active-parent,rgb(16,185,129))]/10 text-[var(--active-parent,rgb(16,185,129))]-700' : 'text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => handleCheckboxChange(pos)}
+                          style={{
+                            accentColor: 'var(--active-parent, rgb(16, 185, 129))'
+                          }}
+                          className="w-4 h-4 rounded border-slate-300 cursor-pointer"
+                        />
+                        <span className={isChecked ? 'text-[var(--active-parent,rgb(16,185,129))] font-semibold' : ''}>
+                          {pos}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+                {selectedPositions.length > 0 && (
+                  <div className="border-t border-slate-100 mt-1 pt-1 px-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedPositions([]);
+                        setCurrentPage(1);
+                      }}
+                      className="w-full text-center py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* FOR GROWTHGROUP FILTER */}
+          <div className="flex items-center gap-2.5 w-full md:w-auto justify-end relative" ref={growthGroupDropdownRef}>
+            <button
+              type="button"
+              onClick={() => setIsGrowthGroupDropdownOpen(!isGrowthGroupDropdownOpen)}
+              className={`flex items-center gap-2 px-4 py-3 bg-white text-slate-600 rounded-xl text-sm font-semibold shadow-sm transition-all outline-none border
+                ${isGrowthGroupDropdownOpen
+                  ? 'border-[var(--active-parent,rgb(16,185,129))] ring-4 ring-[var(--active-parent,rgb(16,185,129))]/15' 
+                  : 'border-slate-200/80 hover:bg-slate-50'}`}
+            >
+              <Filter 
+                size={14} 
+                className={isGrowthGroupDropdownOpen ? 'text-[var(--active-parent,rgb(16,185,129))]' : 'text-slate-500'} 
+              />
+              
+              <span>Growth Group {selectedGrowthGroupStatuses.length > 0 && `(${selectedGrowthGroupStatuses.length})`}</span>
+              
+              <ChevronDown 
+                size={14} 
+                className={`transition-transform duration-200 ${isGrowthGroupDropdownOpen ? 'rotate-180 text-[var(--active-parent,rgb(16,185,129))]' : 'text-slate-400'}`} 
+              />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isGrowthGroupDropdownOpen && (
+              <div className="absolute right-0 top-full mt-2 w-60 bg-white border border-slate-200/80 rounded-xl shadow-lg py-2 z-50">
+                <div className="px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Filter by Growth Group
+                </div>
+                <div className="max-h-60 overflow-y-auto px-1">
+                  {[
+                    { label: 'Growth Group Member', value: 'GrowthGroup Member' },
+                    { label: 'No Growth Group', value: 'No Growth Group' }
+                  ].map((item) => {
+                    const isChecked = selectedGrowthGroupStatuses.includes(item.value);
+                    return (
+                      <label
+                        key={item.value}
+                        className={`flex items-center gap-3 px-3 py-2 mt-0.5 rounded-lg cursor-pointer text-sm font-medium transition-colors ${
+                          isChecked ? 'bg-[var(--active-parent,rgb(16,185,129))]/10 text-[var(--active-parent,rgb(16,185,129))]-700' : 'text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => handleGrowthGroupCheckboxChange(item.value)}
+                          style={{
+                            accentColor: 'var(--active-parent, rgb(16, 185, 129))'
+                          }}
+                          className="w-4 h-4 rounded border-slate-300 cursor-pointer"
+                        />
+                        <span className={isChecked ? 'text-[var(--active-parent,rgb(16,185,129))] font-semibold' : ''}>
+                          {item.label}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+                {selectedGrowthGroupStatuses.length > 0 && (
+                  <div className="border-t border-slate-100 mt-1 pt-1 px-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedGrowthGroupStatuses([]);
+                        setCurrentPage(1);
+                      }}
+                      className="w-full text-center py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+                
             </div>
 
             <div className="w-full bg-white border border-slate-200/60 rounded-xl shadow-sm overflow-hidden">

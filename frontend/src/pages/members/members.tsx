@@ -10,10 +10,19 @@ import { useMembers } from '../../hooks/useMembers';
 import RegisterMemberModal from '../../components/modals/memberModals/RegisterMemberModal';
 
 export default function Members() {
+  const positionOptions = [
+    'Senior Pastor',
+    'Pastor',
+    'Pastoral Staff',
+    'Deacon',
+    'Elder',
+    'Member' // Katumbas ng No Growth Group, Growth Group Member, Growth Group Leader
+  ];
+
   const { hasPermission } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedPositions, setSelectedPositions] = useState<string[]>([]); 
+  const [selectedPositions, setSelectedPositions] = useState<string[]>(positionOptions); 
   const [selectedBaptismStatuses, setSelectedBaptismStatuses] = useState<string[]>([]); 
   const [selectedGrowthGroupStatuses, setSelectedGrowthGroupStatuses] = useState<string[]>([]); 
   
@@ -23,15 +32,6 @@ export default function Members() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const baptismDropdownRef = useRef<HTMLDivElement>(null);
   const growthGroupDropdownRef = useRef<HTMLDivElement>(null);
-
-  const positionOptions = [
-    'Senior Pastor',
-    'Pastor',
-    'Pastoral Staff',
-    'Deacon',
-    'Elder',
-    'Member' // Katumbas ng No Growth Group, Growth Group Member, Growth Group Leader
-  ];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
