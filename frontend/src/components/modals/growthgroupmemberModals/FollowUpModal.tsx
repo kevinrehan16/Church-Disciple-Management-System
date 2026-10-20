@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { X, Filter, ChevronDown } from 'lucide-react';
+import { X, Filter, ChevronDown, Upload } from 'lucide-react';
 import { FaMars, FaVenus, FaMobileAlt, FaFacebook, FaCalendarAlt, FaMapMarkerAlt, FaUserCheck } from 'react-icons/fa';
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import SearchInput from '../../inputs/SearchInput';
 import { useMembers } from '../../../hooks/useMembers';
 import {TableLoading, TableError, TableEmpty} from '../../ui/TableStates';
+import ImportFollowUpModal from './ImportFollowUpModal';
 
 interface FollowUpModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ export default function FollowUpModal({
   isOpen, 
   onClose
 }: FollowUpModalProps) {
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const { isClosing, startClose, handleAnimationEnd } = modalAnimation(onClose);
   const [currentPage, setCurrentPage] = useState(1);
@@ -361,9 +363,27 @@ export default function FollowUpModal({
           >
             <X size={15} /> Cancel
           </button>
+          <button
+            type="button"
+            onClick={() => setIsImportOpen(true)}
+            className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider bg-blue-600 text-white hover:bg-blue-700 rounded-xl transition-all flex items-center gap-2"
+          >
+            <Upload size={15} /> Import
+          </button>
         </div>
 
       </div>
+
+      {isImportOpen && (
+        <ImportFollowUpModal 
+          isOpen={isImportOpen}
+          onClose={() => setIsImportOpen(false)}
+          onSuccess={() => {  
+            refetch(); // I-refresh ang listahan ng members pagkatapos mag-import
+            setIsImportOpen(false); // Isara ang modal pagkatapos ng matagumpay na import
+          }}
+        />
+      )}
     </div>
   );
 }
