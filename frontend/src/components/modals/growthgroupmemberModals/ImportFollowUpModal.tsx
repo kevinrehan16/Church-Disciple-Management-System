@@ -2,7 +2,15 @@ import { useState } from 'react';
 import { FaFileExcel, FaUpload, FaSpinner, FaCheckCircle, FaTimes } from 'react-icons/fa';
 import  {useImportMembers } from '../../../hooks/useMembers';
 
-export default function ImportFollowUpModal({ isOpen, onClose, onSuccess }) {
+export default function ImportFollowUpModal({
+  isOpen,
+  onClose,
+  onSuccess,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess?: () => void;
+}) {
   const [file, setFile] = useState<File | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
   
