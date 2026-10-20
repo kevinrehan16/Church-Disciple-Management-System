@@ -44,7 +44,7 @@ export const useAddGrowthGroupMember = () => {
       queryClient.invalidateQueries({ queryKey: ['members'] });
     },
     onError: (error: any) => {
-      console.error("Add Growth Group Member failed:", error.response?.data || error.message);
+      console.error("Add for Follow-Up Members failed:", error.response?.data || error.message);
     }
   });
 };

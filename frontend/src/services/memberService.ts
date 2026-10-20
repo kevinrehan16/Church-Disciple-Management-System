@@ -35,5 +35,18 @@ export const memberService = {
     const { data } = await apiClient.put(`/members/${id}/`, memberData);
     return data;
   },
+
+  importExcel: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await apiClient.post('/import/members', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data;
+  },
   
 };

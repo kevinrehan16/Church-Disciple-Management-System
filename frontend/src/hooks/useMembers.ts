@@ -56,3 +56,15 @@ export const useUpdateMember = () => {
     }
   });
 };
+
+export const useImportMembers = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (file: File) => memberService.importExcel(file),
+    onSuccess: () => {
+      // I-invalidate ang members cache para mag-update agad ang listahan kapag na-save na
+      queryClient.invalidateQueries({ queryKey: ['members'] });
+    },
+  });
+};
