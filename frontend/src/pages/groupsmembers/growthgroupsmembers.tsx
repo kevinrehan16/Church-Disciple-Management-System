@@ -4,6 +4,7 @@ import { FaLaptopHouse, FaLaptop, FaMobileAlt, FaUserShield, FaUsers, FaUserPlus
 import { Sprout, CalendarClock, MapPinHouse, UserSearch } from 'lucide-react';
 import GrowthGroupMemberModal from '../../components/modals/growthgroupmemberModals/GrowthGroupMemberModal';
 import ViewGrowthGroupMembersModal from '../../components/modals/growthgroupmemberModals/ViewGrowthGroupMembersModal';
+import FollowUpModal from '../../components/modals/growthgroupmemberModals/FollowUpModal';
 import ModuleHeader from '../../components/ui/ModuleHeader';
 import LoadingChurchCard from '../../components/ui/LoadingChurchCard';
 import SearchInput from '../../components/inputs/SearchInput';
@@ -47,6 +48,8 @@ export default function GrowthGroupsMembers() {
 
   const [isViewMembersModalOpen, setIsViewMembersModalOpen] = useState(false);
   const [selectedGroupForView, setSelectedGroupForView] = useState<number | null>(null);
+
+  const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
   
   const handleViewGrowthGroup = (id: number | null) => {
     setSelectedGrowthGroupId(id);
@@ -85,16 +88,16 @@ export default function GrowthGroupsMembers() {
       <div className="px-6 py-4 space-y-4 shrink-0">
         <ModuleHeader
           title="Growth Group Members"
-          description="Monitor and organize small groups, leadership structures, and schedules."
+          description="Monitor and organize Growth-groups, leadership structures, and schedules."
           icon={<Sprout size={24} />}
           actions={
             <button 
               className="group relative overflow-hidden flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-semibold transition-all duration-200 active:scale-95"
-              // onClick={() => handleViewProfile('')}
+              onClick={() => setIsFollowUpModalOpen(true)}
             >
               <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-200" />
               <UserSearch size={16} className="transition-transform duration-300 relative z-10" />
-              <span className="relative z-10">For Follow Ups</span>
+              <span className="relative z-10">Follow Up List</span>
             </button>
         }
         />
@@ -354,6 +357,13 @@ export default function GrowthGroupsMembers() {
           onClose={() => setIsViewMembersModalOpen(false)}
           growthGroupId={selectedGroupForView}
           growthGroupName="Dasma Central Growth Group" // Pwede mong dinamihin based sa napiling group item
+        />
+      )}
+
+      {isFollowUpModalOpen && (
+        <FollowUpModal 
+          isOpen={isFollowUpModalOpen}
+          onClose={() => setIsFollowUpModalOpen(false)}
         />
       )}
     </div>
