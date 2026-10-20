@@ -93,7 +93,7 @@ export default function AdminDashboard() {
   ];
 
   // 11. First-Time Guest Registry (Live Follow-up)
-  const recentPatients = [
+  const recentMembers = [
     { id: "GT-001", name: "Carmela Dizon", type: "Young Pro", status: "Assigned", time: "10:24 AM", doctor: "Ptr. Reyes" },
     { id: "GT-002", name: "Joshua Garcia", type: "Campus", status: "Unassigned", time: "09:45 AM", doctor: "Pending" },
     { id: "GT-003", name: "Elena Cruz", type: "Couples", status: "Contacted", time: "09:12 AM", doctor: "Ptr. Mendoza" },
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* =========================================================================
-          SECTION 3: ANALYTICS COMPLEX (Financial Progress & Patient Inflow)
+          SECTION 3: ANALYTICS COMPLEX (Financial Progress & Member Inflow)
          ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
@@ -402,7 +402,7 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="text-xs font-bold">
-                {recentPatients.map((guest, idx) => (
+                {recentMembers.map((guest, idx) => (
                   <tr key={idx} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                     <td className="px-6 py-3.5 text-slate-700">
                       <div className="font-extrabold">{guest.name}</div>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { X, Filter, ChevronDown, Upload } from 'lucide-react';
+import { X, Filter, ChevronDown, Upload, ShieldCheck, Sprout, CircleX } from 'lucide-react';
 import { FaMars, FaVenus, FaMobileAlt, FaFacebook, FaCalendarAlt, FaMapMarkerAlt, FaUserCheck } from 'react-icons/fa';
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import SearchInput from '../../inputs/SearchInput';
@@ -109,7 +109,7 @@ export default function FollowUpModal({
                     setSearchTerm(val);
                     setCurrentPage(1); // I-reset sa Page 1 tuwing nag-a-update ang search
                 }}
-                placeholder="Search by patient information..."
+                placeholder="Search by member's name..."
                 />
                 
                 <div className="flex items-center gap-2.5 w-full md:w-auto justify-end relative" ref={dropdownRef}>
@@ -191,10 +191,10 @@ export default function FollowUpModal({
                     <table className="w-full text-left text-sm border-separate border-spacing-0">
                         <thead className="sticky top-0 z-10 bg-[var(--active-parent)]">
                         <tr className="text-white uppercase tracking-wider text-[10px] font-extrabold border-b border-slate-200/60">
-                            <th className="px-6 py-4">Patient Details</th>
-                            <th className="px-6 py-4 text-center">Contacts</th>
-                            <th className="px-6 py-4">Social Media</th>
+                            <th className="px-6 py-4">Member Details</th>
+                            <th className="px-6 py-4">Growth Group</th>
                             <th className="px-6 py-4">Availability</th>
+                            <th className="px-6 py-4 text-center">Contacts</th>
                             <th className="px-6 py-4 text-center">Area of Residence</th>
                             <th className="px-6 py-4 text-center">Endorse To</th>
                         </tr>
@@ -246,22 +246,44 @@ export default function FollowUpModal({
                                         </div>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center gap-2 text-xs font-medium text-slate-700">
-                                        <FaMobileAlt className="text-slate-400 shrink-0" size={13} />
-                                        <span>{member.mobile_number || 'No contact'}</span>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center gap-2 text-xs font-medium text-indigo-600">
-                                        <FaFacebook className="text-indigo-500 shrink-0" size={13} />
-                                        <span className="truncate">{member.facebook_name || 'N/A'}</span>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="flex flex-col gap-1.5 items-start">
+                                        {member.growth_groups && member.growth_groups.length > 0 ? (
+                                            <div className="flex flex-col gap-1">
+                                                {member.growth_groups.map((groupName: string, index: number) => (
+                                                    <div key={index} className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 px-0.5">
+                                                        <Sprout size={13} className="shrink-0 text-emerald-500" />
+                                                        <span>{groupName}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="inline-flex items-center gap-1.5 text-xs text-slate-400 italic px-0.5">
+                                                <CircleX size={13} className="shrink-0 text-slate-400" />
+                                                <span>No GrowthGroup</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-2 text-xs text-slate-600">
                                         <FaCalendarAlt className="text-amber-500 shrink-0" size={13} />
                                         <span className="font-medium text-slate-700">{member.available_days_time || 'Not specified'}</span>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4">
+                                    <div className="flex flex-col space-y-1.5 text-xs">
+                                        {/* Mobile Number (Taas) */}
+                                        <div className="flex items-center gap-2 font-medium text-slate-700">
+                                            <FaMobileAlt className="text-slate-400 shrink-0" size={13} />
+                                            <span>{member.mobile_number || 'No contact'}</span>
+                                        </div>
+
+                                        {/* Facebook Name (Baba) */}
+                                        <div className="flex items-center gap-2 font-medium text-indigo-600">
+                                            <FaFacebook className="text-indigo-500 shrink-0" size={13} />
+                                            <span className="truncate">{member.facebook_name || 'N/A'}</span>
+                                        </div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">

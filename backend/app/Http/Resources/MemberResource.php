@@ -93,6 +93,7 @@ class MemberResource extends JsonResource
             'cluster_leader_name'       => trim(($this->cluster?->leader?->first_name ?? '') . ' ' . ($this->cluster?->leader?->last_name ?? '')),
             'has_growth_group' => $this->growthGroups->isNotEmpty(),
             'is_growth_group_leader' => $this->ledGrowthGroups->isNotEmpty(),
+            'growth_groups' => $this->growthGroups ? $this->growthGroups->pluck('name') : [],
 
             // SPIRITUAL GIFTS
             'spiritual_gifts' => SpiritualGiftResource::collection($this->whenLoaded('spiritualGifts')),

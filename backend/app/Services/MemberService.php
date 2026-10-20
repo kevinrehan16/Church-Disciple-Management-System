@@ -11,7 +11,7 @@ class MemberService
 
     public function getPaginatedMembers($request, $position = null, ?int $rank = null)
     {
-        return Member::with(['user', 'church', 'cluster', 'spiritualGifts'])
+        return Member::with(['user', 'church', 'cluster', 'spiritualGifts', 'growthGroups'])
             // 1. FILTER BY POSITION
             ->byPosition($position)
             ->byRank($rank)
