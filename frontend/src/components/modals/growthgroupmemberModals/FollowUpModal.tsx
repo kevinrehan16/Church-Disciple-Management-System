@@ -193,10 +193,10 @@ export default function FollowUpModal({
                         <tr className="text-white uppercase tracking-wider text-[10px] font-extrabold border-b border-slate-200/60">
                             <th className="px-6 py-4">Member Details</th>
                             <th className="px-6 py-4">Growth Group</th>
+                            <th className="px-6 py-4">Endorsed To</th>
                             <th className="px-6 py-4">Availability</th>
-                            <th className="px-6 py-4 text-center">Contacts</th>
-                            <th className="px-6 py-4 text-center">Area of Residence</th>
-                            <th className="px-6 py-4 text-center">Endorse To</th>
+                            <th className="px-6 py-4">Contacts</th>
+                            <th className="px-6 py-4">Area of Residence</th>
                         </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -246,21 +246,45 @@ export default function FollowUpModal({
                                         </div>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="flex flex-col gap-1.5 items-start">
+                                {/* 1. GROWTH GROUPS COLUMN (Pangalan lang ng Growth Groups) */}
+                                <td className="px-6 py-4">
+                                    <div className="flex flex-col gap-2 items-start">
                                         {member.growth_groups && member.growth_groups.length > 0 ? (
-                                            <div className="flex flex-col gap-1">
-                                                {member.growth_groups.map((groupName: string, index: number) => (
-                                                    <div key={index} className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 px-0.5">
+                                            member.growth_groups.map((group: any, index: number) => {
+                                                const groupName = typeof group === 'object' ? group.name : group;
+                                                return (
+                                                    <div key={index} className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 py-1">
                                                         <Sprout size={13} className="shrink-0 text-emerald-500" />
                                                         <span>{groupName}</span>
                                                     </div>
-                                                ))}
-                                            </div>
+                                                );
+                                            })
                                         ) : (
-                                            <div className="inline-flex items-center gap-1.5 text-xs text-slate-400 italic px-0.5">
+                                            <div className="inline-flex items-center gap-1.5 text-xs text-slate-400 italic px-0.5 py-1">
                                                 <CircleX size={13} className="shrink-0 text-slate-400" />
                                                 <span>No GrowthGroup</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </td>
+
+                                {/* 2. LEADER COLUMN (Nakatapat per row sa bawat grupo kung dalawa man) */}
+                                <td className="px-6 py-4">
+                                    <div className="flex flex-col gap-2 items-start">
+                                        {member.growth_groups && member.growth_groups.length > 0 ? (
+                                            member.growth_groups.map((group: any, index: number) => {
+                                                const leaderName = typeof group === 'object' ? group.leader_name : null;
+                                                return (
+                                                    <div key={index} className="inline-flex items-center gap-1.5 text-xs text-slate-600 py-1">
+                                                        <FaUserCheck className="text-emerald-500 shrink-0" size={13} />
+                                                        <span className="font-medium text-slate-700">{leaderName || 'No Leader'}</span>
+                                                    </div>
+                                                );
+                                            })
+                                        ) : (
+                                            <div className="inline-flex items-center gap-1.5 text-xs text-slate-400 italic py-1">
+                                                <FaUserCheck className="text-slate-300 shrink-0" size={13} />
+                                                <span>{member.indorsed_to || 'None'}</span>
                                             </div>
                                         )}
                                     </div>
@@ -294,13 +318,6 @@ export default function FollowUpModal({
                                         </span>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center gap-2 text-xs text-slate-600">
-                                        <FaUserCheck className="text-emerald-500 shrink-0" size={13} />
-                                        <span className="font-medium text-slate-700">{member.indorsed_to || 'None'}</span>
-                                    </div>
-                                </td>
-                            
                             </tr>
                             ))
                         ) : (
