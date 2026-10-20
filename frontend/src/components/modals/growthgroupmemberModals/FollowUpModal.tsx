@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { X, Filter, ChevronDown, Upload, ShieldCheck, Sprout, CircleX } from 'lucide-react';
+import { X, Filter, ChevronDown, Upload, Sprout, CircleX } from 'lucide-react';
 import { FaMars, FaVenus, FaMobileAlt, FaFacebook, FaCalendarAlt, FaMapMarkerAlt, FaUserCheck } from 'react-icons/fa';
 import { modalAnimation } from '../../../utils/ModalAnimation';
 import SearchInput from '../../inputs/SearchInput';
