@@ -36,6 +36,7 @@ export default function AttendancePage() {
                         sessionId={selectedSession.id}
                         sessionTitle={selectedSession.title} 
                         sessionStatus={selectedSession.status} 
+                        // Renamed AttendanceChecker
                     />
                 </div>
             )}
