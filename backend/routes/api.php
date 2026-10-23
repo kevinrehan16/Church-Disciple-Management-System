@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\V1\Role\RoleController;
 use App\Http\Controllers\Api\V1\UserRole\UserRoleController;
 use App\Http\Controllers\Api\V1\DiscipleNetwork\DiscipleNetworkController;
 use App\Http\Controllers\Api\V1\Imports\MemberExcelController;
+use App\Http\Controllers\Api\V1\Attendance\AttendanceSessionController;
+use App\Http\Controllers\Api\V1\Attendance\AttendanceController;
 
 Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
@@ -97,6 +99,22 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('import')->group(function () {
             Route::post('/members', [MemberExcelController::class, 'import']);
+        });
+
+        Route::prefix('attendance')->group(function () {
+            Route::get('/sessions', [AttendanceController::class, 'index']);
+            // 1. Gumawa ng Session
+            Route::post('/sessions', [AttendanceSessionController::class, 'store']);
+
+            // 2. Buksan ang Session at i-generate ang Roster
+            Route::post('/sessions/{id}/open', [AttendanceSessionController::class, 'openSession']);
+
+            Route::get('/sessions/{sessionId}/records', [AttendanceSessionController::class, 'getRecords']);
+            // 3. I-update ang status ng isang miyembro sa session (Present, Absent, etc.)
+            Route::patch('/sessions/{sessionId}/records/{recordId}', [AttendanceSessionController::class, 'updateRecord']);
+
+            // 4. Magdagdag ng Walk-in / Visitor (May anti-duplicate check)
+            Route::post('/sessions/{sessionId}/visitors', [AttendanceController::class, 'storeVisitor']);
         });
     });
 });

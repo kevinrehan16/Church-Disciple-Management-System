@@ -17,6 +17,9 @@ import Elders from './pages/members/elders';
 import Deacons from './pages/members/deacons';
 
 import Visitors from './pages/visitors/visitors';
+
+import AttendancePage from './pages/attendance/AttendancePage';
+
 import DiscipleNetwork from './pages/disciplenetwork/disciplenetwork';
 import GrowthGroupsMembers from './pages/groupsmembers/growthgroupsmembers';
 import ClusterGroupMembers from './pages/groupsmembers/clustergroupmembers';
@@ -67,6 +70,8 @@ function App() {
                   <Route path="/members/deacons" element={<Deacons />} />
 
                   <Route path="/visitors" element={<Visitors />} />
+
+                  <Route path="/attendance" element={<AttendancePage />} />
 
                   <Route path="/disciple-network" element={<DiscipleNetwork />} />
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { FaUsers, FaUserFriends, FaNetworkWired, FaLayerGroup, FaChartArea, FaCogs, FaAddressCard, FaHandHoldingHeart, FaKey, FaUserShield, FaUsersCog } from "react-icons/fa";
+import { FaUsers, FaUserFriends, FaNetworkWired, FaLayerGroup, FaChartArea, FaCogs, FaAddressCard, FaHandHoldingHeart, FaKey, FaUserShield, FaUsersCog, FaClipboardList } from "react-icons/fa";
 import { Settings, ChevronDown, ChevronRight } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { getInitials } from '../../utils/formatters';
@@ -249,6 +249,21 @@ export default function Sidebar({
                 </div>
               )}
             </div>)}
+
+            {/* VISITORS */}
+            <div className="relative group/attendance">
+              <NavLink to="/attendance" className={getNavLinkClass}>
+                <FaClipboardList size={18} className="shrink-0" />
+                <span className={`overflow-hidden transition-all duration-300 whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0 ml-0' : 'max-w-[200px] opacity-100 ml-3'}`}>
+                  Attendance
+                </span>
+              </NavLink>
+              {isCollapsed && (
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-md shadow-lg pointer-events-none opacity-0 group-hover/attendance:opacity-100 transition-opacity duration-150 z-50 whitespace-nowrap border border-slate-700/50">
+                  Attendance
+                </div>
+              )}
+            </div>
 
             {/* DISCIPLE NETWORK */}
             <div className="relative group/network">
