@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import AttendanceSessions, { type SelectedSessionData } from './AttendanceSessions';
-import AttendanceChecker from './AttendanceChecker'; // Checking...
+import AttendanceChecker from './AttendanceChecker';
 
 export default function AttendancePage() {
     const [currentView, setCurrentView] = useState<'sessions' | 'checker'>('sessions');
