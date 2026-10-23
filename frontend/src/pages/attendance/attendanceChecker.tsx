@@ -11,9 +11,10 @@ export default function AttendanceChecker({ sessionId, sessionTitle, sessionStat
     const [search, setSearch] = useState('');
     const [isVisitorModalOpen, setIsVisitorModalOpen] = useState(false);
     
+    // Naayos ang property names to match CreateVisitorPayload
     const [visitorForm, setVisitorForm] = useState({
-        firstname: '',
-        lastname: '',
+        first_name: '',
+        last_name: '',
         mobile_number: ''
     });
 
@@ -21,7 +22,8 @@ export default function AttendanceChecker({ sessionId, sessionTitle, sessionStat
     const { mutate: updateStatus } = useUpdateAttendance();
     const { mutate: addVisitor, isPending: isSubmittingVisitor } = useAddWalkInVisitor();
 
-    const safeRecords = Array.isArray(records) ? records : (records?.data || []);
+    // Ligtas na pag-cast para maiwasan ang 'never' type error
+    const safeRecords = Array.isArray(records) ? records : ((records as any)?.data || []);
     
     const filteredRecords = safeRecords.filter((record: any) => {
         if (!record || !record.member) return false;
@@ -30,18 +32,19 @@ export default function AttendanceChecker({ sessionId, sessionTitle, sessionStat
         return fullName.includes(search.toLowerCase()) || mobile.includes(search);
     });
 
-    const handleUpdateStatus = (recordId: any, newStatus: string) => {
+    // Nilagyan ng explicit union type ang newStatus para maalis ang TS2322 error
+    const handleUpdateStatus = (recordId: any, newStatus: 'present' | 'absent' | 'late' | 'excused' | 'unmarked') => {
         updateStatus({ recordId, payload: { status: newStatus } });
     };
 
     const handleVisitorSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!visitorForm.firstname || !visitorForm.lastname) return;
+        if (!visitorForm.first_name || !visitorForm.last_name) return;
 
         addVisitor({ sessionId, visitorData: visitorForm }, {
             onSuccess: () => {
                 setIsVisitorModalOpen(false);
-                setVisitorForm({ firstname: '', lastname: '', mobile_number: '' });
+                setVisitorForm({ first_name: '', last_name: '', mobile_number: '' });
             }
         });
     };
@@ -162,8 +165,8 @@ export default function AttendanceChecker({ sessionId, sessionTitle, sessionStat
                                 <input
                                     type="text"
                                     required
-                                    value={visitorForm.firstname}
-                                    onChange={(e) => setVisitorForm({...visitorForm, firstname: e.target.value})}
+                                    value={visitorForm.first_name}
+                                    onChange={(e) => setVisitorForm({...visitorForm, first_name: e.target.value})}
                                     className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:outline-none text-sm"
                                 />
                             </div>
@@ -172,8 +175,8 @@ export default function AttendanceChecker({ sessionId, sessionTitle, sessionStat
                                 <input
                                     type="text"
                                     required
-                                    value={visitorForm.lastname}
-                                    onChange={(e) => setVisitorForm({...visitorForm, lastname: e.target.value})}
+                                    value={visitorForm.last_name}
+                                    onChange={(e) => setVisitorForm({...visitorForm, last_name: e.target.value})}
                                     className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:outline-none text-sm"
                                 />
                             </div>

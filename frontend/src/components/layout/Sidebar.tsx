@@ -250,7 +250,7 @@ export default function Sidebar({
               )}
             </div>)}
 
-            {/* VISITORS */}
+            {/* ATTENDANCE */}
             <div className="relative group/attendance">
               <NavLink to="/attendance" className={getNavLinkClass}>
                 <FaClipboardList size={18} className="shrink-0" />

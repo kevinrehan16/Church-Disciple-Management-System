@@ -23,8 +23,7 @@ export default function AttendanceSessions({ onSelectSession }: { onSelectSessio
     const { data: sessionsResponse, isLoading, isError } = useAttendanceSessions({ search });
     const { mutate: createSession, isPending: isCreating } = useCreateAttendanceSession();
 
-    const sessions = sessionsResponse?.data 
-        || sessionsResponse?.results 
+    const sessions = sessionsResponse?.data  
         || (Array.isArray(sessionsResponse) ? sessionsResponse : []);
 
     const handleCreateSubmit = (e: React.FormEvent) => {
