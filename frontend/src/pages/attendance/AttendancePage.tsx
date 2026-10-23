@@ -21,7 +21,6 @@ export default function AttendancePage() {
                 <AttendanceSessions onSelectSession={handleOpenChecker} />
             ) : (
                 <div>
-                    {/* Back Button */}
                     <div className="bg-white px-8 py-4 border-b border-gray-100 flex items-center shadow-sm">
                         <button
                             onClick={() => setCurrentView('sessions')}
@@ -31,12 +30,10 @@ export default function AttendancePage() {
                         </button>
                     </div>
 
-                    {/* Ipinapasa ang id, title, at status sa checker */}
                     <AttendanceChecker 
                         sessionId={selectedSession.id}
                         sessionTitle={selectedSession.title} 
                         sessionStatus={selectedSession.status} 
-                        // Renamed AttendanceChecker
                     />
                 </div>
             )}
