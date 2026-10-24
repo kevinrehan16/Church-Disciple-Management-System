@@ -52,7 +52,7 @@ export default function AttendanceSessions({ onSelectSession }: { onSelectSessio
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Attendance Sessions</h1>
-                    <p className="text-sm text-gray-500 mt-1">Pumili o lumikha ng sesyon para mag-check ng live attendance.</p>
+                    <p className="text-sm text-gray-500 mt-1">Select or create a session to check live attendance.</p>
                 </div>
                 
                 <button
