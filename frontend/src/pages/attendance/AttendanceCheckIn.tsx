@@ -64,7 +64,7 @@ export default function AttendanceCheckIn({ sessionId, sessionTitle, sessionStat
                             {sessionStatus || 'open'}
                         </span>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">Direktang nagbabasa at sumusulat sa database records.</p>
+                    <p className="text-sm text-gray-500 mt-1">Directly reads and writes database records.</p>
                 </div>
                 
                 <button
@@ -78,7 +78,7 @@ export default function AttendanceCheckIn({ sessionId, sessionTitle, sessionStat
             <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
                 <input
                     type="text"
-                    placeholder="Maghanap ng miyembro o mobile number..."
+                    placeholder="Search for a member or mobile number..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full md:w-96 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"
@@ -93,7 +93,7 @@ export default function AttendanceCheckIn({ sessionId, sessionTitle, sessionStat
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-gray-50/75 text-gray-400 text-xs uppercase tracking-wider font-semibold border-b border-gray-100">
-                                <th className="p-5">Pangalan ng Miyembro</th>
+                                <th className="p-5">Member</th>
                                 <th className="p-5">Mobile Number</th>
                                 <th className="p-5">Uri</th>
                                 <th className="p-5">Status</th>
@@ -158,7 +158,7 @@ export default function AttendanceCheckIn({ sessionId, sessionTitle, sessionStat
             {isVisitorModalOpen && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl border border-gray-100">
-                        <h2 className="text-xl font-bold mb-4 text-gray-900">Magrehistro ng Walk-in Visitor</h2>
+                        <h2 className="text-xl font-bold mb-4 text-gray-900">Register Walk-in Visitor</h2>
                         <form onSubmit={handleVisitorSubmit} className="space-y-4">
                             <div>
                                 <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">First Name</label>
