@@ -61,7 +61,9 @@ class Member extends Model
         'comment',
         'user_added',
         'user_updated',
-        'interviewby_member_id'
+        'interviewby_member_id',
+        'church_group_id',
+        'is_visitor',
     ];
 
     public function user(): BelongsTo
@@ -107,6 +109,11 @@ class Member extends Model
             // I-lookup ang rank base sa position. Default is 5.
             $member->position_rank = self::RANK_MAP[$member->member_position] ?? 5;
         });
+    }
+
+    public function getFullNameAttribute()
+    {
+        return "{$this->firstname} {$this->lastname}";
     }
 
     // Scope para sa pag-sort
@@ -171,5 +178,16 @@ class Member extends Model
     public function interviewer()
     {
         return $this->belongsTo(Member::class, 'interviewby_member_id');
+    }
+
+    public function churchGroup(): BelongsTo
+    {
+        return $this->belongsTo(ChurchGroup::class, 'church_group_id');
+    }
+
+    // Attendance records ng member
+    public function attendanceRecords(): HasMany
+    {
+        return $this->hasMany(AttendanceRecord::class, 'member_id');
     }
 }
