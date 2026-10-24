@@ -26,7 +26,7 @@ export default function AttendancePage() {
                             onClick={() => setCurrentView('sessions')}
                             className="text-sm font-semibold text-pink-600 hover:text-pink-700 flex items-center gap-2 transition"
                         >
-                            <span>← Bumalik sa Sessions List</span>
+                            <span>← Back to Sessions List</span>
                         </button>
                     </div>
 

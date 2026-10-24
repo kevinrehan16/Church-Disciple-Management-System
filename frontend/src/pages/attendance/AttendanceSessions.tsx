@@ -67,7 +67,7 @@ export default function AttendanceSessions({ onSelectSession }: { onSelectSessio
             <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
                 <input
                     type="text"
-                    placeholder="Maghanap ng sesyon..."
+                    placeholder="Search sessions..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full md:w-96 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"
@@ -118,7 +118,7 @@ export default function AttendanceSessions({ onSelectSession }: { onSelectSessio
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl border border-gray-100">
-                        <h2 className="text-xl font-bold mb-4 text-gray-900">Lumikha ng Bagong Sesyon</h2>
+                        <h2 className="text-xl font-bold mb-4 text-gray-900">Create New Session</h2>
                         <form onSubmit={handleCreateSubmit} className="space-y-4">
                             <div>
                                 <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Session Title</label>
