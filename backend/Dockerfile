@@ -1,4 +1,4 @@
-FROM php:8.2-cli
+FROM php:8.2.35-cli
 
 # Install system dependencies, PostgreSQL driver, GD, at ZIP extension requirements
 RUN apt-get update && apt-get install -y \

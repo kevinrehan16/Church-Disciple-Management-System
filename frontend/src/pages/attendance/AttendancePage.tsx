@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import AttendanceSessions, { type SelectedSessionData } from './AttendanceSessions';
-import AttendanceChecker from './AttendanceChecker';
+import AttendanceCheckIn from './AttendanceCheckIn';
 
 export default function AttendancePage() {
     const [currentView, setCurrentView] = useState<'sessions' | 'checker'>('sessions');
@@ -30,7 +30,7 @@ export default function AttendancePage() {
                         </button>
                     </div>
 
-                    <AttendanceChecker 
+                    <AttendanceCheckIn 
                         sessionId={selectedSession.id}
                         sessionTitle={selectedSession.title} 
                         sessionStatus={selectedSession.status} 

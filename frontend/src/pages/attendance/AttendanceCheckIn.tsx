@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useSessionRecords, useUpdateAttendance, useAddWalkInVisitor } from '../../hooks/useAttendance';
 
-interface AttendanceCheckerProps {
+interface AttendanceCheckInProps {
     sessionId: number | string;
     sessionTitle?: string;
     sessionStatus?: string;
 }
 
-export default function AttendanceChecker({ sessionId, sessionTitle, sessionStatus }: AttendanceCheckerProps) {
+export default function AttendanceCheckIn({ sessionId, sessionTitle, sessionStatus }: AttendanceCheckInProps) {
     const [search, setSearch] = useState('');
     const [isVisitorModalOpen, setIsVisitorModalOpen] = useState(false);
     
