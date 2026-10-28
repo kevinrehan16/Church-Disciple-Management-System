@@ -1,7 +1,7 @@
-sentry.io - For checking ISSUES and ERRORS
+sentry.io - For checking ISSUES and ERRORS.
 
-Vercel - For my react frontend
+Vercel - For my react frontend.
 
-Render - For my Laravel backend
+Render - For my Laravel backend.
 
 Supabase - For my PostgreSQL database.
